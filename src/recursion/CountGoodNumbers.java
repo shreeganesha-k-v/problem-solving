@@ -19,7 +19,7 @@ public class CountGoodNumbers {
         long evenChoices = 5; // Even digits: 0, 2, 4, 6, 8
         long oddChoices = 4; // Prime digits: 2, 3, 5, 7
 
-        long totalGoodNumbers = (modularExponentiation(evenChoices, evenCount, mod) * modularExponentiation(oddChoices, oddCount, mod)) % mod;
+        long totalGoodNumbers = ((long) modularExponentiation(evenChoices, evenCount, mod) * modularExponentiation(oddChoices, oddCount, mod)) % mod;
 
         return (int) totalGoodNumbers;
     }
