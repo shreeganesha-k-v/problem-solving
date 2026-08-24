@@ -1,0 +1,72 @@
+import java.util.concurrent.*;
+
+public class FutureExample {
+    public static void main(String[] args) throws ExecutionException, InterruptedException {
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+
+        // Submit a task to the executor
+        Future<Integer> future = executor.submit(() -> {
+            Thread.sleep(2000); // Simulate a long-running task
+            return 42;
+        });
+
+        System.out.println("Task submitted. Waiting for result...");
+
+        // Get the result (this will block until the computation is complete)
+        Integer result = future.get();
+        System.out.println("Result: " + result);
+
+        executor.shutdown();
+    }
+}
+
+
+
+
+
+import java.util.concurrent.CompletableFuture;
+
+public class CompletableFutureExample {
+    public static void main(String[] args) {
+        System.out.println("Task started...");
+
+        // Run a task asynchronously
+        CompletableFuture<Integer> future = CompletableFuture.supplyAsync(() -> {
+            try {
+                Thread.sleep(2000); // Simulate a long-running task
+            } catch (InterruptedException e) {
+                throw new IllegalStateException(e);
+            }
+            return 42;
+        });
+
+        // Add a callback to handle the result
+        future.thenAccept(result -> {
+            System.out.println("Result: " + result);
+        });
+
+        System.out.println("Waiting for result...");
+    }
+}
+/* 
+
+supplyAsync(Supplier<T>)	Asynchronous computation with result
+runAsync(Runnable)	Asynchronous computation without result
+thenApply(Function<T, R>)	Transforms result synchronously
+thenApplyAsync(Function<T, R>)	Transforms result asynchronously
+thenAccept(Consumer<T>)	Consumes result without returning anything
+thenRun(Runnable)	Runs after completion, no input/output
+thenCombine(CompletableFuture<U>, BiFunction<T, U, R>)	Combines two futures
+thenCompose(Function<T, CompletableFuture<R>>)	Chains dependent futures
+allOf(CompletableFuture<?>...)	Waits for all futures to complete
+anyOf(CompletableFuture<?>...)	Waits for first completed future
+exceptionally(Function<Throwable, T>)	Provides fallback on failure
+handle(BiFunction<T, Throwable, R>)	Handles both success and failure
+complete(T value)	Manually completes a future
+completeExceptionally(Throwable)	Manually completes with an error
+get()	Blocks until future is completed
+join()	Similar to get() but throws CompletionException
+
+
+
+*/

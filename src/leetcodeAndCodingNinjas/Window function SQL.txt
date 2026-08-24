@@ -1,0 +1,150 @@
+============================================================================================================================================
+Link (https://chatgpt.com/share/67d6b900-5f7c-8005-bb5a-934009d59de7 IMP IMP IMP window function with parition by)
+1. RANK() - Assigns a Rank with Gaps
+RANK() assigns a ranking number to each row in order, with gaps when values are equal.
+Example: Rank Employees by Salary
+SELECT id, name, salary,
+       RANK() OVER (ORDER BY salary DESC) AS rank
+FROM employees;
+Output
+ID	Name	Salary	Rank
+3	Alice	90000	1
+5	John	85000	2
+1	Bob	    85000	2
+4	Mike	78000	4
+2	Sara	75000	5
+📌 Note: Since John and Bob have the same salary, they get rank 2, and the next rank is 4 (skipping 3).
+
+2. DENSE_RANK() - Assigns a Rank Without Gaps
+DENSE_RANK() works like RANK() but does not leave gaps.
+Example
+SELECT id, name, salary,
+       DENSE_RANK() OVER (ORDER BY salary DESC) AS dense_rank
+FROM employees;
+Output
+ID	Name	Salary	Dense Rank
+3	Alice	90000	1
+5	John	85000	2
+1	Bob	85000	2
+4	Mike	78000	3
+2	Sara	75000	4
+📌 No gaps in ranking; rank 3 follows 2 directly.
+
+3. ROW_NUMBER() - Assigns a Unique Rank
+ROW_NUMBER() assigns a unique rank without gaps even for duplicate values.
+
+Example
+SELECT id, name, salary,
+       ROW_NUMBER() OVER (ORDER BY salary DESC) AS row_num
+FROM employees;
+Output
+ID	Name	Salary	Row Number
+3	Alice	90000	1
+5	John	85000	2
+1	Bob	    85000	3
+4	Mike	78000	4
+2	Sara	75000	5
+📌 Each row gets a unique number, even for duplicate values.
+
+4. NTILE(n) - Divides Rows into Equal Buckets
+NTILE(n) distributes rows into n equal groups.
+
+Example: Divide Employees into 3 Groups
+SELECT id, name, salary,
+       NTILE(3) OVER (ORDER BY salary DESC) AS bucket
+FROM employees;
+Output
+ID	Name	Salary	Bucket
+3	Alice	90000	1
+5	John	85000	1
+1	Bob	85000	2
+4	Mike	78000	2
+2	Sara	75000	3
+📌 Divides rows into 3 equal-sized groups.
+
+5. SUM() - Running Total
+Computes a cumulative sum over a window.
+Example: Running Total of Salaries
+SELECT id, name, salary,
+       SUM(salary) OVER (ORDER BY salary DESC) AS running_total
+FROM employees;
+Output
+ID	Name	Salary	Running Total
+3	Alice	90000	90000
+5	John	85000	175000
+1	Bob	85000	260000
+4	Mike	78000	338000
+2	Sara	75000	413000
+📌 Each row adds the salary to the total of previous rows.
+
+6. AVG() - Moving Average
+Calculates the average over a window.
+
+Example: Moving Average of Salaries
+SELECT id, name, salary,
+       AVG(salary) OVER (ORDER BY salary ROWS BETWEEN 2 PRECEDING AND CURRENT ROW) AS moving_avg
+FROM employees;
+📌 Calculates the average of the current row and the two preceding rows.
+
+7. LAG() - Previous Row’s Value
+LAG() fetches the value from the previous row.
+
+Example: Compare Current and Previous Salaries
+SELECT id, name, salary,
+       LAG(salary) OVER (ORDER BY salary DESC) AS prev_salary
+FROM employees;
+Output
+ID	Name	Salary	Prev Salary
+3	Alice	90000	NULL
+5	John	85000	90000
+1	Bob	85000	85000
+4	Mike	78000	85000
+2	Sara	75000	78000
+📌 First row has NULL because there is no previous row.
+
+8. LEAD() - Next Row’s Value
+LEAD() fetches the value from the next row.
+
+Example: Compare Current and Next Salaries
+SELECT id, name, salary,
+       LEAD(salary) OVER (ORDER BY salary DESC) AS next_salary
+FROM employees;
+Output
+ID	Name	Salary	Next Salary
+3	Alice	90000	85000
+5	John	85000	85000
+1	Bob	85000	78000
+4	Mike	78000	75000
+2	Sara	75000	NULL
+📌 Last row has NULL because there is no next row.
+
+9. FIRST_VALUE() - First Row in Window
+Fetches the first value in the window.
+
+Example: Find Highest Salary in the Department
+SELECT id, name, salary, department,
+       FIRST_VALUE(salary) OVER (PARTITION BY department ORDER BY salary DESC) AS top_salary
+FROM employees;
+📌 Finds the highest salary in each department.
+
+10. LAST_VALUE() - Last Row in Window
+Fetches the last value in the window.
+
+Example: Find Lowest Salary in the Department
+SELECT id, name, salary, department,
+       LAST_VALUE(salary) OVER (PARTITION BY department ORDER BY salary DESC ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) AS lowest_salary
+FROM employees;
+📌 Finds the lowest salary in each department.
+
+Summary of Window Functions
+Function	Purpose
+RANK()	Assigns rank with gaps
+DENSE_RANK()	Assigns rank without gaps
+ROW_NUMBER()	Assigns a unique row number
+NTILE(n)	Divides rows into n buckets
+SUM()	Running total
+AVG()	Moving average
+LAG()	Previous row’s value
+LEAD()	Next row’s value
+FIRST_VALUE()	First row’s value in partition
+LAST_VALUE()	Last row’s value in partition

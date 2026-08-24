@@ -1,0 +1,1578 @@
+You are given an integer array banned and two integers n and maxSum. You are choosing some number of integers following the below rules:
+The chosen integers have to be in the range [1, n].Each integer can be chosen at most once.The chosen integers should not be in the array banned.The sum of the chosen integers should not exceed maxSum.Return the maximum number of integers you can choose following the mentioned rules.
+
+Example 1:
+Input: banned = [1,6,5], n = 5, maxSum = 6
+Output: 2
+Explanation: You can choose the integers 2 and 4.
+2 and 4 are from the range [1, 5], both did not appear in banned, and their sum is 6, which did not exceed maxSum.
+Example 2:
+Input: banned = [1,2,3,4,5,6,7], n = 8, maxSum = 1
+Output: 0
+Explanation: You cannot choose any integer while following the mentioned conditions.
+Example 3:
+Input: banned = [11], n = 7, maxSum = 50
+Output: 7
+Explanation: You can choose the integers 1, 2, 3, 4, 5, 6, and 7.
+They are from the range [1, 7], all did not appear in banned, and their sum is 28, which did not exceed maxSum.
+
+class Solution {
+    public int maxCount(int[] banned, int n, int maxSum) {
+        
+        Set<Integer> ban = IntStream.of(banned).boxed().collect(Collectors.toSet());
+
+        int count = 0;
+        int sum = 0;
+        for(int i=1;i<=n;i++){
+            if(!ban.contains(i)&& sum+i<=maxSum){
+                count++;
+                sum += i;
+            }
+        }
+        return count;
+    }
+}
+========================================================================================================================
+Given an array of positive integers nums and a positive integer target, return the minimal length of a 
+subarray whose sum is greater than or equal to target. If there is no such subarray, return 0 instead.
+
+Example 1:Input: target = 7, nums = [2,3,1,2,4,3]                  Output: 2
+Explanation: The subarray [4,3] has the minimal length under the problem constraint.
+Example 2:Input: target = 4, nums = [1,4,4]                        Output: 1
+Example 3:Input: target = 11, nums = [1,1,1,1,1,1,1,1]             Output: 0
+
+public class Solution {
+    public int minSubArrayLen(int target, int[] nums) {
+        int n = nums.length;
+        int minLength = Integer.MAX_VALUE; // Initialize with a large value
+        int currentSum = 0; // To store the sum of the current window
+        int start = 0; // Start pointer of the window
+        for (int end = 0; end < n; end++) {
+            currentSum += nums[end]; // Add the current number to the sum
+
+            // Shrink the window until the sum is less than the target
+            while (currentSum >= target) {
+                minLength = Math.min(minLength, end - start + 1); // Update minimal length
+                currentSum -= nums[start]; // Remove the element at the start
+                start++; // Move the start pointer forward
+            }
+        }
+        // If minLength was not updated, return 0 (no valid subarray found)
+        return minLength == Integer.MAX_VALUE ? 0 : minLength;
+    }
+}
+=====================================================================================================================
+You are given a 0-indexed 2D integer array of events where events[i] = [startTimei, endTimei, valuei]. The ith event starts at startTimei and ends at endTimei, and if you attend this event, you will receive a value of valuei. You can choose at most two non-overlapping events to attend such that the sum of their values is maximized.Return this maximum sum.Note that the start time and end time is inclusive: that is, you cannot attend two events where one of them starts and the other ends at the same time. More specifically, if you attend an event with end time t, the next event must start at or after t + 1.
+Example 1:
+Input: events = [[1,3,2],[4,5,2],[2,4,3]]
+Output: 4
+Explanation: Choose the green events, 0 and 1 for a sum of 2 + 2 = 4.
+Example 2:
+Example 1 Diagram
+Input: events = [[1,3,2],[4,5,2],[1,5,5]]
+Output: 5
+Explanation: Choose event 2 for a sum of 5.
+Example 3:
+Input: events = [[1,5,3],[1,5,1],[6,6,5]]
+Output: 8
+Explanation: Choose events 0 and 2 for a sum of 3 + 5 = 8.
+
+class Solution {
+    public int maxTwoEvents(int[][] events) {
+        // Sort events by end time (ascending)
+        Arrays.sort(events, (a, b) -> Integer.compare(a[1], b[1]));
+        int n = events.length;
+
+        // Precompute the maximum value of events up to index `i`
+        int[] maxSum = new int[n];
+        maxSum[0] = events[0][2];
+        for (int i = 1; i < n; i++) {
+            maxSum[i] = Math.max(maxSum[i - 1], events[i][2]);
+        }
+
+        int resSum = 0;
+        int j = 0; // Sliding window pointer
+
+        for (int i = 0; i < n; i++) {
+            // Slide `j` to find the first event that does not overlap with `i`
+            while (j < i && events[j][1] < events[i][0]) {
+                j++;
+            }
+
+            // Calculate the current maximum sum:
+            // - Current event value (`events[i][2]`)
+            // - Add the maximum value from non-overlapping events (if any)
+            int currMax = events[i][2];
+            if (j > 0) {
+                currMax += maxSum[j - 1];
+            }
+
+            // Update the result with the maximum sum found so far
+            resSum = Math.max(resSum, currMax);
+        }
+
+        return resSum;
+    }
+}
+==============================================================================================================================
+Given two strings ransomNote and magazine, return true if ransomNote can be constructed by using the letters from magazine and false otherwise.Each letter in magazine can only be used once in ransomNote.
+Example 1:
+Input: ransomNote = "a", magazine = "b"           Output: false
+Example 2:
+Input: ransomNote = "aa", magazine = "ab"         Output: false
+Example 3:
+Input: ransomNote = "aa", magazine = "aab"        Output: true
+ 
+class Solution {
+    public boolean canConstruct(String ransomNote, String magazine) {
+        // Create a frequency map for the letters in the magazine
+        int[] charCount = new int[26]; // Assuming only lowercase letters a-z
+
+        // Fill the frequency array with counts from the magazine
+        for (char c : magazine.toCharArray()) {
+            charCount[c - 'a']++;
+        }
+
+        // Check if ransomNote can be constructed
+        for (char c : ransomNote.toCharArray()) {
+            if (charCount[c - 'a'] == 0) {
+                return false; // Not enough of this character in magazine
+            }
+            charCount[c - 'a']--; // Use one occurrence of this character
+        }
+
+        return true; // All characters in ransomNote can be constructed
+    }
+}
+============================================================================================================================
+An array is considered special if every pair of its adjacent elements contains two numbers with different parity.
+You are given an array of integer nums and a 2D integer matrix queries, where for queries[i] = [fromi, toi] your task is to check that 
+subarray nums[fromi..toi] is special or not.Return an array of booleans answer such that answer[i] is true if nums[fromi..toi] is special.
+
+Example 1:
+Input: nums = [3,4,1,2,6], queries = [[0,4]]                 Output: [false]
+Explanation: The subarray is [3,4,1,2,6]. 2 and 6 are both even.
+Example 2:
+Input: nums = [4,3,1,6], queries = [[0,2],[2,3]]     Output: [false,true]
+Explanation:
+The subarray is [4,3,1]. 3 and 1 are both odd. So the answer to this query is false.
+The subarray is [1,6]. There is only one pair: (1,6) and it contains numbers with different parity. So the answer to this query is true.
+class Solution {
+    public boolean[] isArraySpecial(int[] nums, int[][] queries) {
+        int n = queries.length;
+        boolean[] res = new boolean[n];
+
+        for (int i = 0; i < n; i++) {
+            int start = queries[i][0];
+            int end = queries[i][1];
+            res[i] = isSpecial(nums, start, end);
+        }
+
+        return res;
+    }
+
+    private boolean isSpecial(int[] nums, int start, int end) {
+        // Check adjacent pairs
+        for (int i = start; i < end; i++) {
+            // If adjacent elements have the same parity, subarray is not special
+            if (nums[i] % 2 == nums[i + 1] % 2) {
+                return false;
+            }
+        }
+        return true; // All adjacent pairs have different parity
+    }
+}
+=============================================================================================================================
+You are given a string s that consists of lowercase English letters.A string is called special if it is made up of only a single character. For example, the string "abc" is not special, whereas the strings "ddd", "zz", and "f" are special.Return the length of the longest special substring of s which occurs at least thrice, or -1 if no special substring occurs at least thrice.
+A substring is a contiguous non-empty sequence of characters within a string.
+
+Example 1:Input: s = "aaaa"                           Output: 2
+Explanation: The longest special substring which occurs thrice is "aa": substrings "aaaa", "aaaa", and "aaaa".
+It can be shown that the maximum length achievable is 2.
+Example 2:Input: s = "abcdef"                         Output: -1
+Explanation: There exists no special substring which occurs at least thrice. Hence return -1.
+Example 3:Input: s = "abcaba"                         Output: 1
+Explanation: The longest special substring which occurs thrice is "a": substrings "abcaba", "abcaba", and "abcaba".
+It can be shown that the maximum length achievable is 1.
+
+public class LongestSpecialSubstring {
+    public static int longestSpecialSubstring(String s) {
+        int n = s.length();
+        int result = -1;
+
+        // Iterate over all possible lengths of special substrings
+        for (int len = 1; len <= n; len++) {
+            HashMap<String, Integer> substringCount = new HashMap<>();
+
+            // Count the occurrences of each substring of length len
+            for (int i = 0; i <= n - len; i++) {
+                String substring = s.substring(i, i + len);
+
+                // Check if substring is special (all characters same)
+                if (isSpecial(substring)) {
+                    substringCount.put(substring, substringCount.getOrDefault(substring, 0) + 1);
+                }
+            }
+
+            // Check if any special substring of this length occurs at least 3 times
+            for (int count : substringCount.values()) {
+                if (count >= 3) {
+                    result = len; // Update result to the current length
+                }
+            }
+        }
+
+        return result;
+    }
+    // Helper function to check if a string is special (all characters are the same)
+    private static boolean isSpecial(String s) {
+        char firstChar = s.charAt(0);
+        for (char c : s.toCharArray()) {
+            if (c != firstChar) {
+                return false;
+            }
+        }
+        return true;
+    }
+}
+===========================================================================================================================
+Given a string s, find the first non-repeating character in it and return its index. If it does not exist, return -1.
+Example 1:Input: s = "leetcode"                          Output: 0
+Explanation:The character 'l' at index 0 is the first character that does not occur at any other index.
+Example 2:Input: s = "loveleetcode"                     Output: 2
+Example 3:Input: s = "aabb"                              Output: -1
+
+class Solution {
+    public int firstUniqChar(String s) {
+        int[] charCount = new int[26];
+        for (char c : s.toCharArray()) {
+            charCount[c - 'a']++;
+        }
+        // Find the first character with a frequency of 1
+        for (int i = 0; i < s.length(); i++) {
+            if (charCount[s.charAt(i) - 'a'] == 1) {
+                return i;
+            }
+        }
+        return -1;
+    }
+}
+or
+
+public class Solution {
+    public static int firstUniqChar(String s) {
+        return s.chars()
+            .mapToObj(c -> (char) c)
+            .collect(Collectors.groupingBy(
+                Function.identity(), LinkedHashMap::new, Collectors.counting()))
+            .entrySet().stream()
+            .filter(e -> e.getValue() == 1)
+            .map(e -> s.indexOf(e.getKey()))
+            .findFirst()
+            .orElse(-1);
+    }
+}
+
+=============================================================================================================================
+You are given an array nums consisting of positive integers.Starting with score = 0, apply the following algorithm:
+Choose the smallest integer of the array that is not marked. If there is a tie, choose the one with the smallest index.Add the value of the chosen integer to score.Mark the chosen element and its two adjacent elements if they exist.Repeat until all the array elements are marked.Return the score you get after applying the above algorithm.
+
+Example 1:
+Input: nums = [2,1,3,4,5,2]
+Output: 7
+Explanation: We mark the elements as follows:
+- 1 is the smallest unmarked element, so we mark it and its two adjacent elements: [2,1,3,4,5,2].
+- 2 is the smallest unmarked element, so we mark it and its left adjacent element: [2,1,3,4,5,2].
+- 4 is the only remaining unmarked element, so we mark it: [2,1,3,4,5,2].
+Our score is 1 + 2 + 4 = 7.
+Example 2:
+Input: nums = [2,3,5,1,3,2]
+Output: 5
+Explanation: We mark the elements as follows:
+- 1 is the smallest unmarked element, so we mark it and its two adjacent elements: [2,3,5,1,3,2].
+- 2 is the smallest unmarked element, since there are two of them, we choose the left-most one, so we mark the one at index 0 and its right adjacent element: [2,3,5,1,3,2].
+- 2 is the only remaining unmarked element, so we mark it: [2,3,5,1,3,2].
+Our score is 1 + 2 + 2 = 5.
+
+public class SmallestUnmarkedScore {
+    public static int calculateScore(int[] nums) {
+        int n = nums.length;
+        boolean[] marked = new boolean[n]; // To track marked elements
+        int score = 0;
+
+        while (true) {
+            int minIndex = -1;
+            int minValue = Integer.MAX_VALUE;
+
+            // Find the smallest unmarked element
+            for (int i = 0; i < n; i++) {
+                if (!marked[i] && nums[i] < minValue) {
+                    minValue = nums[i];
+                    minIndex = i;
+                }
+            }
+
+            // If no unmarked elements remain, break the loop
+            if (minIndex == -1) break;
+
+            // Add the value of the smallest unmarked element to the score
+            score += nums[minIndex];
+
+            // Mark the selected element and its two adjacent elements if they exist
+            marked[minIndex] = true;
+            if (minIndex > 0) marked[minIndex - 1] = true; // Left neighbor
+            if (minIndex < n - 1) marked[minIndex + 1] = true; // Right neighbor
+        }
+
+        return score;
+    }
+}
+=====================================================================================================================
+Given an array nums of size n, return the majority element.The majority element is the element that appears more than ⌊n / 2⌋ times. You may assume that the majority element always exists in the array.
+
+Example 1:Input: nums = [3,2,3]                          Output: 3
+Example 2:Input: nums = [2,2,1,1,1,2,2]                  Output: 2
+Boyer mooe voting algorithm
+
+//Boyer-Moore Voting Algorithm
+class Solution {
+    public int majorityElement(int[] nums) {
+        int candidate = nums[0];
+        int count = 0;
+
+        // Step 1: Find a potential candidate
+        for (int num : nums) {
+            if (count == 0) {
+                candidate = num;
+            }
+            count += (num == candidate) ? 1 : -1;
+        }
+
+        // Step 2: Verify the candidate (optional, but unnecessary given the problem guarantees)
+        // In this problem, it is guaranteed that a majority element always exists.
+
+        return candidate;
+    }
+}
+====================================================================================================================
+You are given an integer array nums, an integer k, and an integer multiplier.You need to perform k operations on nums. In each operation:
+Find the minimum value x in nums. If there are multiple occurrences of the minimum value, select the one that appears first.Replace the selected minimum value x with x * multiplier.Return an integer array denoting the final state of nums after performing all k operations.
+
+Example 1:Input: nums = [2,1,3,5,6], k = 5, multiplier = 2                          Output: [8,4,6,5,6]
+Explanation:Operation	Result
+After operation 1	[2, 2, 3, 5, 6]
+After operation 2	[4, 2, 3, 5, 6]
+After operation 3	[4, 4, 3, 5, 6]
+After operation 4	[4, 4, 6, 5, 6]
+After operation 5	[8, 4, 6, 5, 6]
+Example 2:
+Input: nums = [1,2], k = 3, multiplier = 4                                         Output: [16,8]
+Explanation:Operation	Result
+After operation 1	[4, 2]
+After operation 2	[4, 8]
+After operation 3	[16, 8]
+
+class Solution {
+    public int[] getFinalState(int[] nums, int k, int multiplier) {
+        while(k-->0){
+            int[] minArray= findMin(nums);
+            nums[minArray[0]]=multiplier*minArray[1];
+
+        }
+        return nums;
+    }
+
+    private int[] findMin(int[] nums){
+        int j=0,min=nums[0];
+        for(int i=0;i<nums.length;i++){
+            if(nums[i]<min){
+                min=nums[i];
+                j=i;
+            }
+        }
+        return new int[]{j,min};
+    }
+}
+===================================================================================================
+You are given an integer array prices where prices[i] is the price of the ith item in a shop.There is a special discount for items in the shop. If you buy the ith item, then you will receive a discount equivalent to prices[j] where j is the minimum index such that j > i and prices[j] <= prices[i]. Otherwise, you will not receive any discount at all.Return an integer array answer where answer[i] is the final price you will pay for the ith item of the shop, considering the special discount.
+
+Example 1:
+Input: prices = [8,4,6,2,3]
+Output: [4,2,4,2,3]
+Explanation: 
+For item 0 with price[0]=8 you will receive a discount equivalent to prices[1]=4, therefore, the final price you will pay is 8 - 4 = 4.
+For item 1 with price[1]=4 you will receive a discount equivalent to prices[3]=2, therefore, the final price you will pay is 4 - 2 = 2.
+For item 2 with price[2]=6 you will receive a discount equivalent to prices[3]=2, therefore, the final price you will pay is 6 - 2 = 4.
+For items 3 and 4 you will not receive any discount at all.
+Example 2:
+Input: prices = [1,2,3,4,5]
+Output: [1,2,3,4,5]
+Explanation: In this case, for all items, you will not receive any discount at all.
+Example 3:
+Input: prices = [10,1,1,6]
+Output: [9,0,1,6]
+class Solution {
+    public int[] finalPrices(int[] prices) {
+        int n = prices.length;
+
+        for(int i=0;i<n-1;i++){
+            for(int j=i+1;j<n;j++){
+                if(prices[i]>=prices[j]){
+                    prices[i]=prices[i]-prices[j];
+                    break;
+                }
+            }
+        } 
+        return prices;
+    }
+}
+=====================================================================================================================
+Given an integer n, return the count of all numbers with unique digits, x, where 0 <= x < 10n.
+Example 1:Input: n = 2 														Output: 91
+Explanation: The answer should be the total numbers in the range of 0 ≤ x < 100, excluding 11,22,33,44,55,66,77,88,99
+Example 2:Input: n = 0     												   Output: 1
+ 
+public class UniqueDigitNumbers {
+    public static int countNumbersWithUniqueDigits(int n) {
+        // If n is 0, the only number is 0 itself
+        if (n == 0) {
+            return 1;
+        }
+
+        int count = 10; // For n = 1, all numbers from 0 to 9 are valid
+        int uniqueDigits = 9; // Possible digits for the first position (1 to 9)
+        int availableDigits = 9; // Remaining available digits for subsequent positions
+
+        // Calculate for n > 1
+        for (int i = 2; i <= n; i++) {
+            uniqueDigits *= availableDigits; // Multiply by the remaining available digits
+            count += uniqueDigits; // Add to the total count
+            availableDigits--; // Decrease the number of available digits
+        }
+
+        return count;
+    }
+}
+=============================================================================================================================
+You are given an integer array nums and an integer target.You want to build an expression out of nums by adding one of the symbols '+' and '-' before each integer in nums and then concatenate all the integers.For example, if nums = [2, 1], you can add a '+' before 2 and a '-' before 1 and concatenate them to build the expression "+2-1".Return the number of different expressions that you can build, which evaluates to target.
+Example 1:Input: nums = [1,1,1,1,1], target = 3		Output: 5
+Explanation: There are 5 ways to assign symbols to make the sum of nums be target 3.
+-1 + 1 + 1 + 1 + 1 = 3
++1 - 1 + 1 + 1 + 1 = 3
++1 + 1 - 1 + 1 + 1 = 3
++1 + 1 + 1 - 1 + 1 = 3
++1 + 1 + 1 + 1 - 1 = 3
+Example 2:Input: nums = [1], target = 1				Output: 1
+ 
+class Solution {
+    public int findTargetSumWays(int[] nums, int target) {
+        return helper(nums, target, 0, 0);
+    }
+
+    private int helper(int[] arr, int target, int idx, int sum) {
+        if (idx >= arr.length)
+            return sum == target ? 1 : 0;
+        
+        int subtract = helper(arr, target, idx + 1, sum - arr[idx]);
+        int add = helper(arr, target, idx + 1, sum + arr[idx]);
+
+        return subtract + add;
+    }
+}
+
+or
+
+public class TargetSum {
+    public int findTargetSumWays(int[] nums, int target) {
+        // A map to store previously computed results (memoization)
+        Map<String, Integer> memo = new HashMap<>();
+        return calculate(nums, 0, 0, target, memo);
+    }
+
+    private int calculate(int[] nums, int index, int currentSum, int target, Map<String, Integer> memo) {
+        // Base case: if we've processed all numbers
+        if (index == nums.length) {
+            return currentSum == target ? 1 : 0;
+        }
+        
+        // Create a unique key for the current state
+        String key = index + "," + currentSum;
+
+        // Check if the result for the current state is already computed
+        if (memo.containsKey(key)) {
+            return memo.get(key);
+        }
+
+        // Recursively calculate the number of ways by adding or subtracting the current number
+        int add = calculate(nums, index + 1, currentSum + nums[index], target, memo);
+        int subtract = calculate(nums, index + 1, currentSum - nums[index], target, memo);
+
+        // Store the result in the memo map
+        memo.put(key, add + subtract);
+
+        return add + subtract;
+    }
+}
+==================================================================================================================
+You are given an integer array values where values[i] represents the value of the ith sightseeing spot. Two sightseeing spots i and j have a distance j - i between them.The score of a pair (i < j) of sightseeing spots is values[i] + values[j] + i - j: the sum of the values of the sightseeing spots, minus the distance between them.Return the maximum score of a pair of sightseeing spots.
+Example 1:Input: values = [8,1,5,2,6]				Output: 11
+Explanation: i = 0, j = 2, values[i] + values[j] + i - j = 8 + 5 + 0 - 2 = 11
+Example 2:Input: values = [1,2]						Output: 2
+
+
+public class Solution {
+    public int maxScoreSightseeingPair(int[] values) {
+        int maxScore = 0;
+        int maxI = values[0]; // Track the maximum values[i] + i seen so far
+
+        for (int j = 1; j < values.length; j++) {
+            // Calculate the score for the current pair (i, j)
+            maxScore = Math.max(maxScore, maxI + values[j] - j);
+
+            // Update maxI for the next iteration
+            maxI = Math.max(maxI, values[j] + j);
+        }
+
+        return maxScore;
+    }
+}
+==================================================================================================================================
+The passes allow that many days of consecutive travel.For example, if we get a 7-day pass on day 2, then we can travel for 7 days: 2, 3, 4, 5, 6, 7, and 8.Return the minimum number of dollars you need to travel every day in the given list of days.
+
+Example 1:
+Input: days = [1,4,6,7,8,20], costs = [2,7,15]
+Output: 11
+Explanation: For example, here is one way to buy passes that lets you travel your travel plan:
+On day 1, you bought a 1-day pass for costs[0] = $2, which covered day 1.
+On day 3, you bought a 7-day pass for costs[1] = $7, which covered days 3, 4, ..., 9.
+On day 20, you bought a 1-day pass for costs[0] = $2, which covered day 20.
+In total, you spent $11 and covered all the days of your travel.
+Example 2:
+Input: days = [1,2,3,4,5,6,7,8,9,10,30,31], costs = [2,7,15]
+Output: 17
+Explanation: For example, here is one way to buy passes that lets you travel your travel plan:
+On day 1, you bought a 30-day pass for costs[2] = $15 which covered days 1, 2, ..., 30.
+On day 31, you bought a 1-day pass for costs[0] = $2 which covered day 31.
+In total, you spent $17 and covered all the days of your travel.
+
+public class MinimumCostForTickets {
+
+    public static int minCostTickets(int[] days, int[] costs) {
+        // Create a set of travel days for quick lookup
+        Set<Integer> travelDays = new HashSet<>();
+        for (int day : days) {
+            travelDays.add(day);
+        }
+
+        // Find the last day we need to calculate
+        int lastDay = days[days.length - 1];
+
+        // DP array where dp[i] represents the minimum cost to travel up to day i
+        int[] dp = new int[lastDay + 1];
+
+        // Fill DP array
+        for (int i = 1; i <= lastDay; i++) {
+            if (!travelDays.contains(i)) {
+                // If it's not a travel day, the cost remains the same as the previous day
+                dp[i] = dp[i - 1];
+            } else {
+                // Otherwise, calculate the minimum cost for day i
+                dp[i] = Math.min(
+                    dp[i - 1] + costs[0], // Cost of 1-day pass
+                    Math.min(
+                        dp[Math.max(0, i - 7)] + costs[1], // Cost of 7-day pass
+                        dp[Math.max(0, i - 30)] + costs[2] // Cost of 30-day pass
+                    )
+                );
+            }
+        }
+
+        // The answer is the cost to cover all days up to the last travel day
+        return dp[lastDay];
+    }
+}
+========================================================================================================================
+You are given a 0-indexed array of strings words and a 2D array of integers queries.Each query queries[i] = [li, ri] asks us to find the number of strings present in the range li to ri (both inclusive) of words that start and end with a vowel.Return an array ans of size queries.length, where ans[i] is the answer to the ith query.Note that the vowel letters are 'a', 'e', 'i', 'o', and 'u'.
+Example 1:Input: words = ["aba","bcb","ece","aa","e"], queries = [[0,2],[1,4],[1,1]]		Output: [2,3,0]
+Explanation: The strings starting and ending with a vowel are "aba", "ece", "aa" and "e".
+The answer to the query [0,2] is 2 (strings "aba" and "ece").
+to query [1,4] is 3 (strings "ece", "aa", "e").
+to query [1,1] is 0.
+We return [2,3,0].
+Example 2:Input: words = ["a","e","i"], queries = [[0,2],[0,1],[2,2]]			Output: [3,2,1]
+Explanation: Every string satisfies the conditions, so we return [3,2,1].
+
+class Solution {
+   
+    public int[] vowelStrings(String[] words, int[][] queries) {
+        int n = queries.length;
+        int[] res = new int[n];
+        int m = words.length;
+        boolean[] vowels = new boolean[m];
+
+        for(int i=0;i<m;i++){
+            vowels[i]=validateVowel(words[i]);
+        }
+
+        for(int i=0;i<n;i++){
+            int[] temp = queries[i];
+            int ans = 0;
+            for(int j=temp[0];j<=temp[1];j++){
+                if(vowels[j]) ans++;
+            }
+            res[i]=ans;
+        }
+
+        return res;
+    }
+
+    private boolean validateVowel(String s){
+        if(s==null || s.isEmpty()) return false;
+
+        char start = s.charAt(0);
+        char end = s.charAt(s.length()-1);
+
+        return vowel(start) && vowel(end);
+    }
+
+    private boolean vowel(char c){
+        return "aeiou".indexOf(c)!=-1;
+    }
+}
+==========================================================================================================
+You are given a 0-indexed integer array nums of length n.nums contains a valid split at index i if the following are true:The sum of the first i + 1 elements is greater than or equal to the sum of the last n - i - 1 elements.There is at least one element to the right of i. That is, 0 <= i < n - 1.Return the number of valid splits in nums.
+Example 1:Input: nums = [10,4,-8,7]						Output: 2
+Explanation: 
+There are three ways of splitting nums into two non-empty parts:
+- Split nums at index 0. Then, the first part is [10], and its sum is 10. The second part is [4,-8,7], and its sum is 3. Since 10 >= 3, i = 0 is a valid split.
+- Split nums at index 1. Then, the first part is [10,4], and its sum is 14. The second part is [-8,7], and its sum is -1. Since 14 >= -1, i = 1 is a valid split.
+- Split nums at index 2. Then, the first part is [10,4,-8], and its sum is 6. The second part is [7], and its sum is 7. Since 6 < 7, i = 2 is not a valid split.
+Thus, the number of valid splits in nums is 2.
+Example 2:Input: nums = [2,3,1,0]						Output: 2
+Explanation: 
+There are two valid splits in nums:
+- Split nums at index 1. Then, the first part is [2,3], and its sum is 5. The second part is [1,0], and its sum is 1. Since 5 >= 1, i = 1 is a valid split. 
+- Split nums at index 2. Then, the first part is [2,3,1], and its sum is 6. The second part is [0], and its sum is 0. Since 6 >= 0, i = 2 is a valid split.
+
+    public static int countValidSplits(int[] nums) {
+        int n = nums.length;
+        if (n < 2) {
+            return 0; // No valid split if array size is less than 2
+        }
+
+        // Step 1: Calculate prefix and suffix sums
+        long[] prefixSum = new long[n];
+        long[] suffixSum = new long[n];
+
+        prefixSum[0] = nums[0];
+        suffixSum[n - 1] = nums[n - 1];
+
+        for (int i = 1; i < n; i++) {
+            prefixSum[i] = prefixSum[i - 1] + nums[i];
+        }
+
+        for (int i = n - 2; i >= 0; i--) {
+            suffixSum[i] = suffixSum[i + 1] + nums[i];
+        }
+
+        // Step 2: Count valid splits
+        int validSplits = 0;
+        for (int i = 0; i < n - 1; i++) {
+            if (prefixSum[i] >= suffixSum[i + 1]) {
+                validSplits++;
+            }
+        }
+
+        return validSplits;
+    }
+=====================================================================================================================================
+You are given two strings s and t.String t is generated by random shuffling string s and then add one more letter at a random position.
+Return the letter that was added to t.
+Example 1:Input: s = "abcd", t = "abcde"			Output: "e"
+Explanation: 'e' is the letter that was added.
+Example 2:Input: s = "", t = "y"					Output: "y"
+
+public class FindAddedLetter {
+    public char findTheDifference(String s, String t) {
+        // Initialize a variable to store the XOR result
+        char result = 0;
+
+        // XOR all characters in string s
+        for (char c : s.toCharArray()) {
+            result ^= c;
+        }
+
+        // XOR all characters in string t
+        for (char c : t.toCharArray()) {
+            result ^= c;
+        }
+
+        // The result will be the added character
+        return result;
+    }
+}
+===================================================================================
+Swap number without using 3rd variable
+
+int a = 5, b = 3;
+a = a ^ b;
+b = a ^ b;
+a = a ^ b;
+System.out.println("a: " + a + ", b: " + b); // Output: a: 3, b: 5
+==============================================================================================
+Unique number
+
+int[] arr = {1, 2, 3, 2, 1};
+int unique = 0;
+for (int num : arr) {
+    unique ^= num;
+}
+System.out.println("Unique number: " + unique); // Output: 3
+=========================================================================================
+Masking Bits:Example: Check if the 3rd bit of a number is set.java
+
+int num = 5; // Binary: 0101
+if ((num & (1 << 2)) != 0) {
+    System.out.println("3rd bit is set");
+}
+
+Setting Specific Bits:Example: Set the 2nd bit of a number.
+
+int num = 5; // Binary: 0101
+num = num | (1 << 1); // Binary: 0111 (Decimal: 7)
+System.out.println(num); // Output: 7
+==========================================================================================================
+You are given a string s of lowercase English letters and a 2D integer array shifts where shifts[i] = [starti, endi, directioni]. For every i, shift the characters in s from the index starti to the index endi (inclusive) forward if directioni = 1, or shift the characters backward if directioni = 0.Shifting a character forward means replacing it with the next letter in the alphabet (wrapping around so that 'z' becomes 'a'). Similarly, shifting a character backward means replacing it with the previous letter in the alphabet (wrapping around so that 'a' becomes 'z').Return the final string after all such shifts to s are applied.
+
+Example 1:Input: s = "abc", shifts = [[0,1,0],[1,2,1],[0,2,1]]		Output: "ace"
+Explanation: Firstly, shift the characters from index 0 to index 1 backward. Now s = "zac".
+Secondly, shift the characters from index 1 to index 2 forward. Now s = "zbd".
+Finally, shift the characters from index 0 to index 2 forward. Now s = "ace".
+Example 2:Input: s = "dztz", shifts = [[0,0,0],[1,1,1]]				Output: "catz"
+Explanation: Firstly, shift the characters from index 0 to index 0 backward. Now s = "cztz".
+Finally, shift the characters from index 1 to index 1 forward. Now s = "catz".
+
+public class ShiftingString {
+    public static String applyShifts(String s, int[][] shifts) {
+        char[] chars = s.toCharArray();
+
+        // Process each shift operation
+        for (int[] shift : shifts) {
+            int start = shift[0];
+            int end = shift[1];
+            int direction = shift[2];
+
+            // Apply the shift for the given range
+            for (int i = start; i <= end; i++) {
+                if (direction == 1) { // Forward shift
+                    chars[i] = (char) ((chars[i] - 'a' + 1) % 26 + 'a');
+                } else { // Backward shift
+                    chars[i] = (char) ((chars[i] - 'a' - 1 + 26) % 26 + 'a');
+                }
+            }
+        }
+
+        return new String(chars);
+    }
+}
+==================================================================================================================================
+Given an array of integers nums containing n + 1 integers where each integer is in the range [1, n] inclusive.There is only one repeated number in nums, return this repeated number.You must solve the problem without modifying the array nums using only constant extra space.
+Example 1:Input: nums = [1,3,4,2,2]				Output: 2
+Example 2:Input: nums = [3,1,3,4,2]				Output: 3
+Example 3:Input: nums = [3,3,3,3,3]				Output: 3
+
+class Solution {
+    public int findDuplicate(int[] nums) {
+        int fast=nums[0];
+        int slow=nums[0];
+
+        do{
+            slow=nums[slow];
+            fast=nums[nums[fast]];
+        } while(slow!=fast);
+
+        fast=nums[0];
+
+        while(fast!=slow){
+            slow=nums[slow];
+            fast=nums[fast];
+        }
+        return slow;
+    }
+}
+==========================================================================================================================
+function addWithoutArithmetic(a, b) {
+    while (b !== 0) {
+        let carry = a & b;  // Calculate carry
+        a = a ^ b;          // Sum without carry
+        b = carry << 1;     // Shift carry to the next higher bit
+    }
+    return a;
+}
+==============================================================================================================================
+function subtractWithoutArithmetic(a, b) {
+    while (b !== 0) {
+        let borrow = (~a) & b; // Calculate borrow
+        a = a ^ b;             // Perform subtraction without borrow
+        b = borrow << 1;       // Shift borrow to the next higher bit
+    }
+    return a;
+}
+=========================================================================================================
+public class MultiplyWithoutOperator {
+    public static int multiply(int a, int b) {
+        int result = 0;
+        boolean isNegative = false;
+
+        // Handle negative numbers
+        if (a < 0 && b < 0) {
+            a = -a;
+            b = -b;
+        } else if (a < 0) {
+            a = -a;
+            isNegative = true;
+        } else if (b < 0) {
+            b = -b;
+            isNegative = true;
+        }
+
+        while (b > 0) {
+            if ((b & 1) == 1) { // Check if the least significant bit of b is 1
+                result += a;    // Add a to the result
+            }
+            a <<= 1;            // Shift a to the left (equivalent to multiplying by 2)
+            b >>= 1;            // Shift b to the right (equivalent to dividing by 2)
+        }
+
+        return isNegative ? -result : result;
+    }
+}
+=========================================================================================================================
+Given an array and a window size k, find the maximum of all subarrays of size k.
+Example Input:Array: [10, 5, 2, 7, 8, 7]k = 3
+Output [10, 7, 8, 8]
+
+public class SlidingWindowMaximum {
+
+    public static int[] slidingWindowMaximum(int[] nums, int k) {
+        if (nums == null || nums.length == 0) {
+            return new int[0];
+        }
+
+        int n = nums.length;
+        int[] result = new int[n - k + 1];
+        Deque<Integer> deque = new LinkedList<>(); // Stores indices of elements in the current window
+
+        for (int i = 0; i < n; i++) {
+            // Remove indices that are out of the current window
+            if (!deque.isEmpty() && deque.peekFirst() < i - k + 1) {
+                deque.pollFirst();
+            }
+
+            // Remove indices of elements smaller than the current element
+            while (!deque.isEmpty() && nums[deque.peekLast()] < nums[i]) {
+                deque.pollLast();
+            }
+
+            // Add the current element's index to the deque
+            deque.offerLast(i);
+
+            // The maximum element in the current window is at the front of the deque
+            if (i >= k - 1) {
+                result[i - k + 1] = nums[deque.peekFirst()];
+            }
+        }
+
+        return result;
+    }
+}
+=====================================================================================================================
+You are given two string arrays words1 and words2.A string b is a subset of string a if every letter in b occurs in a including multiplicity.For example, "wrr" is a subset of "warrior" but is not a subset of "world".A string a from words1 is universal if for every string b in words2, b is a subset of a.Return an array of all the universal strings in words1. You may return the answer in any order.
+Example 1:Input: words1 = ["amazon","apple","facebook","google","leetcode"], words2 = ["e","o"]	Output: ["facebook","google","leetcode"]
+Example 2:Input: words1 = ["amazon","apple","facebook","google","leetcode"], words2 = ["l","e"] Output: ["apple","google","leetcode"]
+Example 3:Input:words1 =["amazon","apple","facebook","google","leetcode"]words2 =["lo","eo"]
+Output:["google","leetcode"]
+
+public class UniversalStrings {
+    public static List<String> wordSubsets(String[] words1, String[] words2) {
+        int[] maxFreq = new int[26];
+        
+        // Calculate the maximum frequency of each character required by words2
+        for (String word : words2) {
+            int[] freq = getCharFrequency(word);
+            for (int i = 0; i < 26; i++) {
+                maxFreq[i] = Math.max(maxFreq[i], freq[i]);
+            }
+        }
+        
+        List<String> result = new ArrayList<>();
+        
+        // Check each word in words1 to see if it meets the requirements
+        for (String word : words1) {
+            int[] freq = getCharFrequency(word);
+            boolean isUniversal = true;
+            for (int i = 0; i < 26; i++) {
+                if (freq[i] < maxFreq[i]) {
+                    isUniversal = false;
+                    break;
+                }
+            }
+            if (isUniversal) {
+                result.add(word);
+            }
+        }
+        
+        return result;
+    }
+    
+    // Helper method to calculate character frequency of a word
+    private static int[] getCharFrequency(String word) {
+        int[] freq = new int[26];
+        for (char c : word.toCharArray()) {
+            freq[c - 'a']++;
+        }
+        return freq;
+    }
+}
+=======================================================================================================================================
+Given a string s and an integer k,return true if you can use all the characters in s to construct k palindrome strings or false otherwise.
+Example 1:Input: s = "annabelle", k = 2		Output: true
+Explanation: You can construct two palindromes using all characters in s.
+Some possible constructions "anna" + "elble", "anbna" + "elle", "anellena" + "b"
+Example 2:Input: s = "leetcode", k = 3		Output: false
+Explanation: It is impossible to construct 3 palindromes using all the characters of s.
+Example 3:Input: s = "true", k = 4		Output: true
+Explanation: The only possible solution is to put each character in a separate string.
+
+public class PalindromeStrings {
+
+    public static boolean canConstruct(String s, int k) {
+        // If k is greater than the length of the string, return false
+        if (k > s.length()) {
+            return false;
+        }
+        
+        // Count character frequencies
+        int[] charCount = new int[26];
+        for (char c : s.toCharArray()) {
+            charCount[c - 'a']++;
+        }
+        
+        // Count the number of characters with odd frequencies
+        int oddCount = 0;
+        for (int count : charCount) {
+            if (count % 2 != 0) {
+                oddCount++;
+            }
+        }
+        
+        // Check if we can construct k palindromes
+        return oddCount <= k;
+    }
+}
+========================================================================================================================
+A parentheses string is a non-empty string consisting only of '(' and ')'. It is valid if any of the following conditions is true:It is ().It can be written as AB (A concatenated with B), where A and B are valid parentheses strings.It can be written as (A), where A is a valid parentheses string.You are given a parentheses string s and a string locked, both of length n. locked is a binary string consisting only of '0's and '1's. For each index i of locked,If locked[i] is '1', you cannot change s[i].But if locked[i] is '0', you can change s[i] to either '(' or ')'.Return true if you can make s a valid parentheses string. Otherwise, return false.
+Example 1:Input: s = "))()))", locked = "010100"			Output: true
+Explanation: locked[1] == '1' and locked[3] == '1', so we cannot change s[1] or s[3].
+We change s[0] and s[4] to '(' while leaving s[2] and s[5] unchanged to make s valid.
+Example 2:Input: s = "()()", locked = "0000"			Output: true
+Explanation: We do not need to make any changes because s is already valid.
+Example 3:Input: s = ")", locked = "0"			Output: false
+Explanation: locked permits us to change s[0]. 
+Changing s[0] to either '(' or ')' will not make s valid.
+
+class Solution {
+    public boolean canBeValid(String s, String locked) {
+        int n = s.length();
+
+        // If the length of the string is odd, it cannot form a valid parentheses string.
+        if (n % 2 != 0) return false;
+
+        // Left-to-right pass
+        int balance = 0, flexible = 0;
+        for (int i = 0; i < n; i++) {
+            if (locked.charAt(i) == '1') {
+                if (s.charAt(i) == '(') balance++;
+                else balance--;
+            } else {
+                flexible++;
+            }
+
+            // If balance drops below -flexible, it means we can't fix it even with flexibility
+            if (balance + flexible < 0) return false;
+        }
+
+        // Right-to-left pass
+        balance = 0;
+        flexible = 0;
+        for (int i = n - 1; i >= 0; i--) {
+            if (locked.charAt(i) == '1') {
+                if (s.charAt(i) == ')') balance++;
+                else balance--;
+            } else {
+                flexible++;
+            }
+
+            // If balance drops below -flexible, it means we can't fix it even with flexibility
+            if (balance + flexible < 0) return false;
+        }
+
+        return true;
+    }
+}
+or
+public class ValidParenthesesString {
+    public boolean canBeValid(String s, String locked) {
+        int n = s.length();
+        if (n % 2 == 1) return false; // Odd-length strings can never be valid
+
+        int minOpen = 0, maxOpen = 0; // minOpen: least open '(', maxOpen: most open '('
+        
+        for (int i = 0; i < n; i++) {
+            char c = s.charAt(i);
+            char lock = locked.charAt(i);
+
+            if (lock == '1') { 
+                // Locked: Directly count '(' or ')'
+                if (c == '(') {
+                    minOpen++;
+                    maxOpen++;
+                } else { 
+                    minOpen--;
+                    maxOpen--;
+                }
+            } else { 
+                // Unlocked: It can be either '(' or ')'
+                minOpen--;   // Assume ')' to minimize '(' count
+                maxOpen++;   // Assume '(' to maximize '(' count
+            }
+
+            if (maxOpen < 0) return false; // Too many ')', can't be valid
+            
+            minOpen = Math.max(minOpen, 0); // minOpen should not be negative
+        }
+
+        return minOpen == 0; // Check if we have a balanced string
+    }
+}
+
+=========================================================================================================================
+You are given a string s.You can perform the following process on s any number of times:Choose an index i in the string such that there is at least one character to the left of index i that is equal to s[i], and at least one character to the right that is also equal to s[i].Delete the closest character to the left of index i that is equal to s[i].Delete the closest character to the right of index i that is equal to s[i].Return the minimum length of the final string s that you can achieve.
+Example 1:Input: s = "abaacbcbb"			Output: 5
+Explanation:We do the following operations:Choose index 2, then remove the characters at indices 0 and 3. The resulting string is s = "bacbcbb".Choose index 3, then remove the characters at indices 0 and 5. The resulting string is s = "acbcb".
+Example 2:Input: s = "aa"			Output: 2
+Explanation:We cannot perform any operations, so we return the length of the original string.
+
+class Solution {
+    public int minimumLength(String s) {
+        int[] charFrequency = new int[26];
+        int totalLength = 0;
+        for (char c : s.toCharArray()) {
+            charFrequency[c - 'a']++;
+        }
+        for (int frequency : charFrequency) {
+            if (frequency == 0) continue;
+            if (frequency % 2 == 0) {
+                totalLength += 2;
+            } else {
+                totalLength += 1;
+            }
+        }
+        return totalLength;
+    }
+}
+=========================================================================================================================================
+You are given two 0-indexed integer permutations A and B of length n.A prefix common array of A and B is an array C such that C[i] is equal to the count of numbers that are present at or before the index i in both A and B.Return the prefix common array of A and B.A sequence of n integers is called a permutation if it contains all integers from 1 to n exactly once.
+
+Example 1:Input: A = [1,3,2,4], B = [3,1,2,4]			Output: [0,2,3,4]
+Explanation: At i = 0: no number is common, so C[0] = 0.
+At i = 1: 1 and 3 are common in A and B, so C[1] = 2.
+At i = 2: 1, 2, and 3 are common in A and B, so C[2] = 3.
+At i = 3: 1, 2, 3, and 4 are common in A and B, so C[3] = 4.
+Example 2:Input: A = [2,3,1], B = [3,1,2]				Output: [0,1,3]
+Explanation: At i = 0: no number is common, so C[0] = 0.
+At i = 1: only 3 is common in A and B, so C[1] = 1.
+At i = 2: 1, 2, and 3 are common in A and B, so C[2] = 3.
+
+public class PrefixCommonArray {
+    public static int[] prefixCommonArray(int[] A, int[] B) {
+        int n = A.length;
+        int[] C = new int[n];
+        HashSet<Integer> seenInA = new HashSet<>();
+        HashSet<Integer> seenInB = new HashSet<>();
+
+        int commonCount = 0;
+
+        for (int i = 0; i < n; i++) {
+            // Add the current elements to their respective seen sets
+            if (seenInB.contains(A[i])) {
+                commonCount++;
+            }
+            seenInA.add(A[i]);
+
+            if (seenInA.contains(B[i])) {
+                commonCount++;
+            }
+            seenInB.add(B[i]);
+
+            // Update the prefix common count
+            C[i] = commonCount;
+        }
+
+        return C;
+    }
+}
+=============================================================================================================================
+You are given two 0-indexed arrays, nums1 and nums2, consisting of non-negative integers. There exists another array, nums3, which contains the bitwise XOR of all pairings of integers between nums1 and nums2 (every integer in nums1 is paired with every integer in nums2 exactly once).Return the bitwise XOR of all integers in nums3.
+Example 1:Input: nums1 = [2,1,3], nums2 = [10,2,5,0]			Output: 13
+Explanation:A possible nums3 array is [8,0,7,2,11,3,4,1,9,1,6,3].The bitwise XOR of all these numbers is 13, so we return 13.
+Example 2:Input: nums1 = [1,2], nums2 = [3,4]					Output: 0
+Explanation:All possible pairs of bitwise XORs are nums1[0] ^ nums2[0], nums1[0] ^ nums2[1], nums1[1] ^ nums2[0],nd nums1[1] ^ nums2[1].
+Thus, one possible nums3 array is [2,5,1,6].
+2 ^ 5 ^ 1 ^ 6 = 0, so we return 0.
+
+class Solution {
+    public int xorAllNums(int[] nums1, int[] nums2) {
+        int xor1 = 0, xor2 = 0;
+
+        // Compute XOR of nums1
+        for (int num : nums1) {
+            xor1 ^= num;
+        }
+
+        // Compute XOR of nums2
+        for (int num : nums2) {
+            xor2 ^= num;
+        }
+
+        int n = nums1.length;
+        int m = nums2.length;
+
+        // Final XOR result based on parity
+        int result = 0;
+        if (n % 2 == 1) {
+            result ^= xor2; // nums2 contributes if nums1 length is odd
+        }
+        if (m % 2 == 1) {
+            result ^= xor1; // nums1 contributes if nums2 length is odd
+        }
+
+        return result;
+    }
+}
+===============================================================================================================================
+Given an integer array nums, return the length of the longest strictly increasing subsequence
+Example 1:Input: nums = [10,9,2,5,3,7,101,18]			Output: 4
+Explanation: The longest increasing subsequence is [2,3,7,101], therefore the length is 4.
+Example 2:Input: nums = [0,1,0,3,2,3]					Output: 4
+Example 3:Input: nums = [7,7,7,7,7,7,7]					Output: 1
+
+    public static int lengthOfLIS(int[] nums) {
+        if (nums == null || nums.length == 0) {
+            return 0;
+        }
+
+        int n = nums.length;
+        int[] dp = new int[n];
+        Arrays.fill(dp, 1); // Each element is its own subsequence of length 1
+
+        int maxLength = 1; // To keep track of the maximum LIS found
+
+        // Build the dp array
+        for (int i = 1; i < n; i++) {
+            for (int j = 0; j < i; j++) {
+                if (nums[i] > nums[j]) {
+                    dp[i] = Math.max(dp[i], dp[j] + 1);
+                }
+            }
+            maxLength = Math.max(maxLength, dp[i]);
+        }
+
+        return maxLength;
+    }
+=================================================================================================================================
+Given an integer n, break it into the sum of k positive integers, where k >= 2, and maximize the product of those integers.Return the maximum product you can get.
+Example 1Input: n = 2								Output: 1
+Explanation: 2 = 1 + 1, 1 × 1 = 1.
+Example 2:Input: n = 10								Output: 36
+Explanation: 10 = 3 + 3 + 4, 3 × 3 × 4 = 36.
+ 
+public class IntegerBreak {
+
+    public static int integerBreak(int n) {
+        // Base cases for small values of n
+        if (n == 2) return 1; // 2 = 1 + 1 -> 1 * 1 = 1
+        if (n == 3) return 2; // 3 = 1 + 2 -> 1 * 2 = 2
+
+        // Divide n by 3 and find the remainder
+        int quotient = n / 3;
+        int remainder = n % 3;
+
+        // Handle different cases for the remainder
+        if (remainder == 0) {
+            // If remainder is 0, use all 3's
+            return (int) Math.pow(3, quotient);
+        } else if (remainder == 1) {
+            // If remainder is 1, replace one 3 with two 2's
+            return (int) Math.pow(3, quotient - 1) * 4;
+        } else {
+            // If remainder is 2, include it directly
+            return (int) Math.pow(3, quotient) * 2;
+        }
+    }
+}
+=========================================================================================================================================
+Given an integer n, return true if it is possible to represent n as the sum of distinct powers of three. Otherwise, return false.An integer y is a power of three if there exists an integer x such that y == 3x.
+Example 1:Input: n = 12					Output: true
+Explanation: 12 = 31 + 32
+Example 2:Input: n = 91					Output: true
+Explanation: 91 = 30 + 32 + 34
+Example 3:Input: n = 21					Output: false
+
+public class Solution {
+    public boolean checkPowersOfThree(int n) {
+        while (n > 0) {
+            if (n % 3 == 2) {
+                return false; // Digit '2' in base-3 means duplicate powers
+            }
+            n /= 3;
+        }
+        return true;
+    }
+}
+=========================================================================================================================================
+Convert a non-negative integer num to its English words representation.
+Example 1:Input: num = 123				Output: "One Hundred Twenty Three"
+Example 2:Input: num = 12345			Output: "Twelve Thousand Three Hundred Forty Five"
+Example 3:Input: num = 1234567			Output: "One Million Two Hundred Thirty Four Thousand Five Hundred Sixty Seven"
+
+public class NumberToWords {
+    private static final String[] LESS_THAN_20 = {
+        "", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten",
+        "Eleven", "Twelve", "Thirteen", "Fourteen", "Fifteen", "Sixteen", "Seventeen", "Eighteen", "Nineteen"
+    };
+
+    private static final String[] TENS = {
+        "", "", "Twenty", "Thirty", "Forty", "Fifty", "Sixty", "Seventy", "Eighty", "Ninety"
+    };
+
+    private static final String[] THOUSANDS = {
+        "", "Thousand", "Million", "Billion"
+    };
+
+    public static String numberToWords(int num) {
+        if (num == 0) {
+            return "Zero";
+        }
+
+        int i = 0;
+        String words = "";
+
+        while (num > 0) {
+            if (num % 1000 != 0) {
+                words = helper(num % 1000) + THOUSANDS[i] + " " + words;
+            }
+            num /= 1000;
+            i++;
+        }
+
+        return words.trim();
+    }
+
+    private static String helper(int num) {
+        if (num == 0) {
+            return "";
+        } else if (num < 20) {
+            return LESS_THAN_20[num] + " ";
+        } else if (num < 100) {
+            return TENS[num / 10] + " " + helper(num % 10);
+        } else {
+            return LESS_THAN_20[num / 100] + " Hundred " + helper(num % 100);
+        }
+    }
+}
+============================================================================================================================
+An n-bit gray code sequence is a sequence of 2n integers where:Every integer is in the inclusive range [0, 2n - 1],The first integer is 0,An integer appears no more than once in the sequence,The binary representation of every pair of adjacent integers differs by exactly one bit, andThe binary representation of the first and last integers differs by exactly one bit.Given an integer n, return any valid n-bit gray code sequence.
+Example 1:Input: n = 2			Output: [0,1,3,2]
+Explanation:
+The binary representation of [0,1,3,2] is [00,01,11,10].
+- 00 and 01 differ by one bit
+- 01 and 11 differ by one bit
+- 11 and 10 differ by one bit
+- 10 and 00 differ by one bit
+[0,2,3,1] is also a valid gray code sequence, whose binary representation is [00,10,11,01].
+- 00 and 10 differ by one bit
+- 10 and 11 differ by one bit
+- 11 and 01 differ by one bit
+- 01 and 00 differ by one bit
+Example 2:Input: n = 1				Output: [0,1]
+ 
+public class GrayCodeGenerator {
+
+    public static List<Integer> generateGrayCode(int n) {
+        List<Integer> grayCodeSequence = new ArrayList<>();
+        int totalNumbers = 1 << n; // 2^n numbers
+
+        for (int i = 0; i < totalNumbers; i++) {
+            int grayCode = i ^ (i >> 1); // Generate Gray Code
+            grayCodeSequence.add(grayCode);
+        }
+
+        return grayCodeSequence;
+    }
+}
+=========================================================================================================================
+Given a positive integer n, you can apply one of the following operations.If n is even, replace n with n / 2.If n is odd, replace n with either n + 1 or n - 1.Return the minimum number of operations needed for n to become 1.
+Example 1:Input: n = 8		Output: 3
+Explanation: 8 -> 4 -> 2 -> 1
+Example 2:Input: n = 7		Output: 4
+Explanation: 7 -> 8 -> 4 -> 2 -> 1
+or 7 -> 6 -> 3 -> 2 -> 1
+Example 3:Input: n = 4		Output: 2
+
+public class IntegerReplacement {
+    public int integerReplacement(int n) {
+        int steps = 0;
+        long num = n; // Use long to avoid overflow
+
+        while (num != 1) {
+            if (num % 2 == 0) {
+                num /= 2;
+            } else {
+                // Use greedy logic to decide between n+1 and n-1
+                if (num == 3 || (num & 2) == 0) {
+                    num--;
+                } else {
+                    num++;
+                }
+            }
+            steps++;
+        }
+
+        return steps;
+    }
+}
+===================================================================================================================================
+Given two strings s and t, return true if s is a subsequence of t, or false otherwise.A subsequence of a string is a new string that is formed from the original string by deleting some (can be none) of the characters without disturbing the relative positions of theremaining characters. (i.e., "ace" is a subsequence of "abcde" while "aec" is not).
+Example 1:Input: s = "abc", t = "ahbgdc"			Output: true
+Example 2:Input: s = "axc", t = "ahbgdc"			Output: false
+ 
+public class SubsequenceChecker {
+    public static boolean isSubsequence(String s, String t) {
+        int i = 0, j = 0;
+
+        // Iterate over string t
+        while (i < s.length() && j < t.length()) {
+            if (s.charAt(i) == t.charAt(j)) {
+                i++; // Move the pointer for s if there's a match
+            }
+            j++; // Always move the pointer for t
+        }
+
+        // If we've traversed all of s, it's a subsequence
+        return i == s.length();
+    }
+}
+=====================================================================================================================================
+There are n gas stations along a circular route, where the amount of gas at the ith station is gas[i].You have a car with an unlimited gas tank and it costs cost[i] of gas to travel from the ith station to its next (i + 1)th station. You begin the journey with an empty tank at one of the gas stations.Given two integer arrays gas and cost, return the starting gas station's index if you can travel around the circuit once in the clockwise direction, otherwise return -1. If there exists a solution, it is guaranteed to be unique.
+
+Example 1:Input: gas = [1,2,3,4,5], cost = [3,4,5,1,2]			Output: 3
+Explanation:
+Start at station 3 (index 3) and fill up with 4 unit of gas. Your tank = 0 + 4 = 4
+Travel to station 4. Your tank = 4 - 1 + 5 = 8
+Travel to station 0. Your tank = 8 - 2 + 1 = 7
+Travel to station 1. Your tank = 7 - 3 + 2 = 6
+Travel to station 2. Your tank = 6 - 4 + 3 = 5
+Travel to station 3. The cost is 5. Your gas is just enough to travel back to station 3.
+Therefore, return 3 as the starting index.
+Example 2:Input: gas = [2,3,4], cost = [3,4,3]					Output: -1
+Explanation:
+You can't start at station 0 or 1, as there is not enough gas to travel to the next station.
+Let's start at station 2 and fill up with 4 unit of gas. Your tank = 0 + 4 = 4
+Travel to station 0. Your tank = 4 - 3 + 2 = 3
+Travel to station 1. Your tank = 3 - 3 + 3 = 3
+You cannot travel back to station 2, as it requires 4 unit of gas but you only have 3.
+Therefore, you can't travel around the circuit once no matter where you start.
+ 
+class Solution {
+    public int canCompleteCircuit(int[] gas, int[] cost) {
+        int totalGas = 0;
+        int totalCost = 0;
+        int index = 0;
+        int tank = 0;
+
+        for (int i = 0; i < gas.length; i++) {
+            totalGas += gas[i];
+            totalCost += cost[i];
+            tank += gas[i] - cost[i];
+
+            // If tank becomes negative, reset starting point
+            if (tank < 0) {
+                index = i + 1; // Reset to the next station
+                tank = 0;
+            }
+        }
+
+        // If total gas is less than total cost, return -1
+        return totalGas >= totalCost ? index : -1;
+    }
+}
+======================================================================================================================
+Assume you are an awesome parent and want to give your children some cookies. But, you should give each child at most one cookie.Each child i has a greed factor g[i], which is the minimum size of a cookie that the child will be content with; and each cookie j has a size s[j]. If s[j] >= g[i], we can assign the cookie j to the child i, and the child i will be content. Your goal is to maximize the number of your content children and output the maximum number.
+Example 1:Input: g = [1,2,3], s = [1,1]			Output: 1
+Explanation: You have 3 children and 2 cookies. The greed factors of 3 children are 1, 2, 3. 
+And even though you have 2 cookies, since their size is both 1, you could only make the child whose greed factor is 1 content.
+You need to output 1.
+Example 2:Input: g = [1,2], s = [1,2,3]			Output: 2
+Explanation: You have 2 children and 3 cookies. The greed factors of 2 children are 1, 2. 
+You have 3 cookies and their sizes are big enough to gratify all of the children, 
+You need to output 2.
+
+public class ContentChildren {
+    public int findContentChildren(int[] g, int[] s) {
+        // Sort greed factors and cookie sizes
+        Arrays.sort(g);
+        Arrays.sort(s);
+
+        int i = 0; // Pointer for children
+        int j = 0; // Pointer for cookies
+
+        // Assign cookies to children
+        while (i < g.length && j < s.length) {
+            if (s[j] >= g[i]) {
+                // Cookie satisfies this child's greed
+                i++;
+            }
+            // Move to the next cookie
+            j++;
+        }
+
+        // Number of satisfied children
+        return i;
+    }
+}
+==================================================================================================================================
+public class PasswordStrengthChecker {
+
+    public static boolean isStrongPassword(String password) {
+        // Rule 1: Password length should be at least 8 characters
+        if (password.length() < 8) {
+            return false;
+        }
+
+        // Rule 2: Password should contain at least one uppercase letter
+        boolean hasUpperCase = false;
+        
+        // Rule 3: Password should contain at least one lowercase letter
+        boolean hasLowerCase = false;
+        
+        // Rule 4: Password should contain at least one digit
+        boolean hasDigit = false;
+        
+        // Rule 5: Password should contain at least one special character
+        boolean hasSpecialChar = false;
+        
+        for (char c : password.toCharArray()) {
+            if (Character.isUpperCase(c)) {
+                hasUpperCase = true;
+            } else if (Character.isLowerCase(c)) {
+                hasLowerCase = true;
+            } else if (Character.isDigit(c)) {
+                hasDigit = true;
+            } else if (!Character.isLetterOrDigit(c)) {
+                hasSpecialChar = true;
+            }
+        }
+
+        // Check if all conditions are met
+        return hasUpperCase && hasLowerCase && hasDigit && hasSpecialChar;
+    }
+}
+or
+import java.util.regex.*;
+
+public class PasswordValidator {
+    public static boolean isValidPassword(String password) {
+        String regex = "^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$";
+        return password.matches(regex);
+    }
+}
+Explanation:
+Breakdown of Regex:
+^ → Start of string.
+(?=.*[A-Z]) → At least one uppercase letter.
+(?=.*[a-z]) → At least one lowercase letter.
+(?=.*\d) → At least one digit.
+(?=.*[@$!%*?&]) → At least one special character.
+[A-Za-z\d@$!%*?&]{8,} → At least 8 characters, consisting of letters, numbers, or special characters.
+$ → End of string.
+
+(?=.*[A-Z])
+(?=...) → This is a lookahead assertion. It ensures that the pattern inside (...) exists somewhere in the string.
+.* → Matches any number of characters (including none) before the uppercase letter.
+[A-Z] → Ensures that at least one uppercase letter (A-Z) appears anywhere in the string.
+
+=====================================================================================================================================
+You are given a 0-indexed 2D matrix grid of size m x n, where (r, c) represents:A land cell if grid[r][c] = 0, orA water cell containing grid[r][c] fish, if grid[r][c] > 0.A fisher can start at any water cell (r, c) and can do the following operations any number of times:
+Catch all the fish at cell (r, c), orMove to any adjacent water cell.Return the maximum number of fish the fisher can catch if he chooses his starting cell optimally, or 0 if no water cell exists.An adjacent cell of the cell (r, c), is one of the cells (r, c + 1), (r, c - 1), (r + 1, c) or (r - 1, c) if it exists.
+Example 1:Input: grid = [[0,2,1,0],[4,0,0,3],[1,0,0,4],[0,3,2,0]]				Output: 7
+Explanation: The fisher can start at cell (1,3) and collect 3 fish, then move to cell (2,3) and collect 4 fish.
+Example 2:Input: grid = [[1,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,1]]				Output: 1
+Explanation: The fisher can start at cells (0,0) or (3,3) and collect a single fish. 
+
+public class FisherMaxFish {
+    public static int findMaxFish(int[][] grid) {
+        int maxFish = 0;
+        int m = grid.length;
+        int n = grid[0].length;
+
+        // Helper method to perform DFS and calculate total fish
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
+                if (grid[i][j] > 0) { // Start DFS only from water cells
+                    maxFish = Math.max(maxFish, dfs(grid, i, j));
+                }
+            }
+        }
+        return maxFish;
+    }
+
+    private static int dfs(int[][] grid, int row, int col) {
+        // Check boundary conditions and if the cell is land or already visited
+        if (row < 0 || row >= grid.length || col < 0 || col >= grid[0].length || grid[row][col] == 0) {
+            return 0;
+        }
+
+        // Collect fish at the current cell
+        int fish = grid[row][col];
+        grid[row][col] = 0; // Mark the cell as visited by setting it to 0
+
+        // Explore all four directions
+        fish += dfs(grid, row + 1, col); // Down
+        fish += dfs(grid, row - 1, col); // Up
+        fish += dfs(grid, row, col + 1); // Right
+        fish += dfs(grid, row, col - 1); // Left
+
+        return fish;
+    }
+}
+===========================================================================================================================
+The DNA sequence is composed of a series of nucleotides abbreviated as 'A', 'C', 'G', and 'T'.For example, "ACGAATTCCG" is a DNA sequence.When studying DNA, it is useful to identify repeated sequences within the DNA.Given a string s that represents a DNA sequence, return all the 10-letter-long sequences (substrings) that occur more than once in a DNA molecule. You may return the answer in any order.
+Example 1:Input: s = "AAAAACCCCCAAAAACCCCCCAAAAAGGGTTT"				Output: ["AAAAACCCCC","CCCCCAAAAA"]
+Example 2:Input: s = "AAAAAAAAAAAAA"								Output: ["AAAAAAAAAA"]
+public static List<String> findRepeatedDnaSequences(String s) {
+        Set<String> seen = new HashSet<>();
+        Set<String> repeated = new HashSet<>();
+        
+        for (int i = 0; i <= s.length() - 10; i++) {
+            String sequence = s.substring(i, i + 10);
+            if (!seen.add(sequence)) { // returns true if it was able to add to set
+                repeated.add(sequence);
+            }
+        }
+        
+        return new ArrayList<>(repeated);
+    }
+
+
+

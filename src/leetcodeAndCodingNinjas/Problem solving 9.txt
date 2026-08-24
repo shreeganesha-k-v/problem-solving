@@ -1,0 +1,1316 @@
+Ninja wants the hero certificate to get the support of local police and government to help the people. But to get the hero certificate he needs to clear an exam.The exam consists of ‘N’ questions from ‘1’ to ‘N’. To clear the exam Ninja needs to solve in a particular order. He needs to leave one question after solving one question(assume that after ‘N’th question he will come back to the first question). He will perform this action till all questions are solved. Help Ninja in exams by telling him the order.
+For Example:If there are ‘5’ questions then the order will be: “ 2 4 1 5 3 ” Where ‘T’ is the number of test cases, ‘N’ is the number of questions.
+Sample Input 1:   6					4      
+Sample Output 1:  2 4 6 3 1 5		2 4 3 1
+Explanation of Sample Output 1:
+Test Case 1:  There are 6 questions and the order is [2, 4, 6, 3, 1, 5]. Ninja will start solving the questions as shown in the image below:
+Test Case 2:There are 6 questions and the order is [2, 4, 3, 1]. Ninja will start solving the questions as shown in image below: 
+Sample Input 2:   10 										7
+Sample Output 2:  2 4 6 8 10 3 7 1 9 5 						2 4 6 1 5 3 7 
+
+public class Solution {
+    public static ArrayList<Integer> theOrder(int n) {
+        // Corrected way: box to Integer first
+        List<Integer> questions = IntStream.rangeClosed(1, n)
+                                           .boxed()  // <--- important to convert int -> Integer
+                                           .collect(Collectors.toList());
+
+        int index = 0;
+        ArrayList<Integer> res = new ArrayList<>();
+        while (!questions.isEmpty()) {
+            index = (index + 1) % questions.size();
+            res.add(questions.get(index));
+            questions.remove(index);
+        }
+        return res;
+    }
+}
+===============================================================================================================================================================
+You are playing the Bulls and Cows game with your friend.You write down a secret number and ask your friend to guess what the number is. When your friend makes a guess, you provide a hint with the following info:The number of "bulls", which are digits in the guess that are in the correct position.The number of "cows", which are digits in the guess that are in your secret number but are located in the wrong position. Specifically, the non-bull digits in the guess that could be rearranged such that they become bulls.Given the secret number secret and your friend's guess guess, return the hint for your friend's guess.The hint should be formatted as "xAyB", where x is the number of bulls and y is the number of cows. Note that both secret and guess may contain duplicate digits.
+Example 1:Input: secret = "1807", guess = "7810"			Output: "1A3B"
+Explanation: Bulls are connected with a '|' and cows are underlined:
+"1807"
+  |
+"7810"
+Example 2:Input: secret = "1123", guess = "0111"			Output: "1A1B"
+Explanation: Bulls are connected with a '|' and cows are underlined:
+"1123"        "1123"
+  |      or     |
+"0111"        "0111"
+Note that only one of the two unmatched 1s is counted as a cow since the non-bull digits can only be rearranged to allow one 1 to be a bull.
+ 
+class Solution {
+    public String getHint(String secret, String guess) {
+        int bulls = 0, cows = 0;
+        int[] secretCount = new int[10]; // count of digits 0-9
+        int[] guessCount = new int[10];  // count of digits 0-9
+        
+        for (int i = 0; i < secret.length(); i++) {
+            if (secret.charAt(i) == guess.charAt(i)) {
+                bulls++;
+            } else {
+                secretCount[secret.charAt(i) - '0']++;
+                guessCount[guess.charAt(i) - '0']++;
+            }
+        }
+        
+        // Now, for cows: minimum of counts in secret and guess
+        for (int i = 0; i < 10; i++) {
+            cows += Math.min(secretCount[i], guessCount[i]);
+        }
+        
+        return bulls + "A" + cows + "B";
+    }
+}
+========================================================================================================================================
+You are given an integer array nums and a positive integer k.Return the number of subarrays where the maximum element of nums appears at least k times in that subarray.
+A subarray is a contiguous sequence of elements within an array.
+Example 1:Input: nums = [1,3,2,3,3], k = 2					Output: 6
+Explanation: The subarrays that contain the element 3 at least 2 times are: [1,3,2,3], [1,3,2,3,3], [3,2,3], [3,2,3,3], [2,3,3] and [3,3].
+Example 2:Input: nums = [1,4,2,1], k = 3					Output: 0
+Explanation: No subarray contains the element 4 at least 3 times.
+ 
+public class Solution {
+    public int countSubarrays(int[] nums, int k) {
+        int n = nums.length;
+        int maxVal = Integer.MIN_VALUE;
+        
+        // Step 1: Find the maximum value in the array
+        for (int num : nums) {
+            maxVal = Math.max(maxVal, num);
+        }
+        
+        int l = 0, count = 0, result = 0;
+        
+        // Step 2: Sliding window
+        for (int r = 0; r < n; r++) {
+            if (nums[r] == maxVal) {
+                count++;
+            }
+            
+            // Shrink window from left if count >= k
+            while (count >= k) {
+                if (nums[l] == maxVal) {
+                    count--;
+                }
+                l++;
+            }
+            
+            // The number of valid subarrays ending at r is l
+            result += l;
+        }
+        
+        return result;
+    }
+}
+======================================================================================================================================================================
+You are given an integer ‘N’. Your task is to print a pattern with the following descriptionThe pattern will consist of ‘N’ lines.For 1 <= ‘i’ <= ‘N’ ‘i’th line consists of a string of ‘N’  + 1 - ‘i’  ‘*’ characters.For example:If ‘N’ is 5 then the pattern will be.
+*****
+****
+***
+**
+*
+Detailed explanation ( Input/output format, Notes, Images )
+Sample Input 1:2	5	3
+Sample Output 1:
+*****
+****
+***
+**
+*
+
+***
+**
+*
+
+public class Solution {
+    public static String[] printPatt(int n) {
+        String[] res = new String[n];
+
+        for (int i = 0; i < n; i++) {
+            res[i] = repeatStar(n - i); // if java 21 has repeate method u can use like res[i]="*".repeat(n-i);
+        }
+
+        return res;
+    }
+
+    // Helper method to repeat '*' character manually
+    public static String repeatStar(int count) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < count; i++) {
+            sb.append("*");
+        }
+        return sb.toString();
+    }
+}
+=====================================================================================================================================================================
+Given a string s, remove duplicate letters so that every letter appears once and only once. You must make sure your result is the smallest in lexicographical order among all possible results.
+Example 1:Input: s = "bcabc"				Output: "abc"
+Example 2:Input: s = "cbacdcbc"				Output: "acdb"
+ 
+class Solution {
+    public String removeDuplicateLetters(String s) {
+        int[] lastIndex = new int[26]; // Store last index of each character
+        boolean[] seen = new boolean[26]; // Track if character is in stack
+        Stack<Character> stack = new Stack<>();
+
+        // Fill last index
+        for (int i = 0; i < s.length(); i++) {
+            lastIndex[s.charAt(i) - 'a'] = i;
+        }
+
+        for (int i = 0; i < s.length(); i++) {
+            char ch = s.charAt(i);
+
+            if (seen[ch - 'a']) continue;
+
+            while (!stack.isEmpty() && ch < stack.peek() && lastIndex[stack.peek() - 'a'] > i) {
+                seen[stack.pop() - 'a'] = false;
+            }
+
+            stack.push(ch);
+            seen[ch - 'a'] = true;
+        }
+
+        // Build result from stack
+        StringBuilder result = new StringBuilder();
+        for (char ch : stack) {
+            result.append(ch);
+        }
+
+        return result.toString();
+    }
+}
+==========================================================================================================================================
+You are given a string 'S'. Now one more additional character is introduced in this string, which turns 'S' into new string 'T'. You have to find out this newly added character.
+Note:1. All the characters in string 'S' and 'T' consist of uppercase English alphabets.2. Length of string 'T' is always 1 more than the length of string 'S'.
+Detailed explanation ( Input/output format, Notes, Images )
+Constraints:
+1 <= TEST <= 100
+1 <= |S|, |T| <= 10^4
+Where '|S|' and '|T|' denotes the length of he strings 'S' and 'T' respectively.
+Sample Input 1:APPLE 		APPHLE
+CODE	CODER
+Sample Output 1:
+H			R
+Explanation for Sample Output 1:
+
+Sample Input 2:MANGO 		MANNGO
+NINJA			NIINJA
+Sample Output 2:N			I
+Explanation for Sample Output 2:In test case 1, As “MANGO” contains only 1 occurrence of ‘N’ but “MANNGO” contains 2 occurrences of ‘N’.
+
+public class Solution {
+	public static void findAddedCharacter(String s, String t) {
+		// Frequency array for uppercase English letters
+		int[] freq = new int[26];
+
+		// Count frequency in string t (which is longer)
+		for (char ch : t.toCharArray()) {
+			freq[ch - 'A']++;
+		}
+
+		// Subtract frequency using string s
+		for (char ch : s.toCharArray()) {
+			freq[ch - 'A']--;
+		}
+
+		// The character whose frequency is 1 is the added character
+		for (int i = 0; i < 26; i++) {
+			if (freq[i] == 1) {
+				System.out.println((char)(i + 'A'));
+				return;
+			}
+		}
+	}
+}
+================================================================================================================================================================
+You are given an integer array coins representing coins of different denominations and an integer amount representing a total amount of money.Return the fewest number of coins that you need to make up that amount. If that amount of money cannot be made up by any combination of the coins, return -1.You may assume that you have an infinite number of each kind of coin.
+Example 1:Input: coins = [1,2,5], amount = 11			Output: 3
+Explanation: 11 = 5 + 5 + 1
+Example 2:Input: coins = [2], amount = 3				Output: -1
+Example 3:Input: coins = [1], amount = 0				Output: 0
+
+public class Solution {
+    public int coinChange(int[] coins, int amount) {
+        // Initialize DP array with a large value (amount + 1 is safe as max)
+        int[] dp = new int[amount + 1];
+        Arrays.fill(dp, amount + 1);
+        dp[0] = 0; // Base case: 0 coins needed to make amount 0
+
+        // Build up dp[1] to dp[amount]
+        for (int i = 1; i <= amount; i++) {
+            for (int coin : coins) {
+                if (i - coin >= 0 && dp[i - coin] != amount+1) {
+                    dp[i] = Math.min(dp[i], dp[i - coin] + 1);
+                }
+            }
+        }
+
+        // If dp[amount] is still amount+1, return -1 (not possible)
+        return dp[amount] == amount + 1 ? -1 : dp[amount];
+    }
+}
+==========================================================================================================================================================================
+Given an n x n matrix where each of the rows and columns is sorted in ascending order, return the kth smallest element in the matrix.Note that it is the kth smallest element in the sorted order, not the kth distinct element.You must find a solution with a memory complexity better than O(n2).
+Example 1:Input: matrix = [[1,5,9],[10,11,13],[12,13,15]], k = 8				Output: 13
+Explanation: The elements in the matrix are [1,5,9,10,11,12,13,13,15], and the 8th smallest number is 13
+Example 2:Input: matrix = [[-5]], k = 1											Output: -5
+
+class Solution {
+    public int kthSmallest(int[][] matrix, int k) {
+        
+        PriorityQueue<Integer> q = new PriorityQueue<>(Comparator.reverseOrder());
+        int row = matrix.length;
+        int col = matrix[0].length;
+        for(int i=0;i<row;i++){
+            for(int j=0;j<col;j++){
+                if(q.size()<k){
+                    q.offer(matrix[i][j]);
+                }else{
+                    if(q.peek()>matrix[i][j]){
+                        q.poll();
+                        q.offer(matrix[i][j]);
+                    }
+                }
+            }
+        }
+
+        return q.peek();
+    }
+}
+=================================================================================================================================================================
+There are n dominoes in a line, and we place each domino vertically upright. In the beginning, we simultaneously push some of the dominoes either to the left or to the right.After each second, each domino that is falling to the left pushes the adjacent domino on the left. Similarly, the dominoes falling to the right push their adjacent dominoes standing on the right.When a vertical domino has dominoes falling on it from both sides, it stays still due to the balance of the forces.For the purposes of this question, we will consider that a falling domino expends no additional force to a falling or already fallen domino.You are given a string dominoes representing the initial state where:
+dominoes[i] = 'L', if the ith domino has been pushed to the left,dominoes[i] = 'R', if the ith domino has been pushed to the right, anddominoes[i] = '.', if the ith domino has not been pushed.Return a string representing the final state.
+Example 1:Input: dominoes = "RR.L"								Output: "RR.L"
+Explanation: The first domino expends no additional force on the second domino.
+Example 2:Input: dominoes = ".L.R...LR..L.."					Output: "LL.RR.LLRRLL.."
+ 
+class Solution {
+    public String pushDominoes(String dominoes) {
+        int n = dominoes.length();
+        int[] forces = new int[n];
+
+        // Left to Right pass
+        int force = 0;
+        for (int i = 0; i < n; i++) {
+            char c = dominoes.charAt(i);
+            if (c == 'R') {
+                force = n;
+            } else if (c == 'L') {
+                force = 0;
+            } else {
+                force = Math.max(force - 1, 0);
+            }
+            forces[i] += force;
+        }
+
+        // Right to Left pass
+        force = 0;
+        for (int i = n - 1; i >= 0; i--) {
+            char c = dominoes.charAt(i);
+            if (c == 'L') {
+                force = n;
+            } else if (c == 'R') {
+                force = 0;
+            } else {
+                force = Math.max(force - 1, 0);
+            }
+            forces[i] -= force;
+        }
+
+        // Build result
+        StringBuilder sb = new StringBuilder();
+        for (int f : forces) {
+            if (f > 0) sb.append('R');
+            else if (f < 0) sb.append('L');
+            else sb.append('.');
+        }
+
+        return sb.toString();
+    }
+}
+=======================================================================================================================================================
+Sub-array sum equals k
+
+public class SubarraySumEqualsK {
+    public static int subarraySum(int[] nums, int k) {
+        Map<Integer, Integer> prefixSumFreq = new HashMap<>();
+        prefixSumFreq.put(0, 1); 
+        
+        int count = 0, sum = 0;
+        for (int num : nums) {
+            sum += num;
+            count += prefixSumFreq.getOrDefault(sum - k, 0);
+            prefixSumFreq.put(sum, prefixSumFreq.getOrDefault(sum, 0) + 1);
+        }
+        return count;
+    }
+}
+==========================================================================================================================================================
+A permutation of an array of integers is an arrangement of its members into a sequence or linear order.For example, for arr = [1,2,3], the following are all the permutations of arr: [1,2,3], [1,3,2], [2, 1, 3], [2, 3, 1], [3,1,2], [3,2,1].The next permutation of an array of integers is the next lexicographically greater permutation of its integer. Moreformally, if all the permutations of the array are sorted in one container according to their lexicographical order, then the next permutation of that array is the permutationthat follows it in the sorted container. If such arrangement is not possible, the array must be rearranged as the lowest possible order (i.e., sorted in ascending order).For example, the next permutation of arr = [1,2,3] is [1,3,2].Similarly, the next permutation of arr = [2,3,1] is [3,1,2].While the next permutation of arr = [3,2,1] is [1,2,3] because [3,2,1] does not have a lexicographical larger rearrangement.Given an array of integers nums, find the next permutation of nums.The replacement must be in place and use only constant extra memory.
+Example 1:Input: nums = [1,2,3]				Output: [1,3,2]
+Example 2:Input: nums = [3,2,1]				Output: [1,2,3]
+Example 3:Input: nums = [1,1,5]				Output: [1,5,1]
+
+class Solution {
+    public void nextPermutation(int[] nums) {
+        int n = nums.length;
+        int j = n - 2;
+	
+        // Step 1: Find first decreasing from right
+        while (j >= 0 && nums[j] >= nums[j + 1]) {
+            j--;
+        }
+
+        // Step 2: If found, find next bigger and swap
+        if (j >= 0) {
+            int i = n - 1;
+            while (nums[j] >= nums[i]) {
+                i--;
+            }
+            swap(i, j, nums);
+        }
+
+        // Step 3: Reverse the right part
+        reverse(j + 1, n - 1, nums);
+    }
+
+    private void swap(int a, int b, int[] nums) {
+        int temp = nums[a];
+        nums[a] = nums[b];
+        nums[b] = temp;
+    }
+
+    private void reverse(int start, int end, int[] nums) {
+        while (start < end) {
+            swap(start++, end--, nums);
+        }
+    }
+}
+================================================================================================================================================
+Find kth permutation 
+
+public class KthPermutation {
+    public String getPermutation(int n, int k) {
+        List<Integer> numbers = new ArrayList<>();
+        int fact = 1;
+        
+        // Step 1: prepare numbers list and factorial (n-1)!
+        for (int i = 1; i < n; i++) {
+            numbers.add(i);
+            fact *= i;
+        }
+        numbers.add(n);
+        
+        k = k - 1; // zero-based index
+        StringBuilder ans = new StringBuilder();
+        
+        // Step 2: build answer
+        while (true) {
+            int index = k / fact;
+            ans.append(numbers.get(index));
+            numbers.remove(index);
+            
+            if (numbers.size() == 0) break;
+            
+            k = k % fact;
+            fact = fact / numbers.size();
+        }
+        
+        return ans.toString();
+    }
+}
+==========================================================================================================================================
+Count pallindromic sub sequences of length 3
+
+class Solution {
+    public int countPalindromicSubsequence(String s) {
+        Set<String> set = new HashSet<>();
+
+        // Fix the middle character
+        for (int i = 1; i < s.length() - 1; i++) {
+            char middle = s.charAt(i);
+            Set<Character> leftSet = new HashSet<>();
+            Set<Character> rightSet = new HashSet<>();
+
+            // Left side check
+            for (int l = 0; l < i; l++) {
+                if (s.charAt(l) == s.charAt(i)) continue; // skip middle
+                leftSet.add(s.charAt(l));
+            }
+
+            // Right side check
+            for (int r = i + 1; r < s.length(); r++) {
+                if (s.charAt(r) == s.charAt(i)) continue; // skip middle
+                rightSet.add(s.charAt(r));
+            }
+
+            // Find common chars on both sides for palindrome c1 c2 c1
+            for (char ch : leftSet) {
+                if (rightSet.contains(ch)) {
+                    set.add("" + ch + middle + ch);
+                }
+            }
+        }
+
+        return set.size();
+    }
+}
+===============================================================================================================================================
+Given an array nums of n integers where nums[i] is in the range [1, n], return an array of all the integers in the range [1, n] that do not appear in nums.
+Example 1:Input: nums = [4,3,2,7,8,2,3,1]							Output: [5,6]
+Example 2:Input: nums = [1,1]										Output: [2]
+ 
+class Solution {
+    public List<Integer> findDisappearedNumbers(int[] nums) {
+        int[] n = new int[nums.length+1];
+
+        for(int i=0;i<nums.length;i++){
+            n[nums[i]]++;
+        }
+
+        List<Integer> res = new ArrayList<>();
+
+        for(int i=1;i<=nums.length;i++){
+            if(n[i]==0) res.add(i);
+        }
+        return res;
+    }
+}
+
+OR
+
+class Solution {
+    public List<Integer> findDisappearedNumbers(int[] nums) {
+        // Mark seen numbers as negative
+        for (int i = 0; i < nums.length; i++) {
+            int index = Math.abs(nums[i]) - 1;  // map num 1..n to index 0..n-1
+            if (nums[index] > 0) {
+                nums[index] = -nums[index];
+            }
+        }
+
+        // Collect indexes which are still positive (i.e., missing numbers)
+        List<Integer> res = new ArrayList<>();
+        for (int i = 0; i < nums.length; i++) {
+            if (nums[i] > 0) {
+                res.add(i + 1);  // map index back to number
+            }
+        }
+        return res;
+    }
+}
+or
+Set<Integer> set = Arrays.stream(nums)
+                                 .boxed()
+                                 .collect(Collectors.toSet());
+
+        return IntStream.rangeClosed(1, nums.length)
+                        .filter(i -> !set.contains(i))
+                        .boxed()
+                        .collect(Collectors.toList());
+==============================================================================================================================================
+You are given an n x n integer matrix. You can do the following operation any number of times:Choose any two adjacent elements of matrix and multiply each of them by -1.
+Two elements are considered adjacent if and only if they share a border.Your goal is to maximize the summation of the matrix's elements. Return the maximum sum of the matrix's elements using the operation mentioned above.
+Example 1:Input: matrix = [[1,-1],[-1,1]]							Output: 4
+Explanation: We can follow the following steps to reach sum equals 4:
+- Multiply the 2 elements in the first row by -1.
+- Multiply the 2 elements in the first column by -1.
+Example 2:Input: matrix = [[1,2,3],[-1,-2,-3],[1,2,3]]				Output: 16
+Explanation: We can follow the following step to reach sum equals 16:
+- Multiply the 2 last elements in the second row by -1.
+
+public class nov24_1975 {
+    public long maxMatrixSum(int[][] matrix) {
+        int negatives=0;
+        long ans = 0;
+        int min = Integer.MAX_VALUE;
+        for(int i=0; i<matrix.length; i++){
+            for(int j=0; j<matrix[0].length; j++){
+                if(matrix[i][j]<0){
+                    negatives++;
+                }
+                int curr = Math.abs(matrix[i][j]);
+                min = Math.min(min, curr);
+                ans += Math.abs(curr);
+            }
+        }
+        if(negatives%2==1){
+            //odd
+            //1 number has to be -ve
+            ans -= min* 2L;
+        }
+        return ans;
+    }
+}
+==========================================================================================================================================================
+Given a list of dominoes, dominoes[i] = [a, b] is equivalent to dominoes[j] = [c, d] if and only if either (a == c and b == d), or (a == d and b == c) - that is, one domino can be rotated to be equal to another domino.Return the number of pairs (i, j) for which 0 <= i < j < dominoes.length, and dominoes[i] is equivalent to dominoes[j].
+Example 1:Input: dominoes = [[1,2],[2,1],[3,4],[5,6]]				Output: 1
+Example 2:Input: dominoes = [[1,2],[1,2],[1,1],[1,2],[2,2]]			Output: 3
+ 
+class Solution {
+    public int numEquivDominoPairs(int[][] dominoes) {
+        HashMap<Integer, Integer> map = new HashMap<>();
+        int count = 0;
+
+        for (int[] d : dominoes) {
+            int key = getKey(d);
+            count += map.getOrDefault(key, 0);  // add existing count (forms new pairs)
+            map.put(key, map.getOrDefault(key, 0) + 1);  // mark current domino seen
+        }
+
+        return count;
+    }
+
+    private int getKey(int[] val) {
+        int a = val[0], b = val[1];
+        return Math.min(a, b) * 10 + Math.max(a, b);  // avoid sorting (faster)
+    }
+}
+=========================================================================================================================================================
+//Knapsack problem
+Given an integer array nums, return true if you can partition the array into two subsets such that the sum of the elements in both subsets is equal or false otherwise.
+Example 1:Input: nums = [1,5,11,5]			Output: true
+Explanation: The array can be partitioned as [1, 5, 5] and [11].
+Example 2:Input: nums = [1,2,3,5]			Output: false
+Explanation: The array cannot be partitioned into equal sum subsets.
+
+class Solution {
+    public boolean canPartition(int[] nums) {
+        int sum = Arrays.stream(nums).sum();
+
+        if(sum % 2 !=0) return false;
+        int target = sum/2;
+        boolean[] dp = new boolean[target+1];
+        dp[0]=true;
+
+        for(int num:nums){
+            for(int j=target;j>=num;j--){
+                dp[j]=dp[j] || dp[j-num];
+            }
+        }
+        return dp[target];
+
+    }
+}
+==========================================================================================================================================================
+Write a function to find the longest common substring between two strings.
+
+public class LongestCommonSubstring {
+    public static String longestCommonSubstring(String s1, String s2) {
+        int m = s1.length();
+        int n = s2.length();
+
+        int maxLen = 0;
+        int endIndex = 0;
+
+        int[][] dp = new int[m + 1][n + 1];
+
+        for (int i = 1; i <= m; i++) {
+            for (int j = 1; j <= n; j++) {
+                if (s1.charAt(i - 1) == s2.charAt(j - 1)) {
+                    dp[i][j] = 1 + dp[i - 1][j - 1];
+
+                    if (dp[i][j] > maxLen) {
+                        maxLen = dp[i][j];
+                        endIndex = i; // end index of substring in s1
+                    }
+                } else {
+                    dp[i][j] = 0; // reset when characters don’t match
+                }
+            }
+        }
+
+        return s1.substring(endIndex - maxLen, endIndex);
+    }
+}
+
+Recursive
+
+public class LongestCommonSubstringRecursive {
+    static int maxLen = 0;
+    static int endIndex = 0; // To track the end index of substring in s1
+
+    public static int lcs(String s1, String s2, int i, int j, int count) {
+        if (i == 0 || j == 0)
+            return count;
+
+        int count1 = count;
+
+        if (s1.charAt(i - 1) == s2.charAt(j - 1)) {
+            count1 = lcs(s1, s2, i - 1, j - 1, count + 1);
+
+            // Update max length and end index
+            if (count1 > maxLen) {
+                maxLen = count1;
+                endIndex = i - 1; // i-1 because string index is 0-based
+            }
+        }
+
+        lcs(s1, s2, i - 1, j, 0);
+        lcs(s1, s2, i, j - 1, 0);
+
+        return maxLen;
+    }
+}
+===================================================================================================================================================================
+public class RotateMatrix {
+    public static void rotate(int[][] matrix) {
+        int n = matrix.length;
+
+        // Step 1: Transpose the matrix (swap rows with columns)
+        for (int i = 0; i < n; i++) {
+            for (int j = i; j < n; j++) {
+                // Swap matrix[i][j] with matrix[j][i]
+                int temp = matrix[i][j];
+                matrix[i][j] = matrix[j][i];
+                matrix[j][i] = temp;
+            }
+        }
+
+        // Step 2: Reverse each row
+        for (int i = 0; i < n; i++) {
+            int left = 0, right = n - 1;
+            while (left < right) {
+                // Swap matrix[i][left] and matrix[i][right]
+                int temp = matrix[i][left];
+                matrix[i][left] = matrix[i][right];
+                matrix[i][right] = temp;
+                left++;
+                right--;
+            }
+        }
+    }
+
+    // Helper to print the matrix
+    public static void print(int[][] matrix) {
+        for (int[] row : matrix) {
+            for (int val : row) {
+                System.out.print(val + " ");
+            }
+            System.out.println();
+        }
+    }
+}
+==========================================================================================================================================================
+Problem statement:You are given an array ‘A’ of length ‘N’ consisting only of positive integers and an integer ‘K’. You have to update every element of the array by increasing or decreasing its value by ‘K’ only once. Your task is to minimize the difference between maximum and minimum elements of the array after performing the increment or decrement on every element of the array.Note: After the operation, every value of the array should remain non-negative.
+For example:Let’s say the array ‘A’ = [1, 2, 3, 4, 5] and ‘K’ = 2, then after increasing each element by ‘K’. The array ‘A’ will become [3, 4, 5, 6, 7]. So the maximum - minimum will be 7 - 3 = 4. Detailed explanation ( Input/output format, Notes, Images )
+Constraints - 1 <= ‘T’ <= 5	, 1 <= ‘N’ <= 10^5 , 1 <= ‘K’ <= 10^9, 1 <= A[i] <= 10^9, for 1 <= i <= ‘N’.Note- Sum of ‘N’ over all test cases does not exceed 10^5.Time Limit: 1 sec
+Sample Input-1
+2
+4 2
+1 5 8 10
+5 2
+1 2 3 4 5
+Sample Output-1
+5
+3
+Explanation for Sample Input 1:
+For test case 1:The final array will look like [3, 3, 6, 8]. So the difference between maximum and minimum is 8 - 3 = 5.
+For test case 2:The final array will look like [3, 4, 1, 2, 3]. So the difference between maximum and minimum is 4 - 1 = 3.
+
+public class Solution {
+
+    public static int minimizeIt(int[] A, int K) {
+        Arrays.sort(A);
+        int n = A.length;
+        int ans = A[n - 1] - A[0];
+
+        int small = A[0] + K;
+        int large = A[n - 1] - K;
+
+        for (int i = 0; i < n - 1; i++) {
+            int minElem = Math.min(small, A[i + 1] - K);
+            int maxElem = Math.max(large, A[i] + K);
+
+            if (minElem < 0) continue;
+
+            ans = Math.min(ans, maxElem - minElem);
+        }
+        return ans;
+    }
+}
+===========================================================================================================================================================
+You are given an m x n binary matrix matrix.You can choose any number of columns in the matrix and flip every cell in that column (i.e., Change the value of the cell from 0 to 1 or vice versa).Return the maximum number of rows that have all values equal after some number of flips.
+Example 1:Input: matrix = [[0,1],[1,1]]						Output: 1
+Explanation: After flipping no values, 1 row has all values equal.
+Example 2:Input: matrix = [[0,1],[1,0]]						Output: 2
+Explanation: After flipping values in the first column, both rows have equal values.
+Example 3:Input: matrix = [[0,0,0],[0,0,1],[1,1,0]			Output: 2
+Explanation: After flipping values in the first two columns, the last two rows have equal values.
+
+class Solution {
+    public int maxEqualRowsAfterFlips(int[][] matrix) {
+        
+        HashMap<String,Integer> map = new HashMap<>();
+        int res = 0;
+
+        for(int[] row:matrix){
+            StringBuilder sb = new StringBuilder();
+            for(int i:row){
+                sb.append(i);
+            }
+
+            if(row[0]==1){
+                for(int i=0;i<row.length;i++){
+                    if(row[i]==1) sb.replace(i,i+1,"0");
+                    else sb.replace(i,i+1,"1");
+                }
+            }
+            String s = sb.toString();
+
+            map.put(s,map.getOrDefault(s,0)+1);
+
+            res = Math.max(res,map.get(s));
+
+        }
+        return res;
+    }
+}
+==============================================================================================================================================
+You are given two arrays ‘A’ and ‘B’, each containing ‘N’ distinct integers. You are also given that ‘B’ is an anagram of ‘A’Find the index mapping from array ‘A’ to array ‘B’, ie: for each element in ‘A’ you need to find the index in ‘B’ corresponding to that element.An array ‘B’ is an anagram of an array ‘A’ means ‘B’ is made by randomizing the order of the elements in ‘A’.
+For Example :If ‘N’ = 5, ‘A’ = {10, 20, 30, 40, 50} and ‘B’ = {20, 10, 40, 50, 30}.Then we will print {1, 0, 4, 2, 3} because:A[0] occurs at 1st index in array B, A[1] occurs at 0th index, A[2] occurs at 4th index, A[3] occurs at 2nd index, A[4] occurs at 3rd index.
+Detailed explanation ( Input/output format, Notes, Images )
+Sample Input 1 :
+10 20 30 40 50
+20 10 40 50 30
+
+10 20 30 40 50
+10 20 30 40 50
+Sample Output 1 :
+1 0 4 2 3
+0 1 2 3 4
+
+public class Solution {
+	public static int[] anagramMapping(int n, int[] a, int[] b) {
+		// Write your code here.
+		HashMap<Integer,Integer> map = new HashMap<>();
+		
+		for(int i=0;i<n;i++){
+			map.put(b[i],i);
+		}
+
+		int[] res = new int[n];
+
+		for(int i=0;i<n;i++){
+			res[i]=map.get(a[i]);
+		}
+		return res;
+	}
+}
+==============================================================================================================================================
+Given a zero-based permutation nums (0-indexed), build an array ans of the same length where ans[i] = nums[nums[i]] for each 0 <= i < nums.length and return it.A zero-based permutation nums is an array of distinct integers from 0 to nums.length - 1 (inclusive).
+Example 1:Input: nums = [0,2,1,5,3,4]		Output: [0,1,2,4,5,3]
+Explanation: The array ans is built as follows: 
+ans = [nums[nums[0]], nums[nums[1]], nums[nums[2]], nums[nums[3]], nums[nums[4]], nums[nums[5]]]
+    = [nums[0], nums[2], nums[1], nums[5], nums[3], nums[4]]
+    = [0,1,2,4,5,3]
+Example 2:Input: nums = [5,0,1,2,3,4]		Output: [4,5,0,1,2,3]
+Explanation: The array ans is built as follows:
+ans = [nums[nums[0]], nums[nums[1]], nums[nums[2]], nums[nums[3]], nums[nums[4]], nums[nums[5]]]
+    = [nums[5], nums[0], nums[1], nums[2], nums[3], nums[4]]
+    = [4,5,0,1,2,3]
+	
+class Solution {
+    public int[] buildArray(int[] nums) {
+        int n = nums.length;
+
+        // First pass: encode both old and new values into nums[i]
+        for (int i = 0; i < n; i++) {
+            nums[i] = nums[i] + (nums[nums[i]] % n) * n;
+        }
+
+        // Second pass: extract new value by dividing by n
+        for (int i = 0; i < n; i++) {
+            nums[i] = nums[i] / n;
+        }
+
+        return nums;
+    }
+}
+=============================================================================================================================================
+You are given an array ‘ARR’ of length ‘N’. There are two operations, ‘FIRST_SUM’ and ‘LAST_SUM’ for every index ‘i’ (1 <= i <= N) in the array,i) FIRST_SUM(i) calculates the sum of first i numbers.ii) LAST_SUM(i) calculates the sum of last N-i+1 numbers.Also for every ‘i’, SPECIAL_SUM(i) can be calculated as:SPECIAL_SUM(i) = FIRST_SUM(i) + LAST_SUM(i).Your task is to return the minimum SPECIAL_SUM for 0 <= i <= N - 1.For example:Given ‘N’ = 4 and ‘ARR’ = [1, 2, 3, 4].Then the minimum special sum will be 5 for i = 0 (0-based indexing), which is (1 + 4) = 5.Sum of 1 integer from beginning and end.For i = 1 it will be (1 + 2) + (3 + 4) = 10For i = 2 it will be (1 + 2 + 3) + (2 + 3 + 4) = 15For i = 3 it will be (1 + 2 + 3 + 4) + (1 + 2 + 3 + 4) = 20.All of which are greater than 5.Detailed explanation ( Input/output format, Notes, Images )
+Sample Input 1:2			4
+1 2 3 4			1 -2 -3 4
+Sample Output 1:5		-5
+Explanation of the Sample Input 1:
+For the first test case:The  minimum special sum will be 5 for i = 0 (0-based indexing), which is (1 + 4) = 5.
+For i = 1 it will be (1 + 2) + (3 + 4) = 10
+For i = 2 it will be (1 + 2 + 3) + (2 + 3 + 4) = 15
+For i = 3 it will be (1 + 2 + 3 + 4) + (1 + 2 + 3 + 4) = 20
+All of which are greater than 5.  
+
+public class Solution {
+	public static int specialSum(ArrayList<Integer> arr, int n) {
+		int totalSum = 0;
+		for (int num : arr) {
+			totalSum += num;
+		}
+
+		int prefixSum = 0;
+		int res = Integer.MAX_VALUE;
+
+		for (int i = 0; i < n; i++) {
+			prefixSum += arr.get(i);
+			int suffixSum = totalSum;
+
+			for (int j = 0; j < i; j++) {
+				suffixSum -= arr.get(j);
+			}
+
+			int specialSum = prefixSum + suffixSum;
+			res = Math.min(res, specialSum);
+		}
+		return res;
+	}
+}
+=================================================================================================================================================================
+You are given two arrays nums1 and nums2 consisting of positive integers.You have to replace all the 0's in both arrays with strictly positive integers such that the sum of elements of both arrays becomes equal.Return the minimum equal sum you can obtain, or -1 if it is impossible.
+Example 1:Input: nums1 = [3,2,0,1,0], nums2 = [6,5,0]								Output: 12
+Explanation: We can replace 0's in the following way:
+- Replace the two 0's in nums1 with the values 2 and 4. The resulting array is nums1 = [3,2,2,1,4].
+- Replace the 0 in nums2 with the value 1. The resulting array is nums2 = [6,5,1].
+Both arrays have an equal sum of 12. It can be shown that it is the minimum sum we can obtain.
+Example 2:Input: nums1 = [2,0,2,0], nums2 = [1,4]									Output: -1
+Explanation: It is impossible to make the sum of both arrays equal.
+
+class Solution {
+    public long minSum(int[] nums1, int[] nums2) {
+        int sum1 = 0, zero1 = 0;
+        int sum2 = 0, zero2 = 0;
+
+        for (int num : nums1) {
+            if (num == 0) zero1++;
+            else sum1 += num;
+        }
+
+        for (int num : nums2) {
+            if (num == 0) zero2++;
+            else sum2 += num;
+        }
+
+        int minSum1 = zero1 + sum1;  // assuming we replace zeros with 1
+        int minSum2 = zero2 + sum2;
+
+        if (minSum1 == minSum2) return minSum1;
+
+        // If one side has no zero and its minimal sum is less → impossible
+        if (minSum1 < minSum2 && zero1 == 0) return -1;
+        if (minSum2 < minSum1 && zero2 == 0) return -1;
+
+        // Else we can always make them equal by filling zeros accordingly
+        return Math.max(minSum1, minSum2);
+    }
+}
+===========================================================================================================================================================
+calculate number of pairs whose difference is a perfect square example n=10 possible pair within n whose diff are perfect square is (1 ,2 )...(6,10)...
+
+public class PerfectSquarePairsOptimized {
+    public static void main(String[] args) {
+        int n = 1_000_000;  // Try with large n
+        long count = 0;
+
+        // For each possible perfect square difference
+        for (int diff = 1; diff < n; diff++) {
+            int sqrt = (int) Math.sqrt(diff);
+            if (sqrt * sqrt == diff) {
+                // For diff, number of valid a is (n - diff)
+                count += (n - diff);
+            }
+        }
+
+        System.out.println("Total pairs with perfect square difference for n = " + n + ": " + count);
+    }
+}
+=============================================================================================================================================================
+You are given a 0-indexed integer array nums of length n.You can perform the following operation as many times as you want:Pick an index i that you haven’t picked before, and pick a prime p strictly less than nums[i], then subtract p from nums[i].Return true if you can make nums a strictly increasing array using the above operation and false otherwise.A strictly increasing array is an array whose each element is strictly greater than its preceding element.
+Example 1:Input: nums = [4,9,6,10]				Output: true
+Explanation: In the first operation: Pick i = 0 and p = 3, and then subtract 3 from nums[0], so that nums becomes [1,9,6,10].
+In the second operation: i = 1, p = 7, subtract 7 from nums[1], so nums becomes equal to [1,2,6,10].
+After the second operation, nums is sorted in strictly increasing order, so the answer is true.
+Example 2:Input: nums = [6,8,11,12]				Output: true
+Explanation: Initially nums is sorted in strictly increasing order, so we don't need to make any operations.
+Example 3:Input: nums = [5,8,3]					Output: false
+Explanation: It can be proven that there is no way to perform operations to make nums sorted in strictly increasing order, so the answer is false.
+
+class Solution {
+    public boolean primeSubOperation(int[] nums) {
+        int n = nums.length;
+        int max = Arrays.stream(nums).max().getAsInt();
+
+        // Corrected size: max + 1
+        boolean[] isPrime = new boolean[max + 1];
+
+        Arrays.fill(isPrime, true);
+        isPrime[0] = isPrime[1] = false;
+
+        for (int i = 2; i * i <= max; i++) {
+            if (isPrime[i]) {
+                for (int j = i * i; j <= max; j += i) {
+                    isPrime[j] = false;
+                }
+            }
+        }
+
+        int prev = 0;
+
+        for (int i = 0; i < n; i++) {
+            int num = nums[i];
+            int reduced = makeSmall(num, prev, isPrime);
+
+            if (reduced == -1) {
+                if (num <= prev) return false;
+            } else {
+                nums[i] = reduced;
+            }
+
+            prev = nums[i];
+        }
+
+        return true;
+    }
+
+    // Finds a prime 'p' such that (num - p) > high
+    private int makeSmall(int num, int high, boolean[] isPrime) {
+        for (int p = num - 1; p >= 2; p--) {
+            if (isPrime[p]) {
+                int reduced = num - p;
+                if (reduced > high) {
+                    return reduced;
+                }
+            }
+        }
+        return -1; // No valid prime found
+    }
+}
+=====================================================================================================================
+Return true if 3 consecutive odds are present in array
+class Solution {
+    public boolean threeConsecutiveOdds(int[] arr) {
+        if (arr.length < 3) return false;
+        for (int i = 0; i <= arr.length - 3; i++) {
+            if ((arr[i] & 1) == 1 && (arr[i+1] & 1) == 1 && (arr[i+2] & 1) == 1)
+                return true;
+        }
+        return false;
+    }
+}
+========================================================================================================================================
+You are given two integers n and x. You have to construct an array of positive integers nums of size n where for every 0 <= i < n - 1, nums[i + 1] is greater than nums[i], and the result of the bitwise AND operation between all elements of nums is x.Return the minimum possible value of nums[n - 1].
+Example 1:Input: n = 3, x = 4				Output: 6
+Explanation:nums can be [4,5,6] and its last element is 6.
+Example 2:Input: n = 2, x = 7				Output: 15
+Explanation:nums can be [7,15] and its last element is 15.
+
+public long minEnd(int n, int x) {
+        long ans = x;
+        while(n-->1){
+            ans = ((ans + 1) | x);
+        }
+        return ans;
+}
+==============================================================================================================================================
+You are given an integer array digits, where each element is a digit. The array may contain duplicates.You need to find all the unique integers that follow the given requirements:The integer consists of the concatenation of three elements from digits in any arbitrary order.The integer does not have leading zeros.The integer is even.For example, if the given digits were [1, 2, 3], integers 132 and 312 follow the requirements.Return a sorted array of the unique integers.
+Example 1:Input: digits = [2,1,3,0]			Output: [102,120,130,132,210,230,302,310,312,320]
+Explanation: All the possible integers that follow the requirements are in the output array. 
+Notice that there are no odd integers or integers with leading zeros.
+Example 2:Input: digits = [2,2,8,8,2]		Output: [222,228,282,288,822,828,882]
+Explanation: The same digit can be used as many times as it appears in digits. 
+In this example, the digit 8 is used twice each time in 288, 828, and 882. 
+Example 3:Input: digits = [3,7,5]			Output: []
+Explanation: No even integers can be formed using the given digits.
+
+class Solution {
+    public int[] findEvenNumbers(int[] digits) {
+        int[] freq = new int[10];
+
+        for (int d : digits) freq[d]++;
+
+        return IntStream.rangeClosed(100, 999)
+                .filter(n -> n % 2 == 0)
+                .filter(n -> canForm(n, freq))
+                .toArray();
+    }
+
+    private boolean canForm(int num, int[] freq) {
+        int d1 = num / 100;
+        int d2 = (num / 10) % 10;
+        int d3 = num % 10;
+
+        int[] temp = new int[10];
+        temp[d1]++;
+        temp[d2]++;
+        temp[d3]++;
+
+        return IntStream.range(0, 10).allMatch(i -> temp[i] <= freq[i]);
+    }
+}
+===========================================================================================================================================================================
+Alex wanted to buy a new keyboard, but due to the low battery in his GPS, he had to print his route on paper, now he wants to know if he can return safely to his home following the instructions written by him. The city of Alex can be represented by a 2D plane, and every location is denoted by ('X','Y') coordinates. Alex is currently standing at ( 0, 0 ) facing north.The printed route contains a string with characters like:'L' : which denotes he should turn to the left of the direction he is facing.'R' : which denotes he should turn to the right of the direction he is facing. 'G' : which denotes he should walk in the same direction by one unit.Determine whether he can return home safely or not by following his instruction on the printed sheet.Note:He can follow the same printed set of instructions as many times as wanted.
+Sample Input 1:GGRRGG			GGG
+Sample Output 1:True			False
+Explanation of sample input 1:
+In the first test case, Alex follows the following instructions, he will go from (0,0) -> (0,1) -> (0,2) -> turned towards east -> turned towards south -> (0,1) -> (0,0).
+In the second test case, he will always go towards the right, hence it is impossible for him to return home.
+Sample Input 2:LR			GL
+Sample Output 2:True		True
+Explanation of sample input 2:In the first test case, he is in the same position just turning in his direction.In the second test case, he will go from (0,0) -> (0,1) -> (turned left) -> (-1,1) -> (turned left) ->(-1,0) ->(turned left) -> (0,0)
+
+class Solution {
+    static boolean canReturnHome(String instructions) {
+        int x = 0, y = 0;
+        // 0 = north, 1 = east, 2 = south, 3 = west
+        int dir = 0;
+
+        for (char ch : instructions.toCharArray()) {
+            if (ch == 'G') {
+                if (dir == 0) y++;
+                else if (dir == 1) x++;
+                else if (dir == 2) y--;
+                else x--;
+            } else if (ch == 'L') {
+                dir = (dir + 3) % 4;
+            } else if (ch == 'R') {
+                dir = (dir + 1) % 4;
+            }
+        }
+
+        // If back at (0,0) or facing not north (so repeating will bring back)
+        return (x == 0 && y == 0) || dir != 0;
+    }
+}
+============================================================================================================================================================
+You are given a natural number ‘N’. Find all the divisors of the number ‘N’. Print them in increasing order.
+Example:Input: ‘N’ = 10 				Output: [1, 2, 5, 10]
+1, 2, 5, and 10 are the only divisors of the number 10.Detailed explanation
+Sample Input 1 : 100													13
+Sample Output 1 :1 2 4 5 10 20 25 50 100								1 13
+public static List<Integer> findDivisors(int n) {
+IntStream.rangeClosed(1, (int) Math.sqrt(n))
+                .filter(i -> n % i == 0)
+                .flatMap(i -> (n / i == i) 
+                        ? IntStream.of(i)               // perfect square
+                        : IntStream.of(i, n / i))       // both divisors
+                .distinct()
+                .sorted()
+                .boxed()
+         .collect(Collectors.toCollection(ArrayList::new));
+}
+or
+public static List<Integer> findDivisors(int n) {
+        TreeSet<Integer> divisors = new TreeSet<>(); // TreeSet to keep it sorted automatically
+
+        for (int i = 1; i <= Math.sqrt(n); i++) {
+            if (n % i == 0) {
+                divisors.add(i);
+                divisors.add(n / i); // Add both i and (n / i)
+            }
+        }
+
+        return new ArrayList<>(divisors); // Convert to List for output
+    }
+================================================================================================================================================================
+You are given a string s and an integer t, representing the number of transformations to perform. In one transformation, every character in s is replaced according to the following rules:If the character is 'z', replace it with the string "ab".Otherwise, replace it with the next character in the alphabet. For example, 'a' is replaced with 'b', 'b' is replaced with 'c', and so on.Return the length of the resulting string after exactly t transformations.Since the answer may be very large, return it modulo 109 + 7.
+Example 1:Input: s = "abcyy", t = 2		Output: 7
+Explanation:First Transformation (t = 1):'a' becomes 'b','b' becomes 'c','c' becomes 'd','y' becomes 'z','y' becomes 'z'.String after the first transformation: "bcdzz".Second Transformation (t = 2):'b' becomes 'c','c' becomes 'd','d' becomes 'e','z' becomes "ab",'z' becomes "ab".String after the second transformation: "cdeabab"
+Final Length of the string: The string is "cdeabab", which has 7 characters.
+Example 2:Input: s = "azbk", t = 1			Output: 5
+Explanation:First Transformation (t = 1):'a' becomes 'b','z' becomes "ab",'b' becomes 'c','k' becomes 'l'.String after the first transformation: "babcl"
+Final Length of the string: The string is "babcl", which has 5 characters.
+
+public class TransformStringLength {
+    static final int MOD = 1_000_000_007; // Given the ans can be too large
+
+    public static int finalStringLength(String s, int t) {
+        long[] count = new long[26];
+
+        // Initial frequency count of each character
+        for (char ch : s.toCharArray()) {
+            count[ch - 'a']++;
+        }
+
+        for (int step = 0; step < t; step++) {
+            long[] next = new long[26];
+            for (int i = 0; i < 26; i++) {
+                if (i == 25) {
+                    // 'z' → "ab"
+                    next[0] = (next[0] + count[25]) % MOD;
+                    next[1] = (next[1] + count[25]) % MOD;
+                } else {
+                    // Other characters → next char
+                    next[i + 1] = (next[i + 1] + count[i]) % MOD;
+                }
+            }
+            count = next;
+        }
+
+        // Final length = sum of all counts
+        long result = 0;
+        for (long c : count) {
+            result = (result + c) % MOD;
+        }
+
+        return (int) result;
+    }
+}
+===========================================================================================================================================================
+Given an integer array nums, return the number of triplets such that the sum of the first and third numbers equals exactly half of the second number.
+
+public int countTriplets(int[] nums) {
+    int count = 0;
+    int n = nums.length;
+
+    for (int j = 1; j < n - 1; j++) {
+        // We want to find pairs (i, k) such that:
+        // 2 * (nums[i] + nums[k]) == nums[j]
+        // So rearranged: nums[i] + nums[k] == nums[j] / 2
+
+        if (nums[j] % 2 != 0) continue; // nums[j]/2 must be an integer
+
+        int target = nums[j] / 2;
+
+        // Count frequency of numbers before j
+        Map<Integer, Integer> freq = new HashMap<>();
+        for (int i = 0; i < j; i++) {
+            freq.put(nums[i], freq.getOrDefault(nums[i], 0) + 1);
+        }
+
+        // Try all k after j and look for (target - nums[k]) in freq
+        for (int k = j + 1; k < n; k++) {
+            int needed = target - nums[k];
+            count += freq.getOrDefault(needed, 0);
+        }
+    }
+
+    return count;
+}
+=====================================================================================================================================================
+You have an integer array ‘A’ of the form of [x, x+1, x+2, x+3, …….]. As the array is vast in size, you are given both endpoints of the array, i.e., If you are given two integers, ‘L’ and ‘R’, the array ‘A’ will be [L, L+1, L+2, ……., R-1, R]. Your task is to find the maximum possible value of ‘X’ such that the following two conditions hold.
+a ^ b = X, where ⊕ denotes bitwise xor operation.Both numbers ‘a’ and ‘b’ belong to the array ‘A’.Detailed explanation ( Input/output format, Notes, Images )
+Sample Input 1 :8 20		1 3
+Sample Output 1 :31			  3
+Explanation for Sample Input 1 :The array looks like [8, 9, 10, ….., 18, 19, 20]. From all possible pairs (a, b), pair (15, 16) gives maximum value of xor, which is 15 ⊕ 16 = 31.
+For Case 2:Optimal pair is (2, 3), which gives 2 ⊕ 3 = 3.
+Sample Input 2 :4 10		
+Sample Output 2 :15
+
+public class MaxXORInRange {
+    private static int getMaxXOR(int l, int r) {
+        int xor = l ^ r;
+        int msb = 0;
+        while (xor > 0) {
+            msb++;
+            xor >>= 1;
+        }
+        return (1 << msb) - 1;  // 2^msb - 1
+    }
+}
+=====================================================================================================================================================
+You are given two arrays with positive integers arr1 and arr2.A prefix of a positive integer is an integer formed by one or more of its digits, starting from its leftmost digit. For example, 123 is a prefix of the integer 12345, while 234 is not.A common prefix of two integers a and b is an integer c, such that c is a prefix of both a and b. For example, 5655359 and 56554 have common prefixes 565 and 5655 while 1223 and 43456 do not have a common prefix.You need to find the length of the longest common prefix between all pairs of integers (x, y) such that x belongs to arr1 and y belongs to arr2.Return the length of the longest common prefix among all pairs. If no common prefix exists among them, return 0.
+Example 1:Input: arr1 = [1,10,100], arr2 = [1000]			Output: 3
+Explanation: There are 3 pairs (arr1[i], arr2[j]):
+- The longest common prefix of (1, 1000) is 1.
+- The longest common prefix of (10, 1000) is 10.
+- The longest common prefix of (100, 1000) is 100.
+The longest common prefix is 100 with a length of 3.
+Example 2:Input: arr1 = [1,2,3], arr2 = [4,4,4]				Output: 0
+Explanation: There exists no common prefix for any pair (arr1[i], arr2[j]), hence we return 0.
+Note that common prefixes between elements of the same array do not count.
+
+class Solution {
+    public int longestCommonPrefix(int[] arr1, int[] arr2) {
+        HashSet<Integer> prefixes = new HashSet<>();
+
+        for(int num:arr1){
+            while(num!=0){
+                prefixes.add(num);
+                num /=10;
+            }
+        }
+
+        int res = 0;
+
+        for(int num:arr2){
+            while(num!=0){
+                if(prefixes.contains(num)){
+                    res = Math.max(res,String.valueOf(num).length());
+                }
+                num /=10;
+            }
+        }
+        return res;
+    }
+}
+============================================================================================================================================
+You are given a 0-indexed string s of even length n. The string consists of exactly n / 2 opening brackets '[' and n / 2 closing brackets ']'.A string is called balanced if and only if:It is the empty string, orIt can be written as AB, where both A and B are balanced strings, orIt can be written as [C], where C is a balanced string.
+You may swap the brackets at any two indices any number of times.Return the minimum number of swaps to make s balanced.
+Example 1:Input: s = "][]["								Output: 1
+Explanation: You can make the string balanced by swapping index 0 with index 3.
+The resulting string is "[[]]".
+Example 2:Input: s = "]]][[["							Output: 2
+Explanation: You can do the following to make the string balanced:
+- Swap index 0 with index 4. s = "[]][][".
+- Swap index 1 with index 5. s = "[[][]]".
+The resulting string is "[[][]]".
+Example 3:Input: s = "[]"								Output: 0
+Explanation: The string is already balanced.
+
+public class Solution {
+    public int minSwaps(String s) {
+        int imbalance = 0;      // Tracks current imbalance
+        int maxImbalance = 0;   // Tracks max imbalance encountered
+
+        for (char ch : s.toCharArray()) {
+            if (ch == '[') {
+                imbalance--;
+            } else { // ch == ']'
+                imbalance++;
+            }
+            maxImbalance = Math.max(maxImbalance, imbalance);
+        }
+
+        return (maxImbalance + 1) / 2;
+}
+========================================================================================================================================================
+Alice and Bob recently studied bitwise operators and were extremely fascinated by them. Alice found the following function in a book :
+Function magic(P, Q):
+while Q > 0 :A = P AND Q,B = P XOR Q,Q = A * 2,P = B,return P
+Alice wondered how many times the while loop would run for any value of ‘P’ and ‘Q’. Alice gave Bob the binary representation of ‘P’ and ‘Q’ and asked him to help her count this.
+Help Bob count the number of times the while loop would run for the given value of ‘P’ and ‘Q’.
+Sample Input 1:	110		10							2: 1		1
+Sample Output 1:3										2
+Explanation for Sample Input 1:In the first test case, initially ‘P’ is 6 and ‘Q’ is 2. After the first iteration, ‘P’ becomes 4 and ‘Q’ becomes 4. After the second iteration, ‘P’ becomes 0 and ‘Q’ becomes 8. After the third iteration, ‘P’ becomes 8 and ‘Q’ becomes 0.
+In the second test case, initially ‘P’ is 1 and ‘Q’ is 1. After the first iteration, ‘P’ becomes 0 and ‘Q’ becomes 2. After the second iteration ‘P’ becomes 2 and ‘Q’ becomes 0.
+Sample Input 2: 1101		101												111			11101
+Sample Output 2:3																			4
+
+public class Solution {
+
+    public static int countMagicLoops(String pStr, String qStr) {
+        BigInteger P = new BigInteger(pStr, 2);
+        BigInteger Q = new BigInteger(qStr, 2);
+
+        int count = 0;
+        while (!Q.equals(BigInteger.ZERO)) {
+            BigInteger A = P.and(Q);
+            BigInteger B = P.xor(Q);
+            Q = A.shiftLeft(1); // Q = A * 2
+            P = B;
+            count++;
+        }
+
+        return count;
+    }
+}
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,1452 @@
+You are given the text ‘IPAddress’. Your task is to check if the given text ‘IPAddress’ is a valid ‘IPv4’ or not.1. Text form of ‘IPAddress’ must be ‘a.b.c.d’ 2. The values of a,b,c and d can vary from ‘0’ to ‘255’ and both ‘0’ and ‘255’ are inclusive.
+Sample Input 1:	123.111.12.k		122.0.330.0		1.1.1.250		1.0.0.0.1
+Sample Output 1:False				False			True			False
+Explanation of sample input 1:
+Test Case 1:Given text ‘IPAddress = 123.111.12.k’, it is satisfying the first condition that given ‘IPAddress’ must be ‘a.b.c.d’ formed but it not satisfying the second condition that d must in a range of ‘0’ to ‘255’ but the value of ‘d’ is ‘k’.Hence return ‘False’.
+Test Case 2:Given text ‘IPAddress = 122.0.330.0’, it is satisfying the first condition that given ‘IPAddress’ must be ‘a.b.c.d’ formed but it not satisfying the second condition that c must in a range of ‘0’ to ‘255’ but the value of ‘c’ is ‘330’ and it is out of range.Hence return ‘False’.
+Test Case 3:Given text ‘IPAddress = 1.1.1.250’, it is satisfying the first condition that given ‘IPAddress’ must be ‘a.b.c.d’ formed as well as it satisfying the second condition that a,b,c, and d must in range of ‘0’ to ‘250’.
+Hence return ‘True’.
+Test Case 4:Given text ‘IPAddress = 1.0.0.0.1’, it is not satisfying the first condition for valid ‘IPv4’, that text ‘IPAddress’ must be in form of ‘a.b.c.d’ but given text is a form of ‘a.b.c.d.e’
+Hence return ‘False’.
+Sample Input 2:	1.90.21.1			1.1
+Sample Output 2:	True			False
+
+public class Solution {
+
+	public static boolean isValidIPv4(String ipAddress) {
+		// write your code here
+		String[] ip = ipAddress.split("\\.");
+
+		if(ip.length != 4){
+			return false;
+		}
+
+		for(String s : ip){
+			try{
+				int val = Integer.parseInt(s);
+				if(val > 255 || val < 0){
+					return false;
+				}
+			}catch(Exception e){
+				return false;
+			}
+		}
+		return true;
+	}
+
+}
+==================================================================================================================================================================================================================
+Given a string s consisting only of characters a, b and c.Return the number of substrings containing at least one occurrence of all these characters a, b and c.
+Example 1:	Input: s = "abcabc"				Output: 10
+Explanation: The substrings containing at least one occurrence of the characters a, b and c are "abc", "abca", "abcab", "abcabc", "bca", "bcab", "bcabc", "cab", "cabc" and "abc" (again). 
+Example 2:Input: s = "aaacb"				Output: 3
+Explanation: The substrings containing at least one occurrence of the characters a, b and c are "aaacb", "aacb" and "acb". 
+Example 3:Input: s = "abc"					Output: 1
+
+class Solution {
+    public int numberOfSubstrings(String s) {
+
+        int n = s.length();
+        int[] freq = new int[3]; // a -> 0, b -> 1, c -> 2
+
+        int left = 0;
+        int count = 0;
+
+        for (int right = 0; right < n; right++) {
+
+            freq[s.charAt(right) - 'a']++;
+
+            // Window contains all a, b and c
+            while (freq[0] > 0 && freq[1] > 0 && freq[2] > 0) {
+
+                // All substrings ending after right are also valid
+                count += n - right;
+
+                freq[s.charAt(left) - 'a']--;
+                left++;
+            }
+        }
+
+        return count;
+    }
+}
+==================================================================================================================================================================================================================
+Rahul is a programming enthusiast. He is currently learning about arrays/lists. One day his teacher asked him to solve a very difficult problem. The problem was to find the length of the smallest subarray(subarray is a contiguous part of an array/list) in a given array/list ‘ARR’ of size ‘N’ with its sum greater than a given value. If there is no such subarray return 0.
+Example: Given an ‘ARR’: [1, 2, 21, 7, 6, 12] and a number ‘X’: 23. The length of the smallest subarray is 2 as the subarray is [21, 7].
+Sample Input 1: 9 1 5 3 9 X= 11    5 1 2 1 X=9
+Sample Output 1:2					4
+Explanation For Sample Input 1:In the first test case, the length of the minimum subarray is 2. The subarray is [3, 9] as the sum is 12 which is greater than the given value 11.In the second test case, the length of the minimum subarray is 4. The subarray is [5,1, 2, 1] as the sum is 9 which is greater than the given value 8.
+
+public class Solution {
+
+    public static int smallestSubarrayWithSum(int[] arr, int n, long x) {
+
+        int left = 0;
+        long sum = 0;
+        int minLen = Integer.MAX_VALUE;
+
+        for (int right = 0; right < n; right++) {
+
+            sum += arr[right];
+
+            // Shrink the window while sum > x
+            while (sum > x) {
+                minLen = Math.min(minLen, right - left + 1);
+
+                sum -= arr[left];
+                left++;
+            }
+        }
+
+        return minLen == Integer.MAX_VALUE ? 0 : minLen;
+    }
+}
+==================================================================================================================================================================================================================
+Ninja has been given a matrix ‘MAT’ of integers having size ‘N’ x ‘M’ i.e. N rows and M columns. Ninja has to find the maximum sum submatrix in it. In other words, he has to find the maximum sum over all submatrices in the matrix.
+Sample Input 1 :
+4 4
+-1 -2 -2 -2
+-5 -4 -1 -9 
+-3 -2 -6 -3
+-4 -3 -3 -2
+Sample Output 1 :
+-1
+Explanation Of Sample Output 1 :For sample test case 1 : In this sample test case, the maximum sum submatrix in the matrix ‘MAT’ is at cell (0,0) with sum -1.
+Sample Input 2 :
+3 3
+1 2 3
+4 5 6
+7 8 9
+Sample Output 2 :
+45
+Explanation Of Sample Output 1 :For sample test case 1 : In this sample test case, the maximum sum submatrix in the matrix ‘MAT’ is having cells (0,0), (0,2), (2,0), (2,2) with sum 45.
+
+public class Solution {
+
+    public static int maximumSumRectangle(int[][] mat, int n, int m) {
+
+        int maxSum = Integer.MIN_VALUE;
+
+        for (int left = 0; left < m; left++) {
+
+            int[] temp = new int[n];
+
+            for (int right = left; right < m; right++) {
+
+                for (int row = 0; row < n; row++) {
+                    temp[row] += mat[row][right];
+                }
+
+                maxSum = Math.max(maxSum, kadane(temp));
+            }
+        }
+
+        return maxSum;
+    }
+
+    private static int kadane(int[] arr) {
+
+        int maxEndingHere = arr[0];
+        int maxSoFar = arr[0];
+
+        for (int i = 1; i < arr.length; i++) {
+            maxEndingHere = Math.max(arr[i], maxEndingHere + arr[i]);
+            maxSoFar = Math.max(maxSoFar, maxEndingHere);
+        }
+
+        return maxSoFar;
+    }
+}
+==================================================================================================================================================================================================================
+You and your friend Ninjax are playing a game of coins. Ninjax place the 'N' number of coins in a straight line.
+The rule of the game is as follows:
+1. Each coin has a value associated with it.
+2. It’s a two-player game played against an opponent with alternating turns. 
+3. At each turn, the player picks either the first or the last coin from the line and permanently removes it.
+4. The value associated with the coin picked by the player adds up to the total amount the player wins. 
+Example 1:Let the values associated with four coins be: [9, 5, 21, 7] Let’s say that initially, you pick 9 and Ninjax picks 7.Then, you pick 21 and Ninjax picks 5. So, you win a total amount of (9+21), i.e. 30.
+In case you would have picked up 7 initially and Ninjax would have picked 21 (as he plays optimally). Then, you would pick 9 and Ninjax would choose 5. So, you win a total amount of (7+9), i.e. 16, which is not the maximum you can obtain.Thus, the maximum amount you can win is 30.
+Example 2:Let the values associated with four coins be: [20, 50, 5, 10] Let’s say that initially, you pick 10 and Ninjax picks 20.Then, you pick 50 and Ninjax picks 5. So, you win a total amount of (10+50), i.e. 60.In case you would have picked up 20 initially and Ninjax would have picked 50 (as he plays optimally). Then, you would pick 10 and Ninjax would choose 5. So, you win a total amount of (20+10), i.e. 30, which is not the maximum you can obtain.Thus, the maximum amount you can win is 60.
+Sample Input 1:		7 8			5 30 4 1
+Sample Output 1:	8			31
+Explanation For Sample Input 1:For the first test case, you can pick the maximum value between 7 and 8, which is 8. Thus, Ninjax has to pick up 7. So, you win a total amount of 8.For the second test case, first, you pick 1, Ninjax picks 5. Then, you pick 30 and Ninjax picks 4, which is the only coin left. So, you win a total amount of (1 + 30) 31.
+Sample Input 2:	0 5 1 7		1 2 3 4 5 6		5 5 5 5
+Sample Output 2: 12			12				10
+
+import java.util.*;
+
+public class Solution {
+
+    public static long maximumAmount(int[] arr, int n) {
+
+        // dp[i][j] = Maximum amount the current player can collect
+        // from coins between index i and j (both inclusive).
+        long[][] dp = new long[n][n];
+
+        // We fill the table diagonally.
+        // gap = j - i
+        // gap = 0 -> subarrays of length 1
+        // gap = 1 -> subarrays of length 2
+        // ...
+        // gap = n-1 -> complete array
+        for (int gap = 0; gap < n; gap++) {
+
+            for (int i = 0, j = gap; j < n; i++, j++) {
+
+                /*
+                 * If we pick the left coin (arr[i]),
+                 * opponent has two choices:
+                 *
+                 * 1. Opponent picks i+1
+                 *      Remaining range -> (i+2, j)
+                 *
+                 * 2. Opponent picks j
+                 *      Remaining range -> (i+1, j-1)
+                 *
+                 * Since opponent plays optimally for himself,
+                 * he leaves us with the MINIMUM possible future amount.
+                 */
+                long x = (i + 2 <= j) ? dp[i + 2][j] : 0;
+                long y = (i + 1 <= j - 1) ? dp[i + 1][j - 1] : 0;
+
+                /*
+                 * If we pick the right coin (arr[j]),
+                 * opponent again has two choices:
+                 *
+                 * 1. Opponent picks i
+                 *      Remaining range -> (i+1, j-1)
+                 *
+                 * 2. Opponent picks j-1
+                 *      Remaining range -> (i, j-2)
+                 */
+                long z = (i <= j - 2) ? dp[i][j - 2] : 0;
+
+                // Option 1: Pick the left coin.
+                long pickLeft = arr[i] + Math.min(x, y);
+
+                // Option 2: Pick the right coin.
+                long pickRight = arr[j] + Math.min(y, z);
+
+                // We choose whichever gives us the maximum amount.
+                dp[i][j] = Math.max(pickLeft, pickRight);
+            }
+        }
+
+        // Answer for the complete array.
+        return dp[0][n - 1];
+    }
+}
+==================================================================================================================================================================================================================
+You are given a positive integer n representing n cities numbered from 1 to n. You are also given a 2D array roads where roads[i] = [ai, bi, distancei] indicates that there is a bidirectional road between cities ai and bi with a distance equal to distancei. The cities graph is not necessarily connected.The score of a path between two cities is defined as the minimum distance of a road in this path.Return the minimum possible score of a path between cities 1 and n.
+Note:A path is a sequence of roads between two cities.It is allowed for a path to contain the same road multiple times, and you can visit cities 1 and n multiple times along the path.
+The test cases are generated such that there is at least one path between 1 and n.
+Example 1:Input: n = 4, roads = [[1,2,9],[2,3,6],[2,4,5],[1,4,7]]					Output: 5
+Explanation: The path from city 1 to 4 with the minimum score is: 1 -> 2 -> 4. The score of this path is min(9,5) = 5.
+It can be shown that no other path has less score.
+Example 2:Input: n = 4, roads = [[1,2,2],[1,3,4],[3,4,7]]							Output: 2
+Explanation: The path from city 1 to 4 with the minimum score is: 1 -> 2 -> 1 -> 3 -> 4. The score of this path is min(2,2,4,7) = 2.
+
+import java.util.*;
+
+class Solution {
+
+    public int minScore(int n, int[][] roads) {
+
+        // Build adjacency list
+        Map<Integer, List<int[]>> graph = new HashMap<>();
+
+        for (int i = 1; i <= n; i++) {
+            graph.put(i, new ArrayList<>());
+        }
+
+        // Since roads are bidirectional, add both directions.
+        // int[] = {neighbor, distance}
+        for (int[] road : roads) {
+            int u = road[0];
+            int v = road[1];
+            int dist = road[2];
+
+            graph.get(u).add(new int[]{v, dist});
+            graph.get(v).add(new int[]{u, dist});
+        }
+
+        boolean[] visited = new boolean[n + 1];
+
+        // Stores the minimum edge seen in this connected component.
+        int[] answer = {Integer.MAX_VALUE};
+
+        dfs(1, graph, visited, answer);
+
+        return answer[0];
+    }
+
+    private void dfs(int node,
+                     Map<Integer, List<int[]>> graph,
+                     boolean[] visited,
+                     int[] answer) {
+
+        visited[node] = true;
+
+        // Explore all roads from current city.
+        for (int[] edge : graph.get(node)) {
+
+            int next = edge[0];
+            int distance = edge[1];
+
+            // Update minimum road distance seen so far.
+            answer[0] = Math.min(answer[0], distance);
+
+            // Visit unvisited neighboring city.
+            if (!visited[next]) {
+                dfs(next, graph, visited, answer);
+            }
+        }
+    }
+}
+==================================================================================================================================================================================================================
+You hosted a great party and invited all of your friends. You have an infinite number of friends. Since you can’t remember all of their names, you have given each of them an ‘id’ numbered from ‘1’ to ‘∞’. You decided to play a game ‘T’ times. Each time you select an even number of friends having ‘id’ from the range ‘L’ to ‘R’. You play the game by dividing all of your friends into ‘(R - L + 1) / 2’ teams, i.e. every team consists of two friends, and every friend is a member of exactly one team. But there is a problem. Two friends will only form a team if the gcd of their ‘id’ is 1. I.e. gcd(i, j) must be 1 and ‘L’ <= i < j <= ‘R’.For each game. If you can divide the friends into ‘(R - L + 1) / 2’ teams, print the resulting pairs,i.e. Pair of friend’s id who are forming a team, else print no solution exists. If there are multiple solutions, you can print any of them.Note: The solution function returns a single value, and based on your answer, the output will either be 1 or 0.
+Sample Input 1:	1 8				1 4
+Sample Output-1
+2 7
+4 1
+3 8
+6 5
+
+1 4
+3 2
+Explanation for Sample Input 1:
+For Case 1:Gcd of all the pairs are 1, and no number is in more than one pair.
+For Case 2:Gcd of all the pairs are 1, and no number is in more than one pair.
+Sample Input 2:
+2
+3 8
+1 2
+Sample Output-2
+1
+4 7
+3 8
+6 5
+1
+1 2
+
+public class Solution {
+
+    public static long[][] teams(long L, long R) {
+
+        int n = (int) ((R - L + 1) / 2);
+        long[][] ans = new long[n][2];
+
+        long current = L;
+
+        for (int i = 0; i < n; i++) {
+            ans[i][0] = current;
+            ans[i][1] = current + 1;
+            current += 2;
+        }
+
+        return ans;
+    }
+}
+==================================================================================================================================================================================================================
+Given a 2D grid of size m x n and an integer k. You need to shift the grid k times.In one shift operation:Element at grid[i][j] moves to grid[i][j + 1].Element at grid[i][n - 1] moves to grid[i + 1][0].
+Element at grid[m - 1][n - 1] moves to grid[0][0].Return the 2D grid after applying shift operation k times.
+Example 1:	Input: grid = [[1,2,3],[4,5,6],[7,8,9]], k = 1				Output: [[9,1,2],[3,4,5],[6,7,8]]
+Example 2:Input: grid = [[3,8,1,9],[19,7,2,5],[4,6,11,10],[12,0,21,13]], k = 4		Output: [[12,0,21,13],[3,8,1,9],[19,7,2,5],[4,6,11,10]]
+Example 3:Input: grid = [[1,2,3],[4,5,6],[7,8,9]], k = 9			Output: [[1,2,3],[4,5,6],[7,8,9]]
+
+class Solution {
+    public List<List<Integer>> shiftGrid(int[][] grid, int k) {
+
+        int m = grid.length;
+        int n = grid[0].length;
+        int total = m * n;
+
+        // Reduce unnecessary full rotations
+        k %= total;
+
+        // Store shifted elements
+        int[][] shifted = new int[m][n];
+
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
+
+                // Convert 2D position to 1D index
+                int oldIndex = i * n + j;
+
+                // Compute new position after k shifts
+                int newIndex = (oldIndex + k) % total;
+
+                // Convert 1D index back to 2D position
+                int newRow = newIndex / n;
+                int newCol = newIndex % n;
+
+                // Place the element in its new position
+                shifted[newRow][newCol] = grid[i][j];
+            }
+        }
+
+        // Convert int[][] to List<List<Integer>>
+        List<List<Integer>> ans = new ArrayList<>();
+
+        for (int i = 0; i < m; i++) {
+            List<Integer> row = new ArrayList<>();
+            for (int j = 0; j < n; j++) {
+                row.add(shifted[i][j]);
+            }
+            ans.add(row);
+        }
+
+        return ans;
+    }
+}
+==================================================================================================================================================================================================================
+You are given a binary string s of length n, where:'1' represents an active section. '0' represents an inactive section.You can perform at most one trade to maximize the number of active sections in s. In a trade, you:
+Convert a contiguous block of '1's that is surrounded by '0's to all '0's.Return the maximum number of active sections in s after making the optimal trade.
+Note: Treat s as if it is augmented with a '1' at both ends, forming t = '1' + s + '1'. The augmented '1's do not contribute to the final count.
+Example 1:Input: s = "01"			Output: 1
+Explanation:Because there is no block of '1's surrounded by '0's, no valid trade is possible. The maximum number of active sections is 1.
+Example 2:Input: s = "0100"			Output: 4
+Explanation:String "0100" → Augmented to "101001".Choose "0100", convert "101001" → "100001" → "111111".The final string without augmentation is "1111". The maximum number of active sections is 4.
+Example 3:Input: s = "1000100"		Output: 7
+Explanation:String "1000100" → Augmented to "110001001".Choose "000100", convert "110001001" → "110000001" → "111111111".The final string without augmentation is "1111111". The maximum number of active sections is 7.
+Example 4:Input: s = "01010"		Output: 4
+Explanation:String "01010" → Augmented to "1010101".Choose "010", convert "1010101" → "1000101" → "1111101".The final string without augmentation is "11110". The maximum number of active sections is 4.
+
+class Solution {
+    public int maxActiveSectionsAfterTrade(String s) {
+
+        // Count initial active sections
+        int ones = 0;
+        for (char c : s.toCharArray()) {
+            if (c == '1') {
+                ones++;
+            }
+        }
+
+        // Augment string
+        String t = "1" + s + "1";
+
+        List<Character> chars = new ArrayList<>();
+        List<Integer> len = new ArrayList<>();
+
+        // Run-length encoding
+        int i = 0;
+        while (i < t.length()) {
+            char ch = t.charAt(i);
+            int j = i;
+
+            while (j < t.length() && t.charAt(j) == ch) {
+                j++;
+            }
+
+            chars.add(ch);
+            len.add(j - i);
+
+            i = j;
+        }
+
+        int maxGain = 0;
+
+        // Check every 0-run,1-run,0-run
+        for (i = 1; i < chars.size() - 1; i++) {
+            if (chars.get(i) == '1'
+                    && chars.get(i - 1) == '0'
+                    && chars.get(i + 1) == '0') {
+
+                int gain = len.get(i - 1) + len.get(i + 1);
+                maxGain = Math.max(maxGain, gain);
+            }
+        }
+
+        return ones + maxGain;
+    }
+}
+==================================================================================================================================================================================================================
+Ninja has been given a string ‘STR’ containing ‘(‘ and ‘)’. ‘STR’ may also contain lower case alphabets. In order to make ‘STR’ valid Ninja can remove either ‘)’ or ‘(’ from ‘STR’.Here are some examples of valid ‘STR’ “((a))”, “(g)()”, “(())()”, "" (an empty string is also a valid string).Ninja wants to know all the possible valid strings that can be formed from ‘STR’ by minimum possible removals (possibly zero).Can you help Ninja to generate all valid strings from ‘STR’ by minimum removals?
+For the given ‘STR’ =  “()(()”, we can form a valid string “()()” by removing ‘(‘ at index 2 or 3.
+Sample Input 1 :()())					()(x))()
+Sample Output 1 :()() (())				()(x)() ((x))()
+Explanation for Sample Output 1 :For the first test case:All the valid unique strings that can be formed from “()())” are “()()”, ”()”, ”(())”, ” ” among which “()()”, “(())” are formed from only 1 ‘)’ removal which is the minimum among all.   
+For the second test case:All the valid unique strings that can be formed from “()(x))()” are “()(x)()”, ”()()”, ”(())”, ”((x))”, ”(x)”, ”(x)()”, ”((x))()”, ” ” among which ”((x))()” and  “()(x)()” are formed from only 1 ‘)’ removal at index 1 and 5 respectively which takes the minimum removals among all possible valid strings.   
+Sample Input 2 :	))a((					(()s())
+Sample Output 2 :	a							(()s())
+Explanation for Sample Output 2 :
+For the first test case:
+All the valid unique strings that can be formed from “))a((” are “a” and “” (empty string is also a valid string) in which “a” is formed from 2 ‘)’ removals at index 0 and 1 and 2 ‘(’ removal at index 3 and 4. which is the minimum among all possible valid strings.   
+For the second test case:All the valid unique strings that can be formed from “ (()s())” are “()(s)()”, ”((())”, ”(s)”, ”(()s)”, ”(s())”, ”(()s())”, ” ”, ”s”, ”((s)), "()s()” among which "(()s())” is formed from 0 removals which is the minimum possible removals.   
+
+public class Solution {
+
+    public static ArrayList<String> minRemovaltoMakeStringValid(String str) {
+
+        int leftRemove = 0;
+        int rightRemove = 0;
+
+        // Count minimum '(' and ')' to remove
+        for (char c : str.toCharArray()) {
+            if (c == '(') {
+                leftRemove++;
+            } else if (c == ')') {
+                if (leftRemove > 0) {
+                    leftRemove--;
+                } else {
+                    rightRemove++;
+                }
+            }
+        }
+
+        Set<String> res = new HashSet<>();
+
+        dfs(str, 0, leftRemove, rightRemove, 0,
+                new StringBuilder(), res);
+
+        return new ArrayList<>(res);
+    }
+
+    private static void dfs(String s,
+                            int index,
+                            int left,
+                            int right,
+                            int balance,
+                            StringBuilder curr,
+                            Set<String> res) {
+
+        // Reached end of string
+        if (index == s.length()) {
+            if (left == 0 && right == 0 && balance == 0) {
+                res.add(curr.toString());
+            }
+            return;
+        }
+
+        char ch = s.charAt(index);
+        int len = curr.length();
+
+        if (ch == '(') {
+
+            // Option 1: Remove '('
+            if (left > 0) {
+                dfs(s, index + 1, left - 1, right,
+                        balance, curr, res);
+            }
+
+            // Option 2: Keep '('
+            curr.append(ch);
+            dfs(s, index + 1, left, right,
+                    balance + 1, curr, res);
+            curr.setLength(len);
+
+        } else if (ch == ')') {
+
+            // Option 1: Remove ')'
+            if (right > 0) {
+                dfs(s, index + 1, left, right - 1,
+                        balance, curr, res);
+            }
+
+            // Option 2: Keep ')' only if there is an unmatched '('
+            if (balance > 0) {
+                curr.append(ch);
+                dfs(s, index + 1, left, right,
+                        balance - 1, curr, res);
+                curr.setLength(len);
+            }
+
+        } else {
+
+            // Always keep alphabets
+            curr.append(ch);
+            dfs(s, index + 1, left, right,
+                    balance, curr, res);
+            curr.setLength(len);
+        }
+    }
+}
+==================================================================================================================================================================================================================
+You have been given three distinct integers ‘X’, ‘Y’ and ‘Z’. You need to find the number with a value in the middle.For example :X = 4, Y = 6, Z = 2Here the element with value in the middle is 4, because 2 < 4 < 6.
+Sample Input 1 :	2 3 1					6 8 9   
+Sample Output 1 :	2 						8
+Explanation of sample input 1 :In the first test case, the three numbers are 2, 3 and 1. The middle element is 2, as 1 < 2 < 3In the second test case, the three numbers are 6, 8 and 9. The middle element is 8, as 6 < 8 < 9
+Sample Input 2 :	15 2 3				2 3 4
+Sample Output 2 :	3					3
+Explanation for sample input 2 :In the first test case, the three numbers are 15, 2 and 3. The middle element is 3, as 2 < 3 < 15.In the second test case, the three numbers are 2, 3 and 4. The middle element is 3, as 2 < 3 < 4
+
+public class Solution {
+    public static int middleOfThree(int x, int y, int z) {
+
+        // Check if x is the middle element
+        if ((x > y && x < z) || (x < y && x > z)) {
+            return x;
+        }
+
+        // Check if y is the middle element
+        if ((y > x && y < z) || (y < x && y > z)) {
+            return y;
+        }
+
+        // Otherwise z is the middle element
+        return z;
+    }
+}
+==================================================================================================================================================================================================================
+You are given an integer array nums of length n, where nums is a permutation of the numbers in the range [1, n].A XOR triplet is defined as the XOR of three elements nums[i] XOR nums[j] XOR nums[k] where i <= j <= k.
+Return the number of unique XOR triplet values from all possible triplets (i, j, k).
+Example 1:Input: nums = [1,2]		Output: 2
+Explanation:The possible XOR triplet values are:(0, 0, 0) → 1 XOR 1 XOR 1 = 1 (0, 0, 1) → 1 XOR 1 XOR 2 = 2 (0, 1, 1) → 1 XOR 2 XOR 2 = 1 (1, 1, 1) → 2 XOR 2 XOR 2 = 2 The unique XOR values are {1, 2}, so the output is 2.
+Example 2:Input: nums = [3,1,2]		Output: 4
+Explanation:The possible XOR triplet values include:(0, 0, 0) → 3 XOR 3 XOR 3 = 3, (0, 0, 1) → 3 XOR 3 XOR 1 = 1 ,(0, 0, 2) → 3 XOR 3 XOR 2 = 2, (0, 1, 2) → 3 XOR 1 XOR 2 = 0.The unique XOR values are {0, 1, 2, 3}, so the output is 4.
+/*k = number of bits required to represent n ,k = floor(log2(n)) + 1, Then every XOR value is at most 2^k - 1 */
+class Solution {
+    public int uniqueXorTriplets(int[] nums) {
+        int n = nums.length;
+
+        // With fewer than 3 numbers, only the numbers themselves are possible.
+        if (n < 3) {
+            return n;
+        }
+
+        // Number of bits needed to represent n
+        int bits = 32 - Integer.numberOfLeadingZeros(n);
+
+        // Total possible XOR values = 2^bits
+        return 1 << bits;
+    }
+}
+==================================================================================================================================================================================================================
+You are given an integer array nums.A XOR triplet is defined as the XOR of three elements nums[i] XOR nums[j] XOR nums[k] where i <= j <= k.Return the number of unique XOR triplet values from all possible triplets (i, j, k).
+Example 1:Input: nums = [1,3]		Output: 2
+Explanation:The possible XOR triplet values are:(0, 0, 0) → 1 XOR 1 XOR 1 = 1, (0, 0, 1) → 1 XOR 1 XOR 3 = 3, (0, 1, 1) → 1 XOR 3 XOR 3 = 1, (1, 1, 1) → 3 XOR 3 XOR 3 = 3.The unique XOR values are {1, 3}. Thus, the output is 2.
+Example 2:Input: nums = [6,7,8,9]			Output: 4
+Explanation:The possible XOR triplet values are {6, 7, 8, 9}. Thus, the output is 4.
+
+class Solution {
+    public int uniqueXorTriplets(int[] nums) {
+
+        // Find maximum element
+        int max = 0;
+        for (int num : nums) {
+            max = Math.max(max, num);
+        }
+
+        // Maximum possible XOR value (< 2 * max)
+        int limit = max << 1;
+
+        // pairXor[x] = true if x can be obtained as a XOR of two numbers
+        boolean[] pairXor = new boolean[limit];
+
+        // Generate all possible XORs of two numbers
+        for (int a : nums) {
+            for (int b : nums) {
+                pairXor[a ^ b] = true;
+            }
+        }
+
+        // tripletXor[x] = true if x can be obtained as XOR of three numbers
+        boolean[] tripletXor = new boolean[limit];
+
+        // Combine every pair XOR with every number
+        for (int xor = 0; xor < limit; xor++) {
+            if (!pairXor[xor]) {
+                continue;
+            }
+
+            for (int num : nums) {
+                tripletXor[xor ^ num] = true;
+            }
+        }
+
+        // Count unique XOR values
+        int answer = 0;
+        for (boolean present : tripletXor) {
+            if (present) {
+                answer++;
+            }
+        }
+
+        return answer;
+    }
+}
+==================================================================================================================================================================================================================
+You are given a positive integer n.Return the maximum product of any two digits in n.Note: You may use the same digit twice if it appears more than once in n.
+Example 1:Input: n = 31			Output: 3
+Explanation:The digits of n are [3, 1].The possible products of any two digits are: 3 * 1 = 3.The maximum product is 3.
+Example 2:Input: n = 22		Output: 4
+Explanation:The digits of n are [2, 2].The possible products of any two digits are: 2 * 2 = 4.The maximum product is 4.
+Example 3:Input: n = 124		Output: 8
+
+class Solution {
+    public int maxProduct(int n) {
+        int max1 = -1;
+        int max2 = -1;
+
+        while (n > 0) {
+            int digit = n % 10;
+
+            if (digit >= max1) {
+                max2 = max1;
+                max1 = digit;
+            } else if (digit > max2) {
+                max2 = digit;
+            }
+
+            n /= 10;
+        }
+
+        return max1 * max2;
+    }
+} 
+==================================================================================================================================================================================================================
+Given an integer array nums, find three numbers whose product is maximum and return the maximum product.
+Example 1:Input: nums = [1,2,3]			Output: 6
+Example 2:Input: nums = [1,2,3,4]		Output: 24
+Example 3:Input: nums = [-1,-2,-3]		Output: -6
+
+class Solution {
+    public int maximumProduct(int[] nums) {
+        Arrays.sort(nums);
+        int n = nums.length;
+
+        int option1 = nums[n - 1] * nums[n - 2] * nums[n - 3];
+        int option2 = nums[0] * nums[1] * nums[n - 1];
+
+        return Math.max(option1, option2);
+    }
+}
+
+or
+
+class Solution {
+    public int maximumProduct(int[] nums) {
+
+        int max1 = Integer.MIN_VALUE;
+        int max2 = Integer.MIN_VALUE;
+        int max3 = Integer.MIN_VALUE;
+
+        int min1 = Integer.MAX_VALUE;
+        int min2 = Integer.MAX_VALUE;
+
+        for (int num : nums) {
+
+            // Update largest three
+            if (num >= max1) {
+                max3 = max2;
+                max2 = max1;
+                max1 = num;
+            } else if (num >= max2) {
+                max3 = max2;
+                max2 = num;
+            } else if (num > max3) {
+                max3 = num;
+            }
+
+            // Update smallest two
+            if (num <= min1) {
+                min2 = min1;
+                min1 = num;
+            } else if (num < min2) {
+                min2 = num;
+            }
+        }
+
+        return Math.max(max1 * max2 * max3,
+                        max1 * min1 * min2);
+    }
+}
+==================================================================================================================================================================================================================
+Given the array of integers nums, you will choose two different indices i and j of that array. Return the maximum value of (nums[i]-1)*(nums[j]-1).
+Example 1:Input: nums = [3,4,5,2]				Output: 12 
+Explanation: If you choose the indices i=1 and j=2 (indexed from 0), you will get the maximum value, that is, (nums[1]-1)*(nums[2]-1) = (4-1)*(5-1) = 3*4 = 12. 
+Example 2:Input: nums = [1,5,4,5]				Output: 16
+Explanation: Choosing the indices i=1 and j=3 (indexed from 0), you will get the maximum value of (5-1)*(5-1) = 16.
+Example 3:Input: nums = [3,7]					Output: 12
+
+class Solution {
+    public int maxProduct(int[] nums) {
+        int max1 = Integer.MIN_VALUE;
+        int max2 = Integer.MIN_VALUE;
+
+        for(int num: nums){
+            if(num > max1){
+                max2 = max1;
+                max1 = num;
+            }else if(num > max2){
+                max2 = num;
+            }
+        }
+        return (max1-1)*(max2-1);
+    }
+}
+==================================================================================================================================================================================================================
+You are given a palindromic string s.Return the lexicographically smallest palindromic permutation of s.
+Example 1:Input: s = "z"				Output: "z"
+Explanation:A string of only one character is already the lexicographically smallest palindrome.
+Example 2:Input: s = "babab"			Output: "abbba"
+Explanation:Rearranging "babab" → "abbba" gives the smallest lexicographic palindrome.
+Example 3:Input: s = "daccad"			Output: "acddca"
+Explanation:Rearranging "daccad" → "acddca" gives the smallest lexicographic palindrome.
+ 
+class Solution {
+    public String smallestPalindrome(String s) {
+
+        // Frequency array to count occurrences of each character
+        int[] freq = new int[26];
+
+        // Count frequency of every character in the string
+        for (char ch : s.toCharArray()) {
+            freq[ch - 'a']++;
+        }
+
+        // Stores the left half of the palindrome
+        StringBuilder left = new StringBuilder();
+
+        // Stores the middle character (if string length is odd)
+        char middle = 0;
+
+        // Traverse characters in lexicographical order ('a' to 'z')
+        for (int i = 0; i < 26; i++) {
+
+            // If frequency is odd, this character will be the middle one
+            if ((freq[i] & 1) == 1) {
+                middle = (char) ('a' + i);
+            }
+
+            // Add half of the occurrences to the left half
+            // The remaining half will appear in the mirrored right half
+            for (int j = 0; j < freq[i] / 2; j++) {
+                left.append((char) ('a' + i));
+            }
+        }
+
+        // Right half is simply the reverse of the left half
+        StringBuilder right = new StringBuilder(left).reverse();
+
+        // If there is a middle character, place it between left and right
+        if (middle != 0) {
+            return left.toString() + middle + right.toString();
+        }
+
+        // Otherwise, concatenate left and right directly
+        return left.toString() + right.toString();
+    }
+}
+==================================================================================================================================================================================================================
+You are given an array of size ‘N’ that represents the number of candies given to ‘N’ people. You have to divide candies among all people such that each person receives the same number of candies. For this You can either increase or decrease the number of candies for any person by any amount. Your task is to minimise total increase/decrease for each person i.e. If you increase or decrease ‘Xi’ number of candies for the person ‘i’ ( 1 <= ‘i’ <= ‘N’), then the sum of all ‘Xi’ should be minimum.
+Detailed explanation ( Input/output format, Notes, Images )
+Sample Input 1:		4 5 1 2 3				1 1 1 2
+Sample Output 1:	6						1
+Explanation of Sample Input 1:
+Test case 1:We can make the final number of candies equal to [3, 3, 3, 3, 3 ] with total changes equal to 6, which is the minimum possible.
+Test case 2:We can make the last element ‘2’ to ‘1’ by decreasing it one time. Hence the minimum changes is 1.
+Sample Input 2:10
+Sample Output 2:0
+Explanation of Sample Input 2:
+Test case 1:As there is only one element, we don't need to change anything.
+
+import java.util.*;
+import java.io.*;
+import java.util.ArrayList;
+
+public class Solution {
+
+    public static long equalCandies(ArrayList<Integer> candies, int n) {
+
+        // Sort the candies to find the median
+        Collections.sort(candies);
+
+        // Median minimizes the sum of absolute differences
+        int median = candies.get(n / 2);
+
+        long operations = 0;
+
+        // Calculate total increase/decrease required
+        for (int candy : candies) {
+            operations += Math.abs(candy - median);
+        }
+
+        return operations;
+    }
+}
+==================================================================================================================================================================================================================
+You're given an array ARR[] of size N, where every element belongs to the range 0 to N-1. Your task is to rearrange the given array so that ARR[i] becomes ARR[ARR[i]] and make sure that this task is done with O(1) extra space.
+Sample Input 1 :0 1 2 3					Sample Output 1:0 1 2 3    
+Explanation of Sample Input 1 :We can see that ARR[ARR[0]] i.e ARR[0] is 0, hence ARR[0] in the output array will be 0. Also, ARR[ARR[1]] i.e ARR[1]  is1, hence ARR[1] in the output array will be 1. Similarly,  ARR[ARR[2]] i.e ARR[2] is 2, hence ARR[2] in the output array will be 2. Finally, ARR[ARR[3]] i.e ARR[3] is 3, hence ARR[3] in the output array will be 3.
+Sample Input 2 :3 2 0 1			Sample Output 2 : 1 0 3 2
+Explanation of Sample Input 2 :We can see that ARR[ARR[0]] i.e ARR[3] is 1, hence ARR[0] in the output array will be 1. Also, ARR[ARR[1]] i.e ARR[2] is 0, hence ARR[1] in the output array will be 0. Similarly,  ARR[ARR[2]] i.e ARR[0] is 3, hence ARR[2] in the output array will be 3. Finally, ARR[ARR[3]] i.e ARR[1] is 2, hence ARR[3] in the output array will be 2.
+
+public class Solution {
+
+    public static void rearrange(int[] arr, int n) {
+
+        // First pass:
+        // Store both the original value and the new value in the same array element.
+        for (int i = 0; i < n; i++) {
+
+            // Original value at index i
+            int oldValue = arr[i];
+
+            // Original value at index arr[i].
+            // Use % n because this element might already be encoded.
+            int newValue = arr[oldValue] % n;
+
+            // Encode:
+            // arr[i] = originalValue + (newValue * n)
+            arr[i] = oldValue + (newValue * n);
+        }
+
+        // Second pass:
+        // Retrieve the new value by dividing by n.
+        for (int i = 0; i < n; i++) {
+            arr[i] = arr[i] / n;
+        }
+    }
+}
+==================================================================================================================================================================================================================
+You are given a string word containing distinct lowercase English letters.Telephone keypads have keys mapped with distinct collections of lowercase English letters, which can be used to form words by pushing them. For example, the key 2 is mapped with ["a","b","c"], we need to push the key one time to type "a", two times to type "b", and three times to type "c" .
+It is allowed to remap the keys numbered 2 to 9 to distinct collections of letters. The keys can be remapped to any amount of letters, but each letter must be mapped to exactly one key. You need to find the minimum number of times the keys will be pushed to type the string word.Return the minimum number of pushes needed to type word after remapping the keys.
+An example mapping of letters to keys on a telephone keypad is given below. Note that 1, *, #, and 0 do not map to any letters.
+Example 1:Input: word = "abcde"					Output: 5
+Explanation: The remapped keypad given in the image provides the minimum cost.
+"a" -> one push on key 2
+"b" -> one push on key 3
+"c" -> one push on key 4
+"d" -> one push on key 5
+"e" -> one push on key 6
+Total cost is 1 + 1 + 1 + 1 + 1 = 5.
+It can be shown that no other mapping can provide a lower cost.
+Example 2:Input: word = "xycdefghij"			Output: 12
+Explanation: The remapped keypad given in the image provides the minimum cost.
+"x" -> one push on key 2
+"y" -> two pushes on key 2
+"c" -> one push on key 3
+"d" -> two pushes on key 3
+"e" -> one push on key 4
+"f" -> one push on key 5
+"g" -> one push on key 6
+"h" -> one push on key 7
+"i" -> one push on key 8
+"j" -> one push on key 9
+Total cost is 1 + 2 + 1 + 2 + 1 + 1 + 1 + 1 + 1 + 1 = 12.
+It can be shown that no other mapping can provide a lower cost.
+ 
+class Solution {
+    public int minimumPushes(String word) {
+
+        int pushes = 0;
+
+        // Since all letters are distinct,
+        // assign the first 8 letters to cost 1,
+        // the next 8 letters to cost 2, and so on.
+        for (int i = 0; i < word.length(); i++) {
+
+            // Push cost for the current letter
+            pushes += (i / 8) + 1;
+        }
+
+        return pushes;
+    }
+}
+==================================================================================================================================================================================================================
+You are given a string word containing lowercase English letters.Telephone keypads have keys mapped with distinct collections of lowercase English letters, which can be used to form words by pushing them. For example, the key 2 is mapped with ["a","b","c"], we need to push the key one time to type "a", two times to type "b", and three times to type "c" .It is allowed to remap the keys numbered 2 to 9 to distinct collections of letters. The keys can be remapped to any amount of letters, but each letter must be mapped to exactly one key. You need to find the minimum number of times the keys will be pushed to type the string word.Return the minimum number of pushes needed to type word after remapping the keys.An example mapping of letters to keys on a telephone keypad is given below. Note that 1, *, #, and 0 do not map to any letters.
+Example 1:Input: word = "abcde"					Output: 5
+Explanation: The remapped keypad given in the image provides the minimum cost.
+"a" -> one push on key 2
+"b" -> one push on key 3
+"c" -> one push on key 4
+"d" -> one push on key 5
+"e" -> one push on key 6
+Total cost is 1 + 1 + 1 + 1 + 1 = 5.It can be shown that no other mapping can provide a lower cost.
+Example 2:Input: word = "xyzxyzxyzxyz"			Output: 12
+Explanation: The remapped keypad given in the image provides the minimum cost.
+"x" -> one push on key 2
+"y" -> one push on key 3
+"z" -> one push on key 4
+Total cost is 1 * 4 + 1 * 4 + 1 * 4 = 12
+It can be shown that no other mapping can provide a lower cost.
+Note that the key 9 is not mapped to any letter: it is not necessary to map letters to every key, but to map all the letters.
+Example 3:Input: word = "aabbccddeeffgghhiiiiii"		Output: 24
+Explanation: The remapped keypad given in the image provides the minimum cost.
+"a" -> one push on key 2
+"b" -> one push on key 3
+"c" -> one push on key 4
+"d" -> one push on key 5
+"e" -> one push on key 6
+"f" -> one push on key 7
+"g" -> one push on key 8
+"h" -> two pushes on key 9
+"i" -> one push on key 9
+Total cost is 1 * 2 + 1 * 2 + 1 * 2 + 1 * 2 + 1 * 2 + 1 * 2 + 1 * 2 + 2 * 2 + 6 * 1 = 24.
+It can be shown that no other mapping can provide a lower cost.
+
+class Solution {
+
+    public int minimumPushes(String word) {
+
+        // Frequency of each character
+        int[] freq = new int[26];
+
+        for (char ch : word.toCharArray()) {
+            freq[ch - 'a']++;
+        }
+
+        // Sort frequencies in ascending order
+        Arrays.sort(freq);
+
+        int pushes = 0;
+        int index = 0;
+
+        // Traverse from highest frequency to lowest
+        for (int i = 25; i >= 0; i--) {
+
+            // Ignore letters that do not appear
+            if (freq[i] == 0)
+                continue;
+
+            // First 8 letters cost 1 push,
+            // next 8 cost 2 pushes, etc.
+            int pushCost = (index / 8) + 1;
+
+            pushes += freq[i] * pushCost;
+
+            index++;
+        }
+
+        return pushes;
+    }
+}
+==================================================================================================================================================================================================================
+Takahashi has a garden with ‘n’ beautiful flowers in a row. He waters exactly “arr[i]” liters of water to ith flowers from left to right daily to keep them beautiful. He has a container that can contain ‘k’ liters of water. But he follows certain rules to water all the plants:Water a plant if he has sufficient water in the container, otherwise refill it.You can only refill at the water tank which is placed one step before the first flower.
+Takahashi wants to know the minimum number of steps he needs to water all the flowers.
+For Example :Let arr = {3, 5, 1, 2}, k = 6Now in this example, he will first move to the first flower and water it. Now his container contains only 3 liters of water, hence he will refill the container, so he goes 1 step back and refills, comes to the 2nd flower, after watering the second flower, he still has 1 liter of water and 1 flower left. So he will water that flower and return to refill. Now he will come to the last flower and water it. Hence the total steps taken are: 1 + 1 + 2 + 1 + 3 + 4 = 12.
+Sample Input 1 :n=3 k=11 arr=3 2 5					n=3 k=5		arr=4 2 1
+Sample Output 1 :3									5
+Explanation For Sample Output 1 :In the first example, he will first move to the first flower and water it, after that he is left with 8 liters of water, now he will move to the second flower and water it, after watering it he is still left with 6 liters of water which is enough for the third flower, so he will move to the third flower. Hence the total steps taken is 3.
+In the second example, he will first move one step to water the first flower, now he is left with only one liter of water, so he will return to the water tank i.e. 1 step behind, and then come to the second flower, water it and move to the third flower, hence the total steps taken are 5.
+Sample Input 2 :n=5 k=9	arr=4 7 2 6 1				n=5 k=1		arr=1 1 1 1 1    
+Sample Output 2 :13									25
+
+public class Solution {
+
+    public static int minimumSteps(int[] arr, int n, int k) {
+
+        int water = k;     // Current water in the container
+        int steps = 0;     // Total steps taken
+
+        for (int i = 0; i < n; i++) {
+
+            // If enough water is available, simply move to the next flower.
+            if (water >= arr[i]) {
+                steps += 1;
+                water -= arr[i];
+            } else {
+
+                // Not enough water:
+                // Go back to the tank (i steps)
+                // Come back to current flower (i + 1 steps)
+                // Total = 2*i + 1
+                steps += (2 * i + 1);
+
+                // Refill and water the current flower
+                water = k - arr[i];
+            }
+        }
+
+        return steps;
+    }
+}
+==================================================================================================================================================================================================================
+Alex wanted to buy a new keyboard, but due to the low battery in his GPS, he had to print his route on paper, now he wants to know if he can return safely to his home following the instructions written by him. The city of Alex can be represented by a 2D plane, and every location is denoted by ('X','Y') coordinates. Alex is currently standing at ( 0, 0 ) facing north.
+The printed route contains a string with characters like:'L' : which denotes he should turn to the left of the direction he is facing. 'R' : which denotes he should turn to the right of the direction he is facing.  'G' : which denotes he should walk in the same direction by one unit.Determine whether he can return home safely or not by following his instruction on the printed sheet.
+Sample Input 1:6 GGRRGG		2 GGG
+Sample Output 1:True		False
+Explanation of sample input 1:In the first test case, Alex follows the following instructions, he will go from (0,0) -> (0,1) -> (0,2) -> turned towards east -> turned towards south -> (0,1) -> (0,0).
+In the second test case, he will always go towards the right, hence it is impossible for him to return home.
+Sample Input 2:2 LR			2 GL
+Sample Output 2:True		True
+Explanation of sample input 2:In the first test case, he is in the same position just turning in his direction.In the second test case, he will go from (0,0) -> (0,1) -> (turned left) -> (-1,1) -> (turned left) ->(-1,0) ->(turned left) -> (0,0)
+
+public class Solution {
+    public static boolean canReturn(String str) {
+        int x = 0, y = 0;
+
+        // 0-North, 1-East, 2-South, 3-West
+        int dir = 0;
+
+        int[] dx = {0, 1, 0, -1};
+        int[] dy = {1, 0, -1, 0};
+
+        for (char ch : str.toCharArray()) {
+            if (ch == 'G') {
+                x += dx[dir];
+                y += dy[dir];
+            } else if (ch == 'L') {
+                dir = (dir + 3) % 4;
+            } else { // 'R'
+                dir = (dir + 1) % 4;
+            }
+        }
+
+        return (x == 0 && y == 0) || (dir != 0);
+    }
+}
+==================================================================================================================================================================================================================
+You are given an integer array nums. Two players are playing a game with this array: player 1 and player 2.Player 1 and player 2 take turns, with player 1 starting first. Both players start the game with a score of 0. At each turn, the player takes one of the numbers from either end of the array (i.e., nums[0] or nums[nums.length - 1]) which reduces the size of the array by 1. The player adds the chosen number to their score. The game ends when there are no more elements in the array.Return true if Player 1 can win the game. If the scores of both players are equal, then player 1 is still the winner, and you should also return true. You may assume that both players are playing optimally.
+Example 1:Input: nums = [1,5,2]					Output: false
+Explanation: Initially, player 1 can choose between 1 and 2. 
+If he chooses 2 (or 1), then player 2 can choose from 1 (or 2) and 5. If player 2 chooses 5, then player 1 will be left with 1 (or 2). 
+So, final score of player 1 is 1 + 2 = 3, and player 2 is 5. 
+Hence, player 1 will never be the winner and you need to return false.
+Example 2:Input: nums = [1,5,233,7]				Output: true
+Explanation: Player 1 first chooses 1. Then player 2 has to choose between 5 and 7. No matter which number player 2 choose, player 1 can choose 233.
+Finally, player 1 has more score (234) than player 2 (12), so you need to return True representing player1 can win.
+
+class Solution {
+    public boolean PredictTheWinner(int[] nums) {
+        int n = nums.length;
+        int[][] dp = new int[n][n];//Maximum score difference the current player can achieve over the opponent from piles i to j.
+
+        // Base case
+        for (int i = 0; i < n; i++) {
+            dp[i][i] = nums[i];
+        }
+
+        // Build DP table
+        for (int len = 2; len <= n; len++) {
+            for (int i = 0; i <= n - len; i++) {
+                int j = i + len - 1;
+
+                int pickLeft = nums[i] - dp[i + 1][j];
+                int pickRight = nums[j] - dp[i][j - 1];
+
+                dp[i][j] = Math.max(pickLeft, pickRight);
+            }
+        }
+
+        return dp[0][n - 1] >= 0;
+    }
+}
+=================================================================================================================================================================================================================
+Alice and Bob play a game with piles of stones. There are an even number of piles arranged in a row, and each pile has a positive integer number of stones piles[i].The objective of the game is to end with the most stones. The total number of stones across all the piles is odd, so there are no ties.Alice and Bob take turns, with Alice starting first. Each turn, a player takes the entire pile of stones either from the beginning or from the end of the row. This continues until there are no more piles left, at which point the person with the most stones wins.Assuming Alice and Bob play optimally, return true if Alice wins the game, or false if Bob wins.
+Example 1:Input: piles = [5,3,4,5]			Output: true
+Explanation: Alice starts first, and can only take the first 5 or the last 5.Say she takes the first 5, so that the row becomes [3, 4, 5].If Bob takes 3, then the board is [4, 5], and Alice takes 5 to win with 10 points.If Bob takes the last 5, then the board is [3, 4], and Alice takes 4 to win with 9 points.This demonstrated that taking the first 5 was a winning move for Alice, so we return true.
+Example 2:Input: piles = [3,7,2,3]		Output: true
+
+class Solution {
+
+    public boolean stoneGame(int[] piles) {
+
+        int n = piles.length;
+
+        // dp[i][j] = Maximum score difference the current player can achieve over the opponent from piles i to j.
+        int[][] dp = new int[n][n];
+
+        // Base case: only one pile left
+        for (int i = 0; i < n; i++) {
+            dp[i][i] = piles[i];
+        }
+
+        // Consider subarrays of increasing length
+        for (int len = 2; len <= n; len++) {
+
+            for (int i = 0; i + len - 1 < n; i++) {
+
+                int j = i + len - 1;
+
+                // Take left pile
+                int takeLeft = piles[i] - dp[i + 1][j];
+
+                // Take right pile
+                int takeRight = piles[j] - dp[i][j - 1];
+
+                // Choose the better option
+                dp[i][j] = Math.max(takeLeft, takeRight);
+            }
+        }
+
+        // Positive difference means Alice wins
+        return dp[0][n - 1] > 0;
+    }
+}
+==================================================================================================================================================================================================================
+You are given an integer array stones, where stones[i] is the value of the ith stone.
+Alice and Bob take turns, with Alice starting first. On each turn, the player may remove any stone from stones. The player who removes a stone loses if the sum of the values of all removed stones is divisible by 3. Bob will win automatically if there are no remaining stones (even if it is Alice's turn).Assuming both players play optimally, return true if Alice wins and false if Bob wins.
+Example 1:Input: stones = [2,1]			Output: true
+Explanation: The game will be played as follows:
+- Turn 1: Alice can remove either stone.
+- Turn 2: Bob removes the remaining stone. 
+The sum of the removed stones is 1 + 2 = 3 and is divisible by 3. Therefore, Bob loses and Alice wins the game.
+Example 2:Input: stones = [2]			Output: false
+Explanation: Alice will remove the only stone, and the sum of the values on the removed stones is 2. 
+Since all the stones are removed and the sum of values is not divisible by 3, Bob wins the game.
+Example 3:Input: stones = [5,1,2,4,3]	Output: false
+Explanation: Bob will always win. One possible way for Bob to win is shown below:
+- Turn 1: Alice can remove the second stone with value 1. Sum of removed stones = 1.
+- Turn 2: Bob removes the fifth stone with value 3. Sum of removed stones = 1 + 3 = 4.
+- Turn 3: Alices removes the fourth stone with value 4. Sum of removed stones = 1 + 3 + 4 = 8.
+- Turn 4: Bob removes the third stone with value 2. Sum of removed stones = 1 + 3 + 4 + 2 = 10.
+- Turn 5: Alice removes the first stone with value 5. Sum of removed stones = 1 + 3 + 4 + 2 + 5 = 15.
+Alice loses the game because the sum of the removed stones (15) is divisible by 3. Bob wins the game.
+
+class Solution {
+    public boolean stoneGameIX(int[] stones) {
+
+        int[] count = new int[3];
+
+        for (int stone : stones) {
+            count[stone % 3]++;
+        }
+
+        int zero = count[0];
+        int one = count[1];
+        int two = count[2];
+
+        // No stones of remainder 1 or 2
+        if (one == 0 && two == 0) {
+            return false;
+        }
+
+        // Only one type of non-zero remainder exists
+        if (one == 0) {
+            return two > 2 && zero % 2 == 1;
+        }
+
+        if (two == 0) {
+            return one > 2 && zero % 2 == 1;
+        }
+
+        // Both remainder 1 and remainder 2 exist
+        if (Math.abs(one - two) > 2) {
+            return true;
+        }
+
+        return zero % 2 == 0;
+    }
+}
+==================================================================================================================================================================================================================
+Given an array KEYS consisting of N non-negative integers. For each element in a given array, you need to determine the index by which this element is mapped in the hash table if the ‘Linear Probing’ technique is used to handle collision.The hash function you need to consider is H(X) = X mod N i.e. index = X mod N.
+Return an array ‘HASH_TABLE’ of size N in which:HASH_TABLE[ i ] = KEYS[ j ] where, i = KEYS[ j ] mod N.In short, an element at index ‘i’ is the element from the given array KEYS which is mapped to that index.
+You can refer to the example given below:The answer for the above example will be [18, 21, 6, 15].
+Sample Input 1:		5 3 2 6 4				1 5 3 7
+Sample Output 1:    5 6 2 3 4				7 1 5 3
+Explanation
+For test case 1:H(X) = X mod 5 All the numbers have unique hash values so there is no collision. Just map each index to its hash index.
+For test case 2:H(1) = 1L index 1 is unoccupied so we will map index 1 with 1.H(5) = 1: but, index 1 is occupied, so, we will use index 2 which is unoccupied, and will map index 2 with 5.H(3) = 3: index 3 is unoccupied so we will map index 3 with 3.H(7) = 3, but index 3 is occupied so we will use index 0 which is unoccupied and will map index 0 with 7.
+Sample Input 2:	4 7 8 1 2 5				6 7 10
+Sample Output 2: 5 7 8 1 4 2			6 7 10
+
+public class Solution {
+
+    public static int[] linearProbing(int[] keys, int n) {
+
+        // Initialize all positions as empty
+        int[] hashTable = new int[n];
+
+        // -1 indicates an empty slot
+        Arrays.fill(hashTable, -1);
+
+        // Insert every key into the hash table
+        for (int key : keys) {
+
+            // Compute hash index
+            int index = key % n;
+
+            // Linear probing until an empty slot is found
+            while (hashTable[index] != -1) {
+                index = (index + 1) % n;
+            }
+
+            // Insert the key
+            hashTable[index] = key;
+        }
+
+        return hashTable;
+    }
+}
+==================================================================================================================================================================================================================
+You’re given a board of length 'L' and width 'W'. Your task is to break this board into 'L' * 'W' smaller squares, such that the total cost involved in breaking is the minimum possible.
+NOTE:The breaking cost of each edge for the board will be given.Detailed explanation ( Input/output format, Notes, Images )
+Sample Input 1:
+3 3
+1 2
+2 1
+Sample Output 1:11
+Explanation of Sample Input 1:Start by cutting the vertical column with cost = 2, hence cost becomes 2. Then make two cuts at the horizontal row with the cost = 2, Cost = 2*2 + 2 =6. Then vertically cut two columns with cost = 2, Cost = 6 + 1*2 = 8. Finally make three horizontal cuts with cost = 1. Final cost becomes 8 + 1*3 = 11.
+Sample Input 2:
+2 2
+2
+1
+Sample Output 2: 4
+Explanation of Sample Input 2:In this case, we’ll be doing a total of 2 cuts. In the first cut, we’ll be cutting the first segment and our cost will now be 1*2 = 2 and in the second and the final cut, we’ll be cutting 2 segments each of cost one. Hence our final cost be 2 + 2*1 = 4.
+
+import java.util.Arrays;
+
+public class Solution {
+
+    public static long minimumCost(int L, int W, int[] costL, int[] costW) {
+
+        // Sort both arrays so that we can process
+        // the most expensive cuts first.
+        Arrays.sort(costL);
+        Arrays.sort(costW);
+
+        int i = costL.length - 1;
+        int j = costW.length - 1;
+
+        // Initially, the board is one horizontal piece
+        // and one vertical piece.
+        int horizontalParts = 1;
+        int verticalParts = 1;
+
+        long totalCost = 0;
+
+        // Process cuts while both types are available.
+        while (i >= 0 && j >= 0) {
+
+            if (costL[i] >= costW[j]) {
+
+                // Horizontal cut.
+                // Its cost is multiplied by the number
+                // of vertical pieces already created.
+                totalCost += (long) costL[i] * verticalParts;
+
+                // This cut increases the number of horizontal pieces.
+                horizontalParts++;
+
+                i--;
+
+            } else {
+
+                // Vertical cut.
+                // Its cost is multiplied by the number
+                // of horizontal pieces already created.
+                totalCost += (long) costW[j] * horizontalParts;
+
+                // This cut increases the number of vertical pieces.
+                verticalParts++;
+
+                j--;
+            }
+        }
+
+        // Remaining horizontal cuts.
+        while (i >= 0) {
+            totalCost += (long) costL[i] * verticalParts;
+            horizontalParts++;
+            i--;
+        }
+
+        // Remaining vertical cuts.
+        while (j >= 0) {
+            totalCost += (long) costW[j] * horizontalParts;
+            verticalParts++;
+            j--;
+        }
+
+        return totalCost;
+    }
+}
+==================================================================================================================================================================================================================
+You are given an integer array nums.Return the length of the longest subsequence in nums whose bitwise XOR is non-zero. If no such subsequence exists, return 0.
+Example 1:Input: nums = [1,2,3]			Output: 2
+Explanation:One longest subsequence is [2, 3]. The bitwise XOR is computed as 2 XOR 3 = 1, which is non-zero.
+Example 2:Input: nums = [2,3,4]			Output: 3
+Explanation:The longest subsequence is [2, 3, 4]. The bitwise XOR is computed as 2 XOR 3 XOR 4 = 5, which is non-zero.
+
+class Solution {
+
+    public int longestSubsequence(int[] nums) {
+
+        int xor = 0;
+        boolean hasNonZero = false;
+
+        // Calculate XOR of all elements
+        // and check whether at least one element is non-zero.
+        for (int num : nums) {
+
+            xor ^= num;
+
+            if (num != 0) {
+                hasNonZero = true;
+            }
+        }
+
+        // Case 1:
+        // XOR of the entire array is already non-zero.
+        // Therefore, the entire array is the answer.
+        if (xor != 0) {
+            return nums.length;
+        }
+
+        // Case 2:
+        // Total XOR is zero, but there is at least one
+        // non-zero element.
+        //
+        // Removing one non-zero element makes the XOR
+        // equal to that removed element, which is non-zero.
+        if (hasNonZero) {
+            return nums.length - 1;
+        }
+
+        // Case 3:
+        // Every element is zero.
+        // XOR of every possible subsequence is zero.
+        return 0;
+    }
+}
+==================================================================================================================================================================================================================
+You’re given a string 'S' of length 'N'. Your task is to find the minimum number of rotations to get the same string 'S'.
+The string only consists of lowercase English alphabets.Detailed explanation ( Input/output format, Notes, Images )The string 'S' only contains lowercase English characters.     Where 'T' denotes the number of test cases and 'N' denotes the length of string 'S'. 
+Sample Input 1 :ninja			Sample Output 1 :5
+Explanation of Sample Input 1 :After five rotations we get the same string i.e “ninja”.  
+Sample Input 2 :ccccc			Sample Output 2 :1
+Explanation of Sample Input 2 :Just after one rotation, we get the same string i.e “ccccc”.
+
+public class Solution {
+
+    public static int minimumRotations(int n, String s) {
+
+        String concat = s + s;
+
+        for (int i = 1; i < n; i++) {
+            if (concat.substring(i, i + n).equals(s)) {
+                return i;
+            }
+        }
+
+        return n;
+    }
+}
+or
+
+public class Solution {
+
+    public static int minimumRotations(String s) {
+        int n = s.length();
+
+        // Build LPS (Longest Prefix Suffix) array
+        int[] lps = new int[n];
+
+        for (int i = 1, len = 0; i < n; ) {
+            if (s.charAt(i) == s.charAt(len)) {
+                lps[i] = ++len;
+                i++;
+            } else if (len > 0) {
+                len = lps[len - 1];
+            } else {
+                lps[i] = 0;
+                i++;
+            }
+        }
+
+        // Length of the smallest repeating pattern
+        int period = n - lps[n - 1];
+
+        // If n is divisible by period, it is a repeating string
+        if (n % period == 0) {
+            return period;
+        }
+
+        // Otherwise, only after n rotations we get the same string
+        return n;
+    }
+}
+==================================================================================================================================================================================================================

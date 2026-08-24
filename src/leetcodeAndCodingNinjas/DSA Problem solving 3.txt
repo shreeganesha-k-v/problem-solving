@@ -1,0 +1,1710 @@
+Given a binary tree root and a linked list with head as the first node. Return True if all the elements in the linked list starting from the head correspond to some downward path connected in the binary tree otherwise return False.In this context downward path means a path that starts at some node and goes downwards.
+Example 1:Input: head = [4,2,8], root = [1,4,4,null,2,2,null,1,null,6,8,null,null,null,null,1,3]		Output: true
+Explanation: Nodes in blue form a subpath in the binary Tree.  
+Example 2:Input: head = [1,4,2,6], root = [1,4,4,null,2,2,null,1,null,6,8,null,null,null,null,1,3]		Output: true
+Example 3:Input: head = [1,4,2,6,8], root = [1,4,4,null,2,2,null,1,null,6,8,null,null,null,null,1,3]	Output: false
+Explanation: There is no path in the binary tree that contains all the elements of the linked list from head.
+
+class Solution {
+
+    public boolean isSubPath(ListNode head, TreeNode root) {
+        if (root == null) return false;
+        return checkPath(root, head);
+    }
+
+    private boolean checkPath(TreeNode node, ListNode head) {
+        if (node == null) return false;
+        if (dfs(node, head)) return true; // If a matching path is found
+        // Recursively check left and right subtrees
+        return checkPath(node.left, head) || checkPath(node.right, head);
+    }
+
+    private boolean dfs(TreeNode node, ListNode head) {
+        if (head == null) return true; // All nodes in the list matched
+        if (node == null) return false; // Reached end of tree without matching all nodes
+        if (node.val != head.val) return false; // Value mismatch
+        return dfs(node.left, head.next) || dfs(node.right, head.next);
+    }
+}
+===============================================================================================================================================================
+Given an encoded string, return its decoded string.The encoding rule is: k[encoded_string], where the encoded_string inside the square brackets is being repeated exactly k times. Note that k is guaranteed to be a positive integer.You may assume that the input string is always valid; there are no extra white spaces, square brackets are well-formed, etc. Furthermore, you may assume that the original data does not contain any digits and that digits are only for those repeat numbers, k. For example, there will not be input like 3a or 2[4].The test cases are generated so that the length of the output will never exceed 105.
+Example 1:Input: s = "3[a]2[bc]"			Output: "aaabcbc"
+Example 2:Input: s = "3[a2[c]]"				Output: "accaccacc"
+Example 3:Input: s = "2[abc]3[cd]ef"		Output: "abcabccdcdcdef"
+
+public class Solution {
+    public String decodeString(String s) {
+        Stack<Integer> countStack = new Stack<>();
+        Stack<StringBuilder> stringStack = new Stack<>();
+        StringBuilder curr = new StringBuilder();
+        int k = 0;
+
+        for (char ch : s.toCharArray()) {
+            if (Character.isDigit(ch)) {
+                // Build the number (for multi-digit numbers)
+                k = k * 10 + (ch - '0');
+            } else if (ch == '[') {
+                // Push current state to stacks
+                countStack.push(k);
+                stringStack.push(curr);
+                curr = new StringBuilder();
+                k = 0;
+            } else if (ch == ']') {
+                // Pop from stacks and build the repeated string
+                int repeat = countStack.pop();
+                StringBuilder temp = stringStack.pop();
+                while (repeat-- > 0) {
+                    temp.append(curr);
+                }
+                curr = temp;
+            } else {
+                curr.append(ch);
+            }
+        }
+
+        return curr.toString();
+    }
+}
+==================================================================================================================================================
+You are given a string s and a robot that currently holds an empty string t. Apply one of the following operations until s and t are both empty:Remove the first character of a string s and give it to the robot. The robot will append this character to the string t.Remove the last character of a string t and give it to the robot. The robot will write this character on paper.Return the lexicographically smallest string that can be written on the paper.
+Example 1:Input: s = "zza"			Output: "azz"
+Explanation: Let p denote the written string.Initially p="", s="zza", t="".Perform first operation three times p="", s="", t="zza".Perform second operation three times p="azz", s="", t="".
+Example 2:Input: s = "bac"			Output: "abc"
+Explanation: Let p denote the written string.Perform first operation twice p="", s="c", t="ba". Perform second operation twice p="ab", s="c", t="". Perform first operation p="ab", s="", t="c". Perform second operation p="abc", s="", t="".
+Example 3:Input: s = "bdda"			Output: "addb"
+Explanation: Let p denote the written string.Initially p="", s="bdda", t="".Perform first operation four times p="", s="", t="bdda".Perform second operation four times p="addb", s="", t="".
+
+public class RobotLexicographic {
+    public static String robotWithString(String s) {
+        int n = s.length();
+        char[] minSuffix = new char[n];
+        minSuffix[n - 1] = s.charAt(n - 1);
+
+        // Fill minSuffix array with the smallest character from i to end
+        for (int i = n - 2; i >= 0; i--) {
+            minSuffix[i] = (char) Math.min(s.charAt(i), minSuffix[i + 1]);
+        }
+
+        Stack<Character> t = new Stack<>();
+        StringBuilder result = new StringBuilder();
+        int i = 0;
+
+        while (i < n) {
+            t.push(s.charAt(i));
+            // Pop from stack while top is <= smallest char remaining in s
+            while (!t.isEmpty() && (i == n - 1 || t.peek() <= minSuffix[i + 1])) {
+                result.append(t.pop());
+            }
+            i++;
+        }
+
+        // Append remaining from t
+        while (!t.isEmpty()) {
+            result.append(t.pop());
+        }
+
+        return result.toString();
+    }
+}
+=====================================================================================================================================================
+Given a binary tree with ‘root’. Your task is to find the sum of all the left leaf nodes.Properties of leaf:-In a binary tree, a leaf is a node such that it does not have any children. Node ‘1’ is always the root of the binary tree. Left leaves are those nodes that are the left child of their parent and a leaf node.
+Sample Input 1:1 2 -1 3 -1 -1 -1			1 2 3 4 -1 -1 5 6 -1 -1 7 -1 -1 -1 -1
+Sample Output 1: 3							6
+Sample Output 1 Explanation:
+Test case 1:Node 3 is a left leaf.Therefore the answer is 3.
+Test case 2:Node 7 is a leaf node but it is not the left child of their parent. Node 6 is a leaf node and the left child of its parent node 4.Therefore the answer is 6.
+Sample Input 2:1 2 3 4 5 -1 -1 -1 -1 -1 -1			1 2 -1 -1 -1
+Sample Output 2:4									2
+
+public class Solution {
+    public static int sumOfLeftLeaves(TreeNode<Integer> root) {
+        return traversal(root);
+    }
+
+    private static int traversal(TreeNode<Integer> root) { //use generic to avoid type erasure or raw type
+        if (root == null) return 0;
+
+        int sum = 0;
+
+        if (root.left != null && isLeaf(root.left)) {
+            sum += root.left.data;
+        }
+
+        sum += traversal(root.left);
+        sum += traversal(root.right);
+
+        return sum;
+    }
+
+    private static boolean isLeaf(TreeNode<Integer> node) {
+        return node.left == null && node.right == null;
+    }
+}
+========================================================================================================================================================
+Given an array/list 'ARR' of integers and an integer 'LIMIT'. You are supposed to return the length of the longest subarray for which the absolute difference between the maximum and minimum element is less than or equal to the 'LIMIT'.
+Sample Input 1 :
+5 2
+3 6 5 4 1
+4 1
+7 2 5 4
+Sample Output 1 :
+3 
+2
+Explanation of Sample Input 1 :In the first test case, the longest subarray with the absolute difference of maximum and minimum element less than or equal to 2 is [1, 3]  (described by indexes with 0 based indexing). The elements of the subarray are {6, 5, 4}. The maximum element is 6 and the minimum element is 4 and the absolute difference is 6 - 4 = 2.In the second test case, the subarray [2, 3] is the longest subarray having the absolute difference of maximum and minimum element less than or equal to 1. The length of the subarray is 2.
+Sample Input 2 :
+5 5
+1 2 3 4 5
+5 0
+3 5 6 2 9
+Sample Output 2 :
+5
+1
+Explanation of Sample Input 2 :In the first test case, the subarray [0, 4] is the longest subarray having the absolute difference of maximum and minimum element less than or equal to 5. The length of the subarray is 5.In the second test case, there are 5 subarrays present having the absolute difference of maximum and minimum element as 0. [0, 0], [1, 1], [2, 2], [3, 3], [4, 4]. The length of all those subarrays is 1.
+
+public class Solution {
+
+    public static int getMaximumOfSubarrays(ArrayList<Integer> arr, int k) {
+        Deque<Integer> minQueue = new LinkedList<>();
+        Deque<Integer> maxQueue = new LinkedList<>();
+        int maxLen = 0;
+        int left = 0;
+
+        for (int right = 0; right < arr.size(); right++) {
+            // Maintain decreasing order for maxQueue
+            while (!maxQueue.isEmpty() && maxQueue.peekLast() < arr.get(right)) {
+                maxQueue.pollLast();
+            }
+            maxQueue.addLast(arr.get(right));
+
+            // Maintain increasing order for minQueue
+            while (!minQueue.isEmpty() && minQueue.peekLast() > arr.get(right)) {
+                minQueue.pollLast();
+            }
+            minQueue.addLast(arr.get(right));
+
+            // Shrink window if condition fails
+            while (!minQueue.isEmpty() && !maxQueue.isEmpty()
+                    && (maxQueue.peekFirst() - minQueue.peekFirst() > k)) {
+                if (arr.get(left).equals(minQueue.peekFirst())) minQueue.pollFirst();
+                if (arr.get(left).equals(maxQueue.peekFirst())) maxQueue.pollFirst();
+                left++;
+            }
+
+            maxLen = Math.max(maxLen, right - left + 1);
+        }
+        return maxLen;
+    }
+}
+=======================================================================================================================================================================
+‘N’ people are standing in a circle numbered from ‘1’ to ‘N’ in clockwise order. First, the person numbered 1 will proceed in a clockwise direction and will skip K-1 persons including itself and will kill a Kth person. Now (K+1)th person from 1 will start and will kill the Kth person from itself.You have to find the position of the last person surviving with respect to initial numbering.
+Sample Input 1	: 4 2 				7 3
+Sample Output 1:  1					4
+Explanation :-For the first TestCase:-The position of the last person is 1.Hence ans is 1.For the second case:-The first starting point is 1 and 3 is killed.The starting point is 4 and 6 is killed.The starting point is 7 and 2 is killed.The starting point is 4 and 7 is killed.The starting point is 1 and 1 is killed.
+Sample Input 2	: 5 6					3 6
+Sample Output2 :  4 					1
+
+public class Solution {
+
+    // Recursive Josephus logic (0-based)
+    public static int josephus(int n, int k) {
+        if (n == 1) return 0;
+        return (josephus(n - 1, k) + k) % n;
+    }
+
+    // Public method to get 1-based result
+    public static int findSurvivor(int n, int k) {
+        return josephus(n, k) + 1; // one based indexing
+    }
+}
+or
+import java.util.*;
+
+public class JosephusQueue {
+
+    public static int findSurvivor(int n, int k) {
+        Queue<Integer> queue = new LinkedList<>();
+
+        // Initialize the queue with people numbered from 1 to n
+        for (int i = 1; i <= n; i++) {
+            queue.add(i);
+        }
+
+        // Simulation
+        while (queue.size() > 1) {
+            // Skip k-1 people
+            for (int i = 1; i < k; i++) {
+                queue.add(queue.poll()); // move front person to the end
+            }
+            queue.poll(); // eliminate the k-th person
+        }
+
+        return queue.peek(); // last person remaining
+    }
+}
+=======================================================================================================================================================================
+You are given an integer array nums and an integer k. You want to find a subsequence of nums of length k that has the largest sum.Return any such subsequence as an integer array of length k.A subsequence is an array that can be derived from another array by deleting some or no elements without changing the order of the remaining elements.
+Example 1:Input: nums = [2,1,3,3], k = 2			Output: [3,3]
+Explanation:The subsequence has the largest sum of 3 + 3 = 6.
+Example 2:Input: nums = [-1,-2,3,4], k = 3			Output: [-1,3,4]
+Explanation: The subsequence has the largest sum of -1 + 3 + 4 = 6.
+Example 3:Input: nums = [3,4,3,3], k = 2			Output: [3,4]
+Explanation:The subsequence has the largest sum of 3 + 4 = 7. Another possible subsequence is [4, 3].
+
+public class MaxSubsequence {
+
+    public static int[] maxSubsequence(int[] nums, int k) {
+        int n = nums.length;
+
+        // Min-heap to keep top k largest elements based on value
+        PriorityQueue<int[]> pq = new PriorityQueue<>(Comparator.comparingInt(a -> a[0]));
+
+        for (int i = 0; i < n; i++) {
+            int[] pair = new int[]{nums[i], i}; // [value, index]
+            pq.offer(pair);
+            if (pq.size() > k) {
+                pq.poll(); // remove smallest
+            }
+        }
+
+        // Now pq has top k elements, collect and sort by original index
+        List<int[]> topK = new ArrayList<>(pq);
+        topK.sort(Comparator.comparingInt(a -> a[1])); // maintain subsequence order
+
+        int[] result = new int[k];
+        for (int i = 0; i < k; i++) {
+            result[i] = topK.get(i)[0];
+        }
+
+        return result;
+    }
+}
+===========================================================================================================================================================================
+You are given a string 'exp' which is a valid infix expression.Convert the given infix expression to postfix expression.Note:Infix notation is a method of writing mathematical expressions in which operators are placed between operands. For example, "3 + 4" represents the addition of 3 and 4.Postfix notation is a method of writing mathematical expressions in which operators are placed after the operands. For example, "3 4 +" represents the addition of 3 and 4.Expression contains digits, lower case English letters, ‘(’, ‘)’, ‘+’, ‘-’, ‘*’, ‘/’, ‘^’. 
+Example:Input: exp = ‘3+4*8’					Output: 348*+
+Explanation:Here multiplication is performed first and then the addition operation. Hence postfix expression is  3 4 8 * +.
+Detailed explanation ( Input/output format, Notes, Images )
+Sample Input 1:3^(1+1)		Expected Answer:	311+^
+Explanation of Sample Input 1:For this testcase, we will evaluate 'b' = (1+1) first. Hence it's equivalent postfix expression will be "11+". Next we will evaluate 3^b. It's equivalent postfix expression will be "3b^". Replacing 'b' with it's equivalent postfix we get "311+^".
+
+public class Solution {
+    public static String infixToPostfix(String exp) {
+        StringBuilder result = new StringBuilder();
+        Stack<Character> stack = new Stack<>();
+
+        for (char ch : exp.toCharArray()) {
+            if (Character.isLetterOrDigit(ch)) {
+                result.append(ch);
+            } else if (ch == '(') {
+                stack.push(ch);
+            } else if (ch == ')') {
+                while (!stack.isEmpty() && stack.peek() != '(') {
+                    result.append(stack.pop());
+                }
+                stack.pop(); // Pop the '('
+            } else { // operator
+                while (!stack.isEmpty() && precedence(stack.peek()) > precedence(ch)
+                       || (precedence(stack.peek()) == precedence(ch) && !isRightAssociative(ch))
+                       && stack.peek() != '(') {
+                    result.append(stack.pop());
+                }
+                stack.push(ch);
+            }
+        }
+
+        while (!stack.isEmpty()) {
+            result.append(stack.pop());
+        }
+
+        return result.toString();
+    }
+
+    private static int precedence(char op) {
+        switch (op) {
+            case '^': return 3;
+            case '*': case '/': return 2;
+            case '+': case '-': return 1;
+            default: return -1;
+        }
+    }
+
+    private static boolean isRightAssociative(char op) {
+        return op == '^';
+    }
+}
+===========================================================================================================================================================================
+Ninja was feeling bored during the lockdown. So, he decided to watch the Ninja World Tournament. The tournament consists of several matches, where the scores of past matches may affect future matches’ scores.At the beginning of the match, every player starts with an empty track record. Ninja wants to calculate the final score for a player. So, given a list of strings, ‘MATCHRESULT’, where ‘MATCHRESULT[ i ]’ is the ‘i’th operation Ninja must apply to the track record and is one of the following:
+1) An integer “A”: Introduce a new score of ‘A’ on the track record.
+2) "+": Introduce a new score on the track record that is the sum of the previous two scores.
+3) "C": Nullify the previous score, removing it from the track record.
+4) "D": Introduce a new score on the track record that is double the previous score.
+Ninja deduced that this could be easily solved using programming. So, he needs your help to calculate the sum of all the scores present in the track record.
+Sample Input 1:		2 3 + D C				15 C 10 D
+Sample Output 1:	10						30
+Explanation of Sample Output 1:Test Case 1 :  Given MATCHRESULT = {“2”, “3”, “+”, “D”, “C”}. Initially, TRACKRECORD = {}.For “2”, Introducing 2 on the ‘TRACKRECORD’. Therefore, TRACKRECORD = {2}.For “3”, Introducing 3 on the ‘TRACKRECORD’. Therefore, TRACKRECORD = {2, 3}.For “+”, Introducing the sum of 2 and 3, i.e., 5 on the ‘TRACKRECORD’. Therefore, TRACKRECORD = {2, 3, 5}.For “D”, Introducing the double of 5, i.e., 10 on the ‘TRACKRECORD’. Therefore, TRACKRECORD = {2, 3, 5, 10}.For “C”, Nullifying the score 10 and thus removing it from the ‘TRACKRECORD’. Therefore, TRACKRECORD = {2, 3, 5}.Sum of all the scores = 2 + 3 + 5 = 10.
+
+import java.util.*;
+
+public class NinjaTournament {
+    
+    public static int calculateScore(String[] matchResult) {
+        Stack<Integer> stack = new Stack<>();
+
+        for (String op : matchResult) {
+            if (op.equals("+")) {
+                int last = stack.pop();
+                int secondLast = stack.peek();
+                int sum = last + secondLast;
+                stack.push(last); // push back the last
+                stack.push(sum);  // push the new sum
+            } else if (op.equals("D")) {
+                stack.push(2 * stack.peek());
+            } else if (op.equals("C")) {
+                stack.pop();
+            } else {
+                stack.push(Integer.parseInt(op));
+            }
+        }
+
+        int total = 0;
+        for (int score : stack) {
+            total += score;
+        }
+
+        return total;
+    }
+}
+===========================================================================================================================================================================
+Given linked lists l1 l2 insert elements of lists in alternating positions ex: l1: 1->3->5 l2: 2->4->6 Output: 1 ->2->3->4->5->6
+
+public class Solution {
+
+    public static void merge(Node head1, Node head2) {
+        
+        Node first = head1, second = head2;
+        Node f_next = null, s_next = null;
+
+        // Solving for each node in Linkedlist.
+        while (first != null)
+        {
+            // Storing the next pointers.
+            f_next = first.next;
+            s_next = second.next;
+
+            // Inserting the node of the second LinkedList in the first LinkedList.
+            second.next = f_next;
+            first.next = second;
+
+            // Updating the current pointers for the next iteration.
+            first = f_next;
+            second = s_next;
+        }
+    }   
+}
+===========================================================================================================================================================================
+You are given an array 'ARR' of Integers. Your task is to replace each element of the array with the smallest element, which is strictly greater than that element and is present on the right side of that element in the array i.e. for each valid index ‘i’ replace ARR[i] with the smallest ARR[j] such that ARR[j]>ARR[i] and j>i.
+In case there exists no such element satisfying the above conditions for a particular array element, replace it with -1.
+Sample Input 1 :
+4
+5 6 7 2
+3 
+4 3 6
+Sample Output 1 :
+6 7 -1 -1 
+6 6 -1
+Explanation for Sample Input 1 :
+For the first test case : 
+1) For ARR [0] = 5, the least greater element is 6.
+2) For ARR [1] = 6, the least greater element is 7.
+3) For ARR [2] = 7, no least greater element exists. Hence, we will consider -1 here.
+4) For ARR [3] = 2, no least greater element exists. Hence, we will consider -1 here.
+Therefore, the output array is [ 6, 7, -1, -1 ] in this case.
+For the second test case : 
+1) For ARR [0] = 4, the least greater element is 6.
+2) For ARR [1] = 3, the least greater element is 6.
+3) For ARR [2] = 6, no least greater element exists. Hence, we will consider -1 here.
+Therefore, the output array is [ 6, 6, -1 ] in this case.
+
+public class LeastGreaterElementRight {
+    private static int[] findLeastGreaterRight(int[] arr) {
+        int n = arr.length;
+        int[] res = new int[n];
+        TreeSet<Integer> set = new TreeSet<>();
+
+        for (int i = n - 1; i >= 0; i--) {
+            Integer nextGreater = set.higher(arr[i]); // returns next higher element in set comparing passed value
+            res[i] = (nextGreater != null) ? nextGreater : -1;
+            set.add(arr[i]);
+        }
+
+        return res;
+    }
+}
+====================================================================================================================================================================
+Given head which is a reference node to a singly-linked list. The value of each node in the linked list is either 0 or 1. The linked list holds the binary representation of a number.Return the decimal value of the number in the linked list.The most significant bit is at the head of the linked list.
+Example 1:Input: head = [1,0,1]			Output: 5
+Explanation: (101) in base 2 = (5) in base 10
+Example 2:Input: head = [0]				Output: 0
+ 
+class Solution {
+    public int getDecimalValue(ListNode head) {
+        int res = 0;
+
+        while (head != null) {
+            res = (res << 1) | head.val;
+            head = head.next;
+        }
+
+        return res;
+    }
+}
+or
+class Solution {
+    public int getDecimalValue(ListNode head) {
+        ListNode revHead = reverse(head); // Use the reversed head
+        int res = 0;
+        int pow = 0;
+
+        while (revHead != null) {
+            res += revHead.val * (1 << pow); // Use bitwise shift instead of Math.pow
+            pow++;
+            revHead = revHead.next;
+        }
+
+        return res;
+    }
+
+    private ListNode reverse(ListNode head) {
+        ListNode prev = null;
+        ListNode curr = head;
+
+        while (curr != null) {
+            ListNode next = curr.next;
+            curr.next = prev;
+            prev = curr;
+            curr = next;
+        }
+        return prev;
+    }
+}
+===============================================================================================================================================
+You are given a string s of even length consisting of digits from 0 to 9, and two integers a and You can apply either of the following two operations any number of times and in any order on s:Add a to all odd indices of s 
+(0-indexed). Digits post 9 are cycled back to 0. For example, if s = "3456" and a = 5, s becomes "3951".Rotate s to the right by b positions. For example, if s = "3456" and b = 1, s becomes "6345".Return the lexicographically 
+smallest string you can obtain by applying the above operations any number of times on s.A string a is lexicographically smaller than a string b (of the same length) if in the first position where a and b differ, string a has 
+a letter that appears earlier in the alphabet than the corresponding letter in b. For example, "0158" is lexicographically smaller than "0190" because the first position they differ is at the third letter, and '5' comes before 
+'9'.
+Example 1:Input: s = "5525", a = 9, b = 2		Output: "2050"
+Explanation: We can apply the following operations:
+Start:  "5525"
+Rotate: "2555"
+Add:    "2454"
+Add:    "2353"
+Rotate: "5323"
+Add:    "5222"
+Add:    "5121"
+Rotate: "2151"
+Add:    "2050"​​​​​
+There is no way to obtain a string that is lexicographically smaller than "2050".
+Example 2:Input: s = "74", a = 5, b = 1			Output: "24"
+Explanation: We can apply the following operations:
+Start:  "74"
+Rotate: "47"
+​​​​​​​Add:    "42"
+​​​​​​​Rotate: "24"​​​​​​​​​​​​
+There is no way to obtain a string that is lexicographically smaller than "24".
+Example 3:Input: s = "0011", a = 4, b = 2		Output: "0011"
+Explanation: There are no sequence of operations that will give us a lexicographically smaller string than "0011".
+
+import java.util.*;
+
+public class LexicographicallySmallestString {
+    public static String findLexSmallestString(String s, int a, int b) {
+        Queue<String> queue = new LinkedList<>();
+        Set<String> visited = new HashSet<>();
+        
+        queue.offer(s);
+        visited.add(s);
+
+        String min = s;
+
+        while (!queue.isEmpty()) {
+            String curr = queue.poll();
+            if (curr.compareTo(min) < 0) {
+                min = curr;
+            }
+
+            // Apply add operation
+            String added = addOperation(curr, a);
+
+            // Apply rotate operation
+            String rotated = rotateOperation(curr, b);
+
+            // Explore new states
+            if (visited.add(added)) queue.offer(added);
+            if (visited.add(rotated)) queue.offer(rotated);
+        }
+
+        return min;
+    }
+
+    private static String addOperation(String s, int a) {
+        char[] arr = s.toCharArray();
+        for (int i = 1; i < arr.length; i += 2) { // odd indices
+            int digit = (arr[i] - '0' + a) % 10;
+            arr[i] = (char) (digit + '0');
+        }
+        return new String(arr);
+    }
+
+    private static String rotateOperation(String s, int b) {
+        int n = s.length();
+        b = b % n; // handle large rotations
+        return s.substring(n - b) + s.substring(0, n - b);
+    }
+}
+================================================================================================================================================================================
+There are contestants standing in a row. Each contestant is assigned a rating, which is an integer. A contestant supports all those whose rating is greater than their rating.Now for each contestant standing in the row, you need to tell the rating of its closest supporter on the left.If no supporter is there, store -1 in that place.For Example Consider the row : [ 3, 1, 5, 12, 10], with 1-based indexing - For index 3, there would be 2 supporters, index 1 and index 2, but index 2 is closest, hence for index 3, we will store ‘1’ (Rating of contestant). For index 5, we will store ‘5’(at index 3).Detailed explanation ( Input/output format, Notes, Images )
+Sample Input 1:   3 1 5 12 10					9 8 1 2 5 5
+Sample Output 1: -1 -1 1 5 5					-1 -1 -1 1 2 2
+Explanation of Sample Input 1(1-based indexing)
+Test Case 1:There is no contestant on the left of 1st contestantNo contestant’s rating is less than this player, hence -1.Both ratings 3 and 1 are smaller than the current rating, but ‘1’ is closest.All ratings are small, but the nearest one is ‘5’.For ‘10’, the nearest rating is ‘5’, as contestant 4 is not a supporter.
+Test Case 2:For the first '3' contestants, there is no supporter.For contestant '4', the only supporter is contestant '3', with the rating '1'.Both ratings '1' and '2' are smaller than the current rating, but ‘2’ is closest.The rating of contestant '5' is not less than the current contestant, hence the closest supporter is 4th, with a rating of '2'.
+Sample Input 2 : 3 2 1 4 5			1 2 3 4
+Sample Output 2: -1 -1 -1 1 4		-1 1 2 3
+
+public class Solution {
+    public static int[] findSupporters(int[] ratings, int n) {
+        // Use a Stack to keep track of potential supporters
+        Stack<Integer> stack = new Stack<>();
+        
+        // Array to store the results
+        int[] result = new int[n];
+
+        for (int i = 0; i < n; i++) {
+            // While the stack is not empty and the top element 
+            // is not a supporter (rating >= current rating), pop it.
+            while (!stack.isEmpty() && stack.peek() >= ratings[i]) {
+                stack.pop();
+            }
+
+            // If stack is empty, no supporter found
+            if (stack.isEmpty()) {
+                result[i] = -1;
+            } else {
+                // The top of the stack is the closest smaller element
+                result[i] = stack.peek();
+            }
+
+            // Push the current rating onto the stack for future contestants
+            stack.push(ratings[i]);
+        }
+		return result;
+    }
+}
+================================================================================================================================================================================
+You are given a task to do some analysis for a messaging service application.You are given series of queries of two types :1 'user' 'time', denoting that the query is of type-1, and a person named 'user' has received a message at the time 'time'.2 ‘l’ ‘r’ 'user' ‘k’, denoting that the query is of type-2, and [l, r] being a range of time, 'user' is a name of a person, ‘k’ is the chunk size.For query of type-2 you need to print a list of integers, representing the number of messages the person 'user' received in each of the time chunks of size ‘k’, in time period [l, r].Example:If [l, r] = [10, 100] and ‘k’ = 35, then the chunks of size ‘k’ for the range will be:  [10, 44], [45, 79], [80, 100]. You need to return a list of size 3 here for each of these 3 chunks, where you tell the number of times a message is received by the person in that particular chunk (or sliced range).
+Note :Here you will implment function receiveMessage(user,time) for query of type-1, and implement function getMessageCount(l,r,user,k) for query fo type-2
+Sample Input 1 :
+5
+1 abc 5
+1 def 7
+1 abc 9
+1 abc 3
+2 5 10 abc 3
+Sample Output 1 :
+1 1
+Explanation For Sample Input 1 :Before the query of type-2, we have 4 queries of type-1, where 3 are the ones where the user is “abc”, who received messages at the time [3, 5, 9].We need to find messages in the range [5, 10] in chunks of 3. I.e. [5, 6, 7], [8, 9, 10].The user “abc” received a message at timestamp 3: which doesn’t belong to any chunk.The user “abc” received a message at timestamp 5: which belongs to chunk 1. The user “abc” received a message at timestamp 7: which belongs to chunk 2.Thus the answer is [1, 1], one message in each chunk.
+Sample Input 2 :
+6
+1 nnax 85
+1 nqwl 35
+1 nnax 86
+1 nqwl 30
+1 nnax 1
+2 5 43 nqwl 10
+Sample Output 2 :
+0 0 1 1
+
+public class Solution {
+    // A map to store the list of message timestamps for each user
+    private static Map<String, List<Integer>> userMessages = new HashMap<>();
+
+    public static void receiveMessage(String user, int time) {
+        // If user is not in map, initialize a new list
+        userMessages.putIfAbsent(user, new ArrayList<>());
+        // Add the timestamp to the user's list
+        userMessages.get(user).add(time);
+    }
+
+    public static ArrayList<Integer> getMessageCount(int l, int r, String user, int k) {
+        ArrayList<Integer> result = new ArrayList<>();
+        
+        // If the user doesn't exist in our records, return 0 for all chunks
+        List<Integer> times = userMessages.getOrDefault(user, new ArrayList<>());
+
+        // Iterate through the range [l, r] in chunks of size k
+        for (int start = l; start <= r; start += k) {
+            // Calculate the end of the current chunk, but don't exceed 'r'
+            int end = Math.min(start + k - 1, r);
+            
+            int count = 0;
+            // Count how many timestamps fall within [start, end]
+            for (int time : times) {
+                if (time >= start && time <= end) {
+                    count++;
+                }
+            }
+            result.add(count);
+        }
+        
+        return result;
+    }
+}
+===========================================================================================================================================================================================================================================================
+There are two groups, one of men, and one of women with unique IDs (Each group has unique IDs but two people from different groups can have the same ID). These two groups are represented in the form of a Binary Search Tree.
+Now, the IDs are handed out in such a way that a man and woman are married if and only if their IDs sum up to ‘X’. Given the two groups, find the number of married couples that exist.
+Sample Input 1:
+6 13 11
+7 2 9 1 5 -1 14 -1 -1 -1 -1 -1 -1
+4 2 5 1 3 -1 -1 -1 -1 -1 -1
+Sample Output 1
+3
+Explanation for Sample Input 1:
+The couples for these groups are (1,5), (2,4) and (5,1). Hence, the answer is 3.
+Sample Input 2:
+1
+8 7 7
+5 4 7 -1 -1 -1 -1
+3 1 4 -1 -1 -1 -1
+Sample Output 2:
+3
+
+public class Solution {
+
+    public static int countCouples(TreeNode root1, TreeNode root2, int x) {
+
+        Stack<TreeNode> s1 = new Stack<>();
+        Stack<TreeNode> s2 = new Stack<>();
+
+        TreeNode curr1 = root1;
+        TreeNode curr2 = root2;
+
+        int count = 0;
+
+        while (true) {
+
+            // push left path of tree1
+            while (curr1 != null) {
+                s1.push(curr1);
+                curr1 = curr1.left;
+            }
+
+            // push right path of tree2
+            while (curr2 != null) {
+                s2.push(curr2);
+                curr2 = curr2.right;
+            }
+
+            if (s1.isEmpty() || s2.isEmpty()) break;
+
+            TreeNode top1 = s1.peek();
+            TreeNode top2 = s2.peek();
+
+            int sum = top1.data + top2.data;
+
+            if (sum == x) {
+                count++;
+
+                // move forward in tree1
+                s1.pop();
+                curr1 = top1.right;
+
+                // move backward in tree2
+                s2.pop();
+                curr2 = top2.left;
+            }
+            else if (sum < x) {
+                // need bigger value from tree1
+                s1.pop();
+                curr1 = top1.right;
+            }
+            else {
+                // need smaller value from tree2
+                s2.pop();
+                curr2 = top2.left;
+            }
+        }
+
+        return count;
+    }
+}
+====================================================================================================================================================================================================================================================
+Given the root of a binary search tree, return a balanced binary search tree with the same node values. If there is more than one answer, return any of them.A binary search tree is balanced if the depth of the two subtrees of every node never differs by more than 1.
+Example 1:Input: root = [1,null,2,null,3,null,4,null,null]					Output: [2,1,3,null,null,null,4]
+Explanation: This is not the only correct answer, [3,1,4,null,2] is also correct.
+Example 2:Input: root = [2,1,3]												Output: [2,1,3]
+
+class Solution {
+
+    public TreeNode balanceBST(TreeNode root) {
+        List<Integer> list = new ArrayList<>();
+        inorder(root, list);
+        return build(list, 0, list.size() - 1);
+    }
+
+    // Step 1: inorder traversal → sorted list
+    private void inorder(TreeNode node, List<Integer> list) {
+        if (node == null) return;
+
+        inorder(node.left, list);
+        list.add(node.val);
+        inorder(node.right, list);
+    }
+
+    // Step 2: build balanced BST
+    private TreeNode build(List<Integer> list, int left, int right) {
+        if (left > right) return null;
+
+        int mid = left + (right - left) / 2;
+        TreeNode root = new TreeNode(list.get(mid));
+
+        root.left = build(list, left, mid - 1);
+        root.right = build(list, mid + 1, right);
+
+        return root;
+    }
+}
+====================================================================================================================================================================================================================================================
+Given an array of integers, find the Kth largest sum subarray For example, given the array [1, -2, 3, -4, 5] and K = 2, the 2nd largest sum subarray would be [3, -4, 5], which has a sum of 4.Please note that a subarray is the sequence of consecutive elements of the array.
+Sample Input 1 : arr = 3 -2 5 k = 3 , arr = 4 1 k = 2
+Sample output 1 : 3 					4
+Explanation of Sample output 1 :
+For the first test case, 
+Sum of [0, 0] = 3
+Sum of [0, 1] = 1
+Sum of [0, 2] = 6
+Sum of [1, 1] = -2
+Sum of [1, 2] = 3
+Sum of [2, 2] = 5
+All sum of subarrays are {6, 5, 3, 3, 1, -2} where the third largest element is 3. For the second test case, 
+Sum of [0, 0] = 4
+Sum of [0, 1] = 5
+Sum of [1, 1] = 1
+All sum of subarrays are {5, 4, 1} where the second largest element is 4.For the second test case, among the sum of all the subarray, the largest sum will be 6.
+
+public class Solution {
+
+    public static int kthLargestSum(int[] arr, int k) {
+        int n = arr.length;
+        
+        PriorityQueue<Integer> pq = new PriorityQueue<>(); // min heap
+        
+        for (int i = 0; i < n; i++) {
+            int sum = 0;
+            
+            for (int j = i; j < n; j++) {
+                sum += arr[j];
+                
+                if (pq.size() < k) {
+                    pq.add(sum);
+                } else if (pq.peek() < sum) {
+                    pq.poll();
+                    pq.add(sum);
+                }
+            }
+        }
+        
+        return pq.peek();
+    }
+}
+====================================================================================================================================================================================================================================================
+You are given a BST (Binary search tree) with’ N’ number of nodes and a value ‘X’. Your task is to find the greatest value node of the BST which is smaller than or equal to ‘X’.
+Sample Input 1: root = 10 5 15 2 6 -1 -1 -1 -1 -1 -1 x= 7
+root = 2 1 3 -1 -1 -1 -1      x = 2
+Sample Output 1:6				2
+Explanation of Sample Input 1:the first test case, the BST looks like as below:The greatest value node of the BST which is smaller than or equal to  7 is 6.In the second test case, the BST looks like as below:The greatest value node of the BST which is smaller than or equal to  2 is 2.
+Sample Input 2:
+5 3 10 2 4 6 15 -1 -1 -1 -1 -1 -1 -1 -1
+15
+5 3 10 2 4 6 15 -1 -1 -1 -1 -1 -1 -1 -1
+8
+Sample Output 2:
+15
+6
+
+public class Solution {
+
+    public static int floorInBST(TreeNode<Integer> root, int X) {
+        int floor = -1;
+
+        while (root != null) {
+
+            if (root.data == X) {
+                return root.data;
+            }
+
+            if (root.data < X) {
+                floor = root.data;   // possible answer
+                root = root.right;   // try to find a bigger value ≤ X
+            } else {
+                root = root.left;    // move left to smaller values
+            }
+        }
+
+        return floor;
+    }
+}
+or
+public static int floorInBST(TreeNode<Integer> root, int X) {
+    if (root == null) return -1;
+
+    if (root.data == X) return X;
+
+    if (root.data > X)
+        return floorInBST(root.left, X);
+
+    int floor = floorInBST(root.right, X);
+
+    return (floor <= X && floor != -1) ? floor : root.data;
+}
+====================================================================================================================================================================================================================================================
+You have been given a Binary Tree of 'N' nodes. Your task is to find and return the deepest right leaf node. In case of multiple answers, return the rightmost node. 
+Sample Input 1: 1 2 3 -1 -1 -1 -1
+Sample Output 1: 3
+Explanation to Sample Output 1:The input binary tree will be represented as:From the above representation, the leaves node are 2 and 3. But 3 is the right child of its parent but 2 is the left child of its parent. Thus, 3 should be the answer.
+Sample Input 2: 1 2 3 -1 4 4 -1 -1 5 6 -1 -1 -1 -1 -1
+Sample Output 2: 5
+Explanation to Sample Output 2:The input binary tree will be represented as: From the above representation, the leaves node are 5 and 6. But 5 is the right child of its parent but 6 is the left child of its parent. Thus, 5 should be the answer.
+
+public class Solution {
+
+    static class Pair {
+        TreeNode node;
+        boolean isRight;
+
+        Pair(TreeNode node, boolean isRight) {
+            this.node = node;
+            this.isRight = isRight;
+        }
+    }
+
+    public static int deepestRightLeaf(TreeNode root) {
+        if (root == null) return -1;
+
+        Queue<Pair> queue = new LinkedList<>();
+        queue.offer(new Pair(root, false));
+
+        int result = -1;
+
+        while (!queue.isEmpty()) {
+            Pair curr = queue.poll();
+            TreeNode node = curr.node;
+
+            // Check if it's a right leaf
+            if (curr.isRight && node.left == null && node.right == null) {
+                result = node.data;
+            }
+
+            if (node.left != null) {
+                queue.offer(new Pair(node.left, false));
+            }
+
+            if (node.right != null) {
+                queue.offer(new Pair(node.right, true));
+            }
+        }
+
+        return result;
+    }
+}
+====================================================================================================================================================================================================================================================
+You are given a linked list and a number ‘x’, You have to partition the linked list in such a way that all nodes with a value less than 'x' comes before the nodes with values greater than or equal to 'x'. The original relative order should be preserved.
+Sample Input 1: 5 4 7 1 2 3 -1	X=4						1 2 3 4 0 5 6 -1 X=3
+Sample Output 1:1 2 3 5 4 7  							1 2 0 3 4 5 6  
+Explanation:-Here is the linked list for the first test case:-The nodes with value 1,2,3 are less than x that is 4.They should appear before 5,4,7
+
+public class Solution {
+    public static Node findPartition(Node head, int X) {
+
+        Node lessDummy = new Node(0);
+        Node greaterDummy = new Node(0);
+
+        Node less = lessDummy;
+        Node greater = greaterDummy;
+
+        while (head != null) {
+            Node next = head.next; // store next
+            head.next = null;      // detach node
+
+            if (head.data < X) {
+                less.next = head;
+                less = less.next;
+            } else {
+                greater.next = head;
+                greater = greater.next;
+            }
+
+            head = next;
+        }
+
+        // connect both lists
+        less.next = greaterDummy.next;
+
+        return lessDummy.next;
+    }
+}
+====================================================================================================================================================================================================================================You have been given a Binary Tree of integers. You are supposed to return the reverse of the level order traversal.
+Sample Input 1:1 2 3 4 -1 5 6 -1 7 -1 -1 -1 -1 -1 -1						Sample Output 1:7 6 5 4 3 2 1
+Explanation of Sample Input 1:Start with the bottom of the tree, i.e. 7, and traverse in the tree in the reverse direction of level order, i.e., bottom to top and right to left. So, the reverse level order traversal will be {7,6,5,4,3,2,1}.
+Sample Input 2: 2 7 5 2 6 -1 9 -1 -1 5 11 4 -1 -1 -1 -1 -1 -1 -1			Sample Output 2:
+4 11 5 9 6 2 5 7 2
+Explanation of Sample Input 2: Traverse the tree in the reverse direction of level order, i.e., bottom to top and right to left. So reverse level order traversal will be {4,11,5,9,6,2,5,7,2}.
+
+public class ReverseLevelOrder {
+
+    public static List<Integer> reverseLevelOrder(TreeNode root) {
+        List<Integer> result = new ArrayList<>();
+        
+        if (root == null) return result;
+
+        Queue<TreeNode> queue = new LinkedList<>();
+        Stack<Integer> stack = new Stack<>();
+
+        queue.offer(root);
+
+        while (!queue.isEmpty()) {
+            TreeNode current = queue.poll();
+            
+            // Push current node to stack
+            stack.push(current.data);
+
+            // IMPORTANT: right first, then left
+            if (current.right != null) queue.offer(current.right);
+            if (current.left != null) queue.offer(current.left);
+        }
+
+        // Pop all elements from stack
+        while (!stack.isEmpty()) {
+            result.add(stack.pop());
+        }
+
+        return result;
+    }
+}
+===================================================================================================================================================================================================================================
+Given the head of a linked list, rotate the list to the right by k places.
+Example 1:Input: head = [1,2,3,4,5], k = 2		Output: [4,5,1,2,3]
+Example 2:Input: head = [0,1,2], k = 4			Output: [2,0,1]
+
+public class Solution {
+
+    public ListNode rotateRight(ListNode head, int k) {
+        if (head == null || head.next == null || k == 0) {
+            return head;
+        }
+
+        // Step 1: Find length
+        ListNode temp = head;
+        int length = 1;
+
+        while (temp.next != null) {
+            temp = temp.next;
+            length++;
+        }
+
+        // Step 2: Make it circular
+        temp.next = head;
+
+        // Step 3: Optimize k
+        k = k % length;
+
+        // Step 4: Find new tail (length - k - 1 steps)
+        int stepsToNewTail = length - k;
+
+        ListNode newTail = head;
+        for (int i = 1; i < stepsToNewTail; i++) {
+            newTail = newTail.next;
+        }
+
+        // Step 5: Break the circle
+        ListNode newHead = newTail.next;
+        newTail.next = null;
+
+        return newHead;
+    }
+}
+===================================================================================================================================================================================================================================
+An expression is called the postfix expression if the operator appears in the expression after the operands.
+Example :Infix expression: A + B  *  C - D  Postfix expression:  A B + C D - * Given a postfix expression, the task is to evaluate the expression. The answer could be very large, output your answer modulo (10^9+7). Also, use modular division when required.
+Note: 1. Operators will only include the basic arithmetic operators like '*', '/', '+', and '-'. 2. The operand can contain multiple digits.  3. The operators and operands will have space as a separator between them. 4. There won’t be any brackets in the postfix expression. Where ‘N’ denotes the length of postfix expression and ‘NUM’ denotes the operand.
+Sample input 1 : 2 3 1 * + 9 -				1 2 3 + * 8 -
+Sample output 1: -4							-3
+Explanation of sample input 1:
+Test case 1:
+2 3 1 * + 9 -
+- : ( ) - ( )
+9 : ( ) - (9)
++ : ( ( ) + ( ) ) - (9)
+'*':  ( ( ) + ( ( ) * ( ) ) ) - (9)
+1 : ( ( ) + ( ( ) * (1) ) ) - (9)
+3 : ( ( ) + ( (3) * (1) ) ) - (9)
+2 : ( (2) + ( (3) * (1) ) ) - (9) 
+Result = (2 + 3) - 9 = 5 - 9 = -4
+Test case 2:
+1 2 3 + * 8 -
+ - : ( ) - ( )
+8 : ( ) - (8)
+* : ( ( ) * ( ) ) - (8)
++ : ( ( ) * ( ( ) + ( ) ) ) - (8)
+3 : ( ( ) * ( ( ) + (3) ) ) - (8)
+2 : ( ( ) * ( (2) + (3) ) ) - (8)
+1 : ( (1) * ( (2) + (3) ) ) - (8) 
+Result = (1 * 5) - 8 = 5 - 8 = -3
+Sample input 2: 100 200 + 2 / 5 * 7 +
+Sample output 2: 757
+Explanation of sample input 2:100 + 200 = 300, 300 / 2 = 150, 150 * 5 = 750, 750 + 7 = 757
+
+public class Solution {
+
+    static final long MOD = 1_000_000_007L;
+
+    public static int evaluatePostfix(String[] exp) {
+
+        Stack<Long> stack = new Stack<>();
+
+        for (String token : exp) {
+
+            if ("+-*/".contains(token) && token.length() == 1) {
+
+                long b = stack.pop();
+                long a = stack.pop();
+
+                long res = 0;
+
+                switch (token) {
+
+                    case "+":
+                        res = (a + b) % MOD;
+                        break;
+
+                    case "-":
+                        res = (a - b) % MOD;
+                        break;
+
+                    case "*":
+                        res = ((a % MOD) * (b % MOD)) % MOD;
+                        break;
+
+                    case "/":
+                        res = ((a % MOD) * modInverse(b, MOD)) % MOD;
+                        break;
+                }
+
+                stack.push(res);
+
+            } else {
+                stack.push(Long.parseLong(token));
+            }
+        }
+
+        long ans = stack.pop();
+
+        if (ans < 0) {
+            ans += MOD;
+        }
+
+        return (int) ans;
+    }
+
+    static long modInverse(long a, long mod) {
+        return power(a, mod - 2, mod);
+    }
+
+    static long power(long a, long b, long mod) {
+
+        long res = 1;
+
+        a %= mod;
+
+        while (b > 0) {
+
+            if ((b & 1) == 1) {
+                res = (res * a) % mod;
+            }
+
+            a = (a * a) % mod;
+            b >>= 1;
+        }
+
+        return res;
+    }
+}
+========================================================================================================================================================================================================
+You have been given an array/list ‘ARR’ consisting of ‘N’ positive integers. Your task is to return the Next Greater Element(NGE) for every element.The Next Greater Element for an element ‘X’ is the first element on the right side of ‘X’ in the array 'ARR', which is greater than ‘X’. If no such element exists to the right of ‘X’, then return -1.
+For example:For the given array 'ARR' = [7, 12, 1, 20]The next greater element for 7 is 12.The next greater element for 12 is 20. The next greater element for 1 is 20. There is no greater element for 20 on the right side.
+So, the output is [12, 20, 20, -1].
+Sample Input 1:13 7 6 12				Sample Output 1:-1 12 12 -1
+Explanation For Sample Output 1:For the given array [13, 7, 6, 12].There is no greater element for 13 on the right side.The next greater element for 7 is 12. The next greater element for 6 is 12. There is no greater element for 12 on the right side.So, the output is [-1, 12, 12, -1].
+Sample Input 2:	1 2 3 4 5					10 9 10
+Sample Output 2:2 3 4 5 -1					-1 10 -1
+
+public class Solution 
+{
+    public static ArrayList<Integer> nextGreaterElement(ArrayList<Integer> arr, int n)
+    {
+        ArrayList<Integer> res = new ArrayList<>(Collections.nCopies(n, -1));
+
+        Stack<Integer> stack = new Stack<>();
+
+        for(int i = n - 1; i >= 0; i--)
+        {
+            while(!stack.isEmpty() && stack.peek() <= arr.get(i))
+            {
+                stack.pop();
+            }
+
+            if(!stack.isEmpty())
+            {
+                res.set(i, stack.peek());
+            }
+
+            stack.push(arr.get(i));
+        }
+
+        return res;
+    }
+}
+========================================================================================================================================================================================================
+You are given a singly linked list ‘HEAD’ consisting of ‘N’ nodes. The task is to group all the odd nodes together, followed by the even nodes, maintaining the relative order of nodes given in the input. Note that we are talking about the node’s positions and not the value stored in the node. Try to write an in-place algorithm (i.e., without using any extra space) to solve this problem.
+Example:Given linked list: ‘2 => 1 => 3 => 4 => 6 => 5’While maintaining the relative order of nodes as it is in the input, Nodes at odd positions are (2, 3, 6), and nodes at evens position are (1, 4, 5).Modified linked list: ‘2 => 3 => 6 => 1 => 4 => 5’
+Note:1. Consider that the first node is odd, the second is even, and so on.
+Sample input 1:	1 2 3 -4 5 6 -1    					-3 -1 
+Sample output 1: 1 3 5 2 -4 6 -1					-3 -1 
+Explanation of sample input 1:
+Test Case 1: Given linked list: ‘1 => 2 => 3 => -4 => 5 => 6’While maintaining the relative order of nodes as it is in the input, Nodes at odd positions are (1, 3, 5), and nodes at evens position are (2, -4, 6). Modified linked list: ‘1 => 3 => 5 => 2 => -4 => 6’
+Test Case 2:Input linked list: ‘-3’. The linked list contains only one node.Modified linked list: ‘-3’
+Sample input 2:		3 5 -2 1 7 -1				-2 3 5 3 -1  
+Sample output 2:	3 -2 7 5 1 -1				-2 5 3 3 -1
+
+public class Solution {
+
+    public static Node oddEvenList(Node head) {
+
+        // Edge cases
+        if (head == null || head.next == null) {
+            return head;
+        }
+
+        Node odd = head;
+        Node even = head.next;
+        Node evenHead = even;
+
+        // Rearranging links
+        while (even != null && even.next != null) {
+
+            odd.next = even.next;
+            odd = odd.next;
+
+            even.next = odd.next;
+            even = even.next;
+        }
+
+        // Attach even list after odd list
+        odd.next = evenHead;
+
+        return head;
+    }
+}
+========================================================================================================================================================================================================
+You are provided with a singly linked list, all you have to do is to delete the last node of the linked list and add it to the front of the linked list.
+Example:Please note that the linked list will only contain numeric values.
+Sample Input 1:	2 5 3 11 1 -1				2 -1
+Sample Output 1: 1 2 5 3 11 -1				2 -1
+Explanation of Sample Output 1:In test case 1, the new linked list after doing delete and add operations to the last node: 1 2 5 3 11 -1.In test case 2, the linked list has only one node and so, the last node is itself at the front.
+Sample Input 2:4 3 -1			1 1 1 1 -1
+Sample Output 2:3 4 -1			1 1 1 1 -1
+Explanation for Sample Output 2:In test case 1, the new linked list after doing delete and add operations to the last node: 3 4 -1.In test case 2, the new linked list after swapping first and last nodes: 1 1 1 1 -1.
+
+public class Solution {
+
+    public static Node moveLastToFront(Node head) {
+
+        // Empty list or single node
+        if (head == null || head.next == null) {
+            return head;
+        }
+
+        Node prev = null;
+        Node curr = head;
+
+        // Traverse till last node
+        while (curr.next != null) {
+            prev = curr;
+            curr = curr.next;
+        }
+
+        // Remove last node
+        prev.next = null;
+
+        // Move last node to front
+        curr.next = head;
+        head = curr;
+
+        return head;
+    }
+}
+========================================================================================================================================================================================================
+You are given a BST (Binary search tree) with’ N’ number of nodes and a node ‘X’ (which is definitely present in the input the BST). You need to remove the node ‘X’ and return the root of the updated BST.
+For example:Figure1 : Input BST and Figure2: Output BSTIn the above example, For the given BST (Fig.1) and X = 6,  we have output( Fig. 2 ) after removing node 6.
+Detailed explanation ( Input/output format, Notes, Images )
+Sample Input 1:	10 5 15 2 6 -1 -1 -1 -1 -1 -1	X= 6
+Sample Output 1: 2 5 10 15
+Explanation of Sample Input 1:In the first test case, the input figure is given above in the input format explanation. After removing 6 from BST, the tree becomes as below:So the inorder traversal of the updated tree is: 2 5 10 15
+Sample Input 2:2 1 3 -1 -1 -1 -1		X=2
+Sample Output 2:1 3
+Explanation of Sample Output 2 :Figure1: Input BST  and Figure2: Output BST. So the inorder traversal of the updated tree is: 1 3
+
+public class Solution {
+
+    public static BinaryTreeNode<Integer> deleteNode(
+            BinaryTreeNode<Integer> root, int X) {
+
+        if (root == null) {
+            return null;
+        }
+
+        // Search in left subtree
+        if (X < root.data) {
+            root.left = deleteNode(root.left, X);
+        }
+
+        // Search in right subtree
+        else if (X > root.data) {
+            root.right = deleteNode(root.right, X);
+        }
+
+        // Node found
+        else {
+
+            // Case 1 & 2: No child or one child
+            if (root.left == null) {
+                return root.right;
+            }
+
+            if (root.right == null) {
+                return root.left;
+            }
+
+            // Case 3: Two children
+            // Find inorder successor (minimum in right subtree)
+            BinaryTreeNode<Integer> successor = findMin(root.right);
+
+            // Replace current node's value
+            root.data = successor.data;
+
+            // Delete successor node
+            root.right = deleteNode(root.right, successor.data);
+        }
+
+        return root;
+    }
+	 private static BinaryTreeNode<Integer> findMin(
+            BinaryTreeNode<Integer> node) {
+
+        while (node.left != null) {
+            node = node.left;
+        }
+
+        return node;
+    }
+   }
+}
+========================================================================================================================================================================================================
+You are given a doubly-linked list of size 'N', consisting of positive integers. Now your task is to reverse it and return the head of the modified list.
+Note:A doubly linked list is a kind of linked list that is bidirectional, meaning it can be traversed in both forward and backward directions.
+Input: 4 3 2 1 this means you have been given doubly linked list of size 4 = 4 <-> 3 <-> 2 <-> 1.
+Output:  1 2 3 4
+
+class Solution {
+    public static Node reverseDLL(Node head) {
+        if (head == null || head.next == null) {
+            return head;
+        }
+
+        Node curr = head;
+        Node temp = null;
+
+        while (curr != null) {
+            // Swap prev and next
+            temp = curr.prev;
+            curr.prev = curr.next;
+            curr.next = temp;
+
+            // Move to the next node in original list
+            curr = curr.prev;
+        }
+
+        // temp points to previous node of null
+        if (temp != null) {
+            head = temp.prev;
+        }
+
+        return head;
+    }
+}
+========================================================================================================================================================================================================
+Given an integer array ‘ARR’ of size ‘N’, find the maximum absolute difference between the nearest left and the right smaller element of every element in ‘ARR’. If there is no left smaller or right smaller element of any element then take 0 as the smaller element. You are given ‘ARR’ = [1, 2, 3, 1]. The difference between the nearest left and the right smaller element of ‘ARR[2],’ i.e., 2 - 1 = 1 is the maximum possible. Hence the answer is 1.
+Sample Input 1:	1 2 3 1			3 4 1 
+Sample Output 1: 1					2
+Explanation:For the first test case, the difference between the nearest left and the right smaller element of ‘ARR[2],’ i.e., 2 - 1 = 1 is maximum possible. Hence the answer is 1.For the second test case, the difference between the nearest left and the right smaller element of ‘ARR[1],’ i.e., 3 - 1 = 2, is maximum possible. Hence the answer is 2.
+Sample Input 2: 1 2 3 4				1 1 1 
+Sample Output 2: 3						0
+
+public class MaxDifferenceNearestSmaller {
+    
+    // Main solution function
+    public static int findMaxDifference(int[] arr) {
+        int n = arr.length;
+        
+        // Arrays to store nearest left and right smaller elements
+        int[] left = new int[n];
+        int[] right = new int[n];
+        
+        // Find nearest left smaller element using stack
+        Stack<Integer> stack = new Stack<>();
+        for(int i = 0; i < n; i++) {
+            // Pop elements from stack that are >= current element
+            while(!stack.isEmpty() && arr[stack.peek()] >= arr[i]) {
+                stack.pop();
+            }
+            // If stack is empty, no left smaller element, take 0
+            left[i] = stack.isEmpty() ? 0 : arr[stack.peek()];
+            // Push current element's index
+            stack.push(i);
+        }
+        
+        // Clear stack for right smaller element calculation
+        stack.clear();
+        
+        // Find nearest right smaller element using stack
+        for(int i = n - 1; i >= 0; i--) {
+            // Pop elements from stack that are >= current element
+            while(!stack.isEmpty() && arr[stack.peek()] >= arr[i]) {
+                stack.pop();
+            }
+            // If stack is empty, no right smaller element, take 0
+            right[i] = stack.isEmpty() ? 0 : arr[stack.peek()];
+            // Push current element's index
+            stack.push(i);
+        }
+        
+        // Find maximum difference
+        int maxDiff = 0;
+        for(int i = 0; i < n; i++) {
+            maxDiff = Math.max(maxDiff, left[i] - right[i]);
+        }
+        
+        return maxDiff;
+    }
+}
+========================================================================================================================================================================================================
+The problem is that he now has an integer array 'ARR'. For every index i, he wants to find the product of the largest, second largest and the third largest integer in the range [0, i] given that array has 0 based indexing.
+You have to return the list as required.Note: Two numbers can be the same value-wise but they should be distinct index-wise.
+Example:If the array is [2, 3, 3, 4], the answer should be:--1  -1 18 (3 * 3 * 2) 36 (4 * 3 * 3) 
+Detailed explanation ( Input/output format, Notes, Images )
+Sample input 1:2 3 1 4 
+Sample output 1:-1 -1 6 24
+Explanation: -1 (no second largest as well as third largest element is present) -1 (no third largest element is present)6 (3 * 2 * 1) 24 (4 * 3 * 2)
+Sample input 2:1 5 7 3 9 12
+Sample output 2:1 -1 35 105 315 756
+
+public class Solution {
+
+    public static ArrayList<Long> findMaxProduct(ArrayList<Integer> arr) {
+        ArrayList<Long> ans = new ArrayList<>();
+        PriorityQueue<Integer> pq = new PriorityQueue<>(); // Min-heap to store top 3 elements
+
+        for (int num : arr) {
+
+            // Add element if heap has less than 3 elements
+            if (pq.size() < 3) {
+                pq.offer(num);
+            }
+            // Replace the smallest among top 3 if current number is larger
+            else if (num > pq.peek()) {
+                pq.poll();
+                pq.offer(num);
+            }
+
+            // If less than 3 elements are available
+            if (pq.size() < 3) {
+                ans.add(-1L);
+            } else {
+                long product = 1L;
+
+                // Copy heap because iterating directly is safe but copying keeps heap untouched
+                for (int val : pq) {
+                    product *= val;
+                }
+
+                ans.add(product);
+            }
+        }
+
+        return ans;
+    }
+}
+========================================================================================================================================================================================================
+Given an array of integers, find the Kth largest sum subarray For example, given the array [1, -2, 3, -4, 5] and K = 2, the 2nd largest sum subarray would be [3, -4, 5], which has a sum of 4.Please note that a subarray is the sequence of consecutive elements of the array.
+Sample Input 1 :	arr=3 -2 5, k= 3			arr=4 1, k=2
+Sample output 1 :   3							4
+Explanation of Sample output 1 :For the first test case, Sum of [0, 0] = 3. Sum of [0, 1] = 1. Sum of [0, 2] = 6. Sum of [1, 1] = -2. Sum of [1, 2] = 3. Sum of [2, 2] = 5
+All sum of subarrays are {6, 5, 3, 3, 1, -2} where the third largest element is 3.
+For the second test case, Sum of [0, 0] = 4. Sum of [0, 1] = 5. Sum of [1, 1] = 1
+All sum of subarrays are {5, 4, 1} where the second largest element is 4.
+Sample Input 2 :arr=5 4 -8 6, k=10			arr=1 2 3, k=1
+Sample output 2 : -8						6
+Explanation of Sample output 2 :For the first test case, among the sum of all the subarray, the tenth-largest sum will be -8.For the second test case, among the sum of all the subarray, the largest sum will be 6.
+
+public class Solution {
+
+    public static int kthLargest(int[] arr, int n, int k) {
+
+        // Prefix sum array
+        long[] prefix = new long[n + 1];
+
+        for (int i = 0; i < n; i++) {
+            prefix[i + 1] = prefix[i] + arr[i];
+        }
+
+        // Min heap to store K largest sums
+        PriorityQueue<Long> minHeap = new PriorityQueue<>();
+
+        // Generate every subarray
+        for (int start = 0; start < n; start++) {
+
+            for (int end = start; end < n; end++) {
+
+                long sum = prefix[end + 1] - prefix[start];
+
+                if (minHeap.size() < k) {
+                    minHeap.offer(sum);
+                } else if (sum > minHeap.peek()) {
+                    minHeap.poll();
+                    minHeap.offer(sum);
+                }
+            }
+        }
+
+        return minHeap.peek().intValue();
+    }
+}
+========================================================================================================================================================================================================
+You are given a singly linked list containing ‘n’ nodes, where every node in the linked list contains a pointer “next” which points to the next node in the list and having values either 0 or 1. Your task is to return the decimal representation of the given number in the linked list.
+For Example:n = 4, list: 1 -> 0 -> 1 -> 0.Now in this example, the value in the linked list is 1010, which is 10 in Decimal.Hence the answer is 10.
+Sample Input 1 :	1 0 1 -1		1 1 -1   
+Sample Output 1 :5					3
+Explanation For Sample Output 1 :In the first test case, there are two paths from 1 to 3. I.e. 1 -> 2 -> 3 or 1 -> 0 -> 3 and both these paths have no common track.Hence the answer is 0.
+In the second test case, there are two different paths from 1 to 0. i.e. , 1 -> 2 -> 3 -> 6 -> 0 and 1 -> 2 -> 4 -> 6 -> 0. Having two common tracks, 1 -> 2 and 6 -> 0.Hence the answer is 2.
+Sample Input 2 :	1 -1				1 0 0 -1
+Sample Output 2 ;   1						4
+
+public class Solution {
+
+    public static int binaryToInteger(LinkedListNode<Integer> head) {
+        int result = 0;
+
+        while (head != null) {
+            result = result * 2 + head.data;
+            head = head.next;
+        }
+
+        return result;
+    }
+}
+========================================================================================================================================================================================================
+You are given a linked list having ‘n’ nodes and an integer ‘k’.You have to rotate the linked list to the right by ‘k’ positions .
+Example :Input: linked list = [1 2 3 4] , k = 2					Output: 3 4 1 2
+Explanation:We have to rotate the given linked list to the right 2 times. After rotating it to the right once it becomes 4->1->2->3. After rotating it to the right again, it becomes 3->4->1->2. 
+Sample Input 1 : 1 2 3 4 5 6		k=2
+Sample Output 1 :5 6 1 2 3 4
+Explanation For Sample Input 1 :For the first test case, after 1st clockwise rotation the modified linked list will be : 6->1->2->3->4->5After, 2nd clockwise rotated the modified linked list will be : 5->6->1->2->3->4.
+Thus the output is: 5 6 1 2 3 4.
+Sample Input 2 :3 6 9 	k=0
+Sample Output 2:3 6 9
+Explanation For Sample Input 2 :In this test case, ‘k’ is 0 therefore there will be no rotation, so the linked list remains unchanged.
+
+public class Solution {
+    public static Node rotate(Node head, int k) {
+
+        if (head == null || head.next == null || k == 0) {
+            return head;
+        }
+
+        // Find length and last node
+        int length = 1;
+        Node tail = head;
+
+        while (tail.next != null) {
+            tail = tail.next;
+            length++;
+        }
+
+        // Reduce unnecessary rotations
+        k = k % length;
+
+        if (k == 0) {
+            return head;
+        }
+
+        // Make the linked list circular
+        tail.next = head;
+
+        // Find the new tail
+        int steps = length - k - 1;
+        Node newTail = head;
+
+        while (steps-- > 0) {
+            newTail = newTail.next;
+        }
+
+        // New head
+        Node newHead = newTail.next;
+
+        // Break the circle
+        newTail.next = null;
+
+        return newHead;
+    }
+}
+========================================================================================================================================================================================================
+At the beginning of the match, every player starts with an empty track record. Ninja wants to calculate the final score for a player. So, given a list of strings, ‘MATCHRESULT’, where ‘MATCHRESULT[ i ]’ is the ‘i’th operation Ninja must apply to the track record and is one of the following:
+1) An integer “A”: Introduce a new score of ‘A’ on the track record.
+2) "+": Introduce a new score on the track record that is the sum of the previous two scores.
+3) "C": Nullify the previous score, removing it from the track record.
+4) "D": Introduce a new score on the track record that is double the previous score.
+Ninja deduced that this could be easily solved using programming. So, he needs your help to calculate the sum of all the scores present in the track record.
+Sample Input 1:	2 3 + D C				15 C 10 D
+Sample Output 1: 10						30
+Explanation of Sample Output 1:
+Test Case 1 :  Given MATCHRESULT = {“2”, “3”, “+”, “D”, “C”}. Initially, TRACKRECORD = {}.For “2”, Introducing 2 on the ‘TRACKRECORD’. Therefore, TRACKRECORD = {2}.For “3”, Introducing 3 on the ‘TRACKRECORD’. Therefore, TRACKRECORD = {2, 3}.For “+”, Introducing the sum of 2 and 3, i.e., 5 on the ‘TRACKRECORD’. Therefore, TRACKRECORD = {2, 3, 5}.For “D”, Introducing the double of 5, i.e., 10 on the ‘TRACKRECORD’. Therefore, TRACKRECORD = {2, 3, 5, 10}.For “C”, Nullifying the score 10 and thus removing it from the ‘TRACKRECORD’. Therefore, TRACKRECORD = {2, 3, 5}.Sum of all the scores = 2 + 3 + 5 = 10.
+Test Case 2 :     Given MATCHRESULT = {“15”, “C”, “10”, “D”}. Initially, TRACKRECORD = {}.For “15”, Introducing 15 on the ‘TRACKRECORD’. Therefore, TRACKRECORD = {15}.For “C”, Nullifying the score 15 and thus removing it from the ‘TRACKRECORD’. Therefore, TRACKRECORD = {}.For “10”, Introducing 10 on the ‘TRACKRECORD’. Therefore, TRACKRECORD = {10}.For “D”, Introducing the double of 10, i.e., 20 on the ‘TRACKRECORD’. Therefore, TRACKRECORD = {10, 20}.Sum of all the scores = 10 + 20 = 30.
+Sample Input 2:	7 D 2 + C D				15 48 13 + D D C
+Sample Output 2:	27						259
+
+import java.util.*;
+
+public class Solution {
+
+    public static int calculateScore(String[] matchResult) {
+
+        // Stack to maintain the current track record.
+        Deque<Integer> stack = new ArrayDeque<>(); // or Stack<Integer> stack = new Stack<>(); also works
+
+        for (String operation : matchResult) {
+
+            // Case 1: Add a new integer score.
+            if (operation.equals("C")) {
+
+                // C -> Remove the previous score.
+                stack.pop();
+
+            } else if (operation.equals("D")) {
+
+                // D -> Add double of the previous score.
+                int previousScore = stack.peek();
+
+                stack.push(previousScore * 2);
+
+            } else if (operation.equals("+")) {
+
+                // + -> Add the sum of the previous two scores.
+                int first = stack.pop();
+                int second = stack.peek();
+
+                int newScore = first + second;
+
+                // Put the first score back.
+                stack.push(first);
+
+                // Add the new score.
+                stack.push(newScore);
+
+            } else {
+
+                // The operation is an integer.
+                stack.push(Integer.parseInt(operation));
+            }
+        }
+
+        // Calculate the sum of all scores currently in the record.
+        int total = 0;
+
+        for (int score : stack) {
+            total += score;
+        }
+
+        return total;
+    }
+}
+========================================================================================================================================================================================================
+You have been given a Binary Tree of 'n' nodes, where the nodes have integer valuesPrint the left view of the binary tree.
+Example :If the input tree is as depicted in the picture: The Left View of the tree will be:  2 35 2 
+Detailed explanation ( Input/output format, Notes, Images )
+Sample Input 1 :2 35 10 2 3 5 2 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+Sample Output 1 :2 35 2
+Sample Input 2 :1 2 3 4 5 -1 7 -1 -1 -1 -1 -1 -1 
+Sample Output 2 :1 2 4
+Explanation of Sample Input 2 :
+The Tree looks as follows:
+            1
+          /   \
+         2     3
+       /   \     \
+      4     5     7
+
+public class Solution {
+
+    public static ArrayList<Integer> getLeftView(TreeNode root) {
+
+        ArrayList<Integer> result = new ArrayList<>();
+
+        // Empty tree has no left view.
+        if (root == null) {
+            return result;
+        }
+
+        // Queue for level-order traversal.
+        Queue<TreeNode> queue = new LinkedList<>();
+        queue.offer(root);
+
+        while (!queue.isEmpty()) {
+
+            // Number of nodes at the current level.
+            int levelSize = queue.size();
+
+            for (int i = 0; i < levelSize; i++) {
+
+                TreeNode current = queue.poll();
+
+                // The first node of every level is
+                // visible from the left side.
+                if (i == 0) {
+                    result.add(current.data);
+                }
+
+                // Add left child first.
+                if (current.left != null) {
+                    queue.offer(current.left);
+                }
+
+                // Add right child.
+                if (current.right != null) {
+                    queue.offer(current.right);
+                }
+            }
+        }
+
+        return result;
+    }
+}
+========================================================================================================================================================================================================

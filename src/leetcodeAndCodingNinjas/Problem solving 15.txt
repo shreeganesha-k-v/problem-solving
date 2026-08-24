@@ -1,0 +1,777 @@
+You are given an integer array nums and an integer k.An integer x is almost missing from nums if x appears in exactly one subarray of size k within nums.Return the largest almost missing integer from nums. If no such integer exists, return -1.A subarray is a contiguous sequence of elements within an array.
+Example 1:Input: nums = [3,9,2,1,7], k = 3			Output: 7
+Explanation:1 appears in 2 subarrays of size 3: [9, 2, 1] and [2, 1, 7]. 2 appears in 3 subarrays of size 3: [3, 9, 2], [9, 2, 1], [2, 1, 7]. 3 appears in 1 subarray of size 3: [3, 9, 2]. 7 appears in 1 subarray of size 3: [2, 1, 7]. 9 appears in 2 subarrays of size 3: [3, 9, 2], and [9, 2, 1]. We return 7 since it is the largest integer that appears in exactly one subarray of size k.
+Example 2:Input: nums = [3,9,7,2,1,7], k = 4			Output: 3
+Explanation:1 appears in 2 subarrays of size 4: [9, 7, 2, 1], [7, 2, 1, 7]. 2 appears in 3 subarrays of size 4: [3, 9, 7, 2], [9, 7, 2, 1], [7, 2, 1, 7]. 3 appears in 1 subarray of size 4: [3, 9, 7, 2]. 7 appears in 3 subarrays of size 4: [3, 9, 7, 2], [9, 7, 2, 1], [7, 2, 1, 7]. 9 appears in 2 subarrays of size 4: [3, 9, 7, 2], [9, 7, 2, 1]. We return 3 since it is the largest and only integer that appears in exactly one subarray of size k.
+Example 3:Input: nums = [0,0], k = 1					Output: -1
+Explanation:There is no integer that appears in only one subarray of size 1.
+
+import java.util.*;
+
+class Solution {
+
+    public int largestAlmostMissing(int[] nums, int k) {
+
+        int n = nums.length;
+
+        // Frequency of elements in the current sliding window.
+        Map<Integer, Integer> windowFreq = new HashMap<>();
+
+        // Number of size-k subarrays in which each number appears.
+        Map<Integer, Integer> windowCount = new HashMap<>();
+
+        // Build the first window.
+        for (int i = 0; i < k; i++) {
+            windowFreq.put(nums[i],
+                    windowFreq.getOrDefault(nums[i], 0) + 1);
+        }
+
+        // Every distinct number in the first window
+        // appears in exactly one subarray so far.
+        for (int num : windowFreq.keySet()) {
+            windowCount.put(num, 1);
+        }
+
+        // Slide the window from left to right.
+        for (int right = k; right < n; right++) {
+
+            int entering = nums[right];
+            int leaving = nums[right - k];
+
+            // Remove the element leaving the window.
+            int freq = windowFreq.get(leaving);
+
+            if (freq == 1) {
+                // It completely disappears from the current window.
+                windowFreq.remove(leaving);
+            } else {
+                windowFreq.put(leaving, freq - 1);
+            }
+
+            // Add the new element.
+            windowFreq.put(
+                    entering,
+                    windowFreq.getOrDefault(entering, 0) + 1
+            );
+
+            /*
+             * The current window contains each distinct element
+             * exactly once as a subarray occurrence.
+             *
+             * Increment windowCount only for elements that are
+             * actually present in the current window.
+             */
+            for (int num : windowFreq.keySet()) {
+                windowCount.put(
+                        num,
+                        windowCount.getOrDefault(num, 0) + 1
+                );
+            }
+        }
+
+        // Find the largest number that appears in exactly
+        // one size-k subarray.
+        int answer = -1;
+
+        for (Map.Entry<Integer, Integer> entry : windowCount.entrySet()) {
+
+            if (entry.getValue() == 1) {
+                answer = Math.max(answer, entry.getKey());
+            }
+        }
+
+        return answer;
+    }
+}
+===========================================================================================================================================================================================================================
+You have a bookshelf in the form of an array ‘arr’ in which names of the books(single word name) are given. You are also given names of two books, ‘book1’ and ‘book2’. You are supposed to find the minimum distance between ‘book1’ and ‘book2’.Distance between two books is defined as the absolute difference between the indices of the books i.e for two books at index 'i' and 'j' the distance is equal to |i-j|.
+Note:1. There may be multiple occurrences of any book. 2. book1 and book2 are present on the bookshelf. 3. The name of the books is in lower-case. 4. book1 is not equal to book2.
+Sample Input 1: arr=coding ninjas help to crack product based companies	book1=coding book2=product
+arr=eat code sleep repeat eat code sleep repeat  book1=eat book2=repeat
+Sample Output 1:5			1
+Explanation for Sample Input 1:In the first test case, there are 8 books on the bookshelf.book1 = “coding”, book2 = “product”. The distance between book1 and book2 is 5. So, the answer is 5.In the second test case, there are 8 books on the bookshelf. and there are 2 occurrences in every book.book1 = “eat”, book2 = “repeat”.  book1 is present at indices 0 and 4. book2 is present at indices 3 and 7. The distances are 3, 7, 1, 4. The minimum of these is 1. So, the answer is 1.
+Sample Input 2: arr=alpha beta gamma theta beta	book1=theta book2=beta
+arr=be cool whatever the situation is	book1=situation book2=cool
+Sample Output 2:1			3
+
+public class Solution {
+
+    public static int minDistance(String[] arr, String book1, String book2) {
+
+        // Store the most recent index of book1.
+        int lastBook1 = -1;
+
+        // Store the most recent index of book2.
+        int lastBook2 = -1;
+
+        // Start with maximum possible answer.
+        int minDistance = Integer.MAX_VALUE;
+
+        // Traverse the bookshelf only once.
+        for (int i = 0; i < arr.length; i++) {
+
+            // If current book is book1,
+            // update its most recent position.
+            if (arr[i].equals(book1)) {
+                lastBook1 = i;
+            }
+
+            // If current book is book2,
+            // update its most recent position.
+            if (arr[i].equals(book2)) {
+                lastBook2 = i;
+            }
+
+            // If we have seen both books,
+            // calculate their distance.
+            if (lastBook1 != -1 && lastBook2 != -1) {
+
+                minDistance = Math.min(
+                        minDistance,
+                        Math.abs(lastBook1 - lastBook2)
+                );
+            }
+        }
+
+        return minDistance;
+    }
+}
+===========================================================================================================================================================================================================================
+A cinema has n rows of seats, numbered from 1 to n. Each row has 10 seats, numbered from 1 to 10.You are given a 2D integer array reservedSeats, where reservedSeats[i] = [rowi, seati] means that seat seati in row rowi is already reserved.A four-person group must be assigned to four seats in the same row. The group can be seated in one of the following seat blocks: seats 2, 3, 4, 5 seats 4, 5, 6, 7 seats 6, 7, 8, 9. A block can be used only if none of its seats are reserved. Each seat can be assigned to at most one group.Return an integer denoting the maximum number of four-person groups that can be assigned.
+Example 1:Input: n = 3, reservedSeats = [[1,2],[1,3],[1,8],[2,6],[3,1],[3,10]]			Output: 4
+Explanation: The figure above shows an optimal allocation of four groups. Seats marked in blue are already reserved, and each set of four contiguous seats marked in orange is assigned to one group.
+Example 2:Input: n = 2, reservedSeats = [[2,1],[1,8],[2,6]]								Output: 2
+Example 3:Input: n = 4, reservedSeats = [[4,3],[1,4],[4,6],[1,7]]						Output: 4
+
+class Solution {
+
+    public int maxNumberOfFamilies(int n, int[][] reservedSeats) {
+
+        // Store reserved seats for each row.
+        Map<Integer, Set<Integer>> rows = new HashMap<>();
+
+        for (int[] seat : reservedSeats) {
+            rows.computeIfAbsent(seat[0], k -> new HashSet<>())
+                .add(seat[1]);
+        }
+
+        // Rows with no reservations can always fit 2 groups.
+        int result = (n - rows.size()) * 2;
+
+        for (Set<Integer> seats : rows.values()) {
+
+            boolean left = true;
+            boolean middle = true;
+            boolean right = true;
+
+            // Check seats 2,3,4,5
+            for (int seat = 2; seat <= 5; seat++) {
+                if (seats.contains(seat)) {
+                    left = false;
+                    break;
+                }
+            }
+
+            // Check seats 4,5,6,7
+            for (int seat = 4; seat <= 7; seat++) {
+                if (seats.contains(seat)) {
+                    middle = false;
+                    break;
+                }
+            }
+
+            // Check seats 6,7,8,9
+            for (int seat = 6; seat <= 9; seat++) {
+                if (seats.contains(seat)) {
+                    right = false;
+                    break;
+                }
+            }
+
+            if (left && right) {
+                // Can fit two non-overlapping groups.
+                result += 2;
+            } else if (left || middle || right) {
+                // Can fit at least one group.
+                result++;
+            }
+        }
+
+        return result;
+    }
+}
+or using bit masking
+class Solution {
+
+    public int maxNumberOfFamilies(int n, int[][] reservedSeats) {
+
+        /*
+         * Store only rows that have reserved seats.
+         *
+         * Bit i represents whether seat i is reserved.
+         */
+        Map<Integer, Integer> reserved = new HashMap<>();
+
+        for (int[] seat : reservedSeats) {
+
+            int row = seat[0];
+            int seatNumber = seat[1];
+
+            // Set the bit corresponding to this seat.
+            reserved.put(
+                    row,
+                    reserved.getOrDefault(row, 0) | (1 << seatNumber)
+            );
+        }
+
+        int result = 0;
+
+        /*
+         * Rows without any reservations can always accommodate
+         * two groups:
+         *
+         * [2,3,4,5] and [6,7,8,9]
+         */
+        result += (n - reserved.size()) * 2;
+
+        /*
+         * Process only rows that contain reserved seats.
+         */
+        for (int mask : reserved.values()) {
+
+            // Seats 2,3,4,5
+            boolean leftAvailable =
+                    (mask & ((1 << 2) | (1 << 3) |
+                             (1 << 4) | (1 << 5))) == 0;
+
+            // Seats 4,5,6,7
+            boolean middleAvailable =
+                    (mask & ((1 << 4) | (1 << 5) |
+                             (1 << 6) | (1 << 7))) == 0;
+
+            // Seats 6,7,8,9
+            boolean rightAvailable =
+                    (mask & ((1 << 6) | (1 << 7) |
+                             (1 << 8) | (1 << 9))) == 0;
+
+            /*
+             * Left and right blocks don't overlap,
+             * so both can be used simultaneously.
+             */
+            if (leftAvailable && rightAvailable) {
+                result += 2;
+            }
+
+            /*
+             * If left and right cannot both be used,
+             * the middle block may still accommodate one group.
+             */
+            else if (leftAvailable || middleAvailable || rightAvailable) {
+                result += 1;
+            }
+        }
+
+        return result;
+    }
+}
+========================================================================================================================================================================================================
+You’re given a board of length 'L' and width 'W'. Your task is to break this board into 'L' * 'W' smaller squares, such that the total cost involved in breaking is the minimum possible.
+Sample Input 1:
+3 3
+1 2
+2 1
+Sample Output 1:
+11
+Explanation of Sample Input 1:
+Start by cutting the vertical column with cost = 2, hence cost becomes 2. Then make two cuts at the horizontal row with the cost = 2, Cost = 2*2 + 2 =6. Then vertically cut two columns with cost = 2, Cost = 6 + 1*2 = 8. Finally make three horizontal cuts with cost = 1. Final cost becomes 8 + 1*3 = 11.
+Sample Input 2:
+2 2
+2
+1
+Sample Output 2:
+4
+Explanation of Sample Input 2:
+In this case, we’ll be doing a total of 2 cuts. In the first cut, we’ll be cutting the first segment and our cost will now be 1*2 = 2 and in the second and the final cut, we’ll be cutting 2 segments each of cost one. Hence our final cost be 2 + 2*1 = 4.
+
+public class Solution {
+
+    public static long minimumCost(int L, int W,
+                                    int[] costL, int[] costW) {
+
+        /*
+         * Sort both arrays in ascending order.
+         * We will process them from right to left,
+         * which means highest cost first.
+         */
+        Arrays.sort(costL);
+        Arrays.sort(costW);
+
+        int i = costL.length - 1;
+        int j = costW.length - 1;
+
+        /*
+         * Initially the board is one piece in each direction.
+         */
+        int horizontalPieces = 1;
+        int verticalPieces = 1;
+
+        long totalCost = 0;
+
+        /*
+         * Process both types of cuts while both are available.
+         */
+        while (i >= 0 && j >= 0) {
+
+            /*
+             * Choose the more expensive cut first.
+             */
+            if (costL[i] >= costW[j]) {
+
+                /*
+                 * Horizontal cut crosses all current
+                 * vertical pieces.
+                 */
+                totalCost += (long) costL[i] * verticalPieces;
+
+                // This creates one additional horizontal piece.
+                horizontalPieces++;
+
+                i--;
+
+            } else {
+
+                /*
+                 * Vertical cut crosses all current
+                 * horizontal pieces.
+                 */
+                totalCost += (long) costW[j] * horizontalPieces;
+
+                // This creates one additional vertical piece.
+                verticalPieces++;
+
+                j--;
+            }
+        }
+
+        /*
+         * If horizontal cuts are still remaining,
+         * all vertical pieces already exist.
+         */
+        while (i >= 0) {
+
+            totalCost += (long) costL[i] * verticalPieces;
+
+            horizontalPieces++;
+            i--;
+        }
+
+        /*
+         * If vertical cuts are still remaining,
+         * all horizontal pieces already exist.
+         */
+        while (j >= 0) {
+
+            totalCost += (long) costW[j] * horizontalPieces;
+
+            verticalPieces++;
+            j--;
+        }
+
+        return totalCost;
+    }
+}
+========================================================================================================================================================================================================
+You are given a 1-indexed array of distinct integers nums of length n.You need to distribute all the elements of nums between two arrays arr1 and arr2 using n operations. In the first operation, append nums[1] to arr1. In the second operation, append nums[2] to arr2. Afterwards, in the ith operation:If the last element of arr1 is greater than the last element of arr2, append nums[i] to arr1. Otherwise, append nums[i] to arr2.
+The array result is formed by concatenating the arrays arr1 and arr2. For example, if arr1 == [1,2,3] and arr2 == [4,5,6], then result = [1,2,3,4,5,6].Return the array result.
+Example 1:Input: nums = [2,1,3]				Output: [2,3,1]
+Explanation: After the first 2 operations, arr1 = [2] and arr2 = [1].In the 3rd operation, as the last element of arr1 is greater than the last element of arr2 (2 > 1), append nums[3] to arr1.After 3 operations, arr1 = [2,3] and arr2 = [1].Hence, the array result formed by concatenation is [2,3,1].
+Example 2:Input: nums = [5,4,3,8]			Output: [5,3,4,8]
+Explanation: After the first 2 operations, arr1 = [5] and arr2 = [4].In the 3rd operation, as the last element of arr1 is greater than the last element of arr2 (5 > 4), append nums[3] to arr1, hence arr1 becomes [5,3].In the 4th operation, as the last element of arr2 is greater than the last element of arr1 (4 > 3), append nums[4] to arr2, hence arr2 becomes [4,8].After 4 operations, arr1 = [5,3] and arr2 = [4,8].Hence, the array result formed by concatenation is [5,3,4,8].
+
+class Solution {
+
+    public int[] resultArray(int[] nums) {
+
+        // Lists are convenient because we don't know
+        // how many elements will go into each array.
+        List<Integer> arr1 = new ArrayList<>();
+        List<Integer> arr2 = new ArrayList<>();
+
+        // First operation:
+        // nums[0] goes into arr1.
+        arr1.add(nums[0]);
+
+        // Second operation:
+        // nums[1] goes into arr2.
+        arr2.add(nums[1]);
+
+        // Process the remaining elements.
+        for (int i = 2; i < nums.length; i++) {
+
+            // Compare the last elements of arr1 and arr2.
+            if (arr1.get(arr1.size() - 1) >
+                    arr2.get(arr2.size() - 1)) {
+
+                // Last element of arr1 is greater,
+                // so add current element to arr1.
+                arr1.add(nums[i]);
+
+            } else {
+
+                // Otherwise, add current element to arr2.
+                arr2.add(nums[i]);
+            }
+        }
+
+        // Create the final result array.
+        int[] result = new int[nums.length];
+
+        int index = 0;
+
+        // First append all elements from arr1.
+        for (int num : arr1) {
+            result[index++] = num;
+        }
+
+        // Then append all elements from arr2.
+        for (int num : arr2) {
+            result[index++] = num;
+        }
+
+        return result;
+    }
+}
+========================================================================================================================================================================================================
+You’re given two fractions, a/b, and c/d. Your task is to add these two fractions and print this answer in the simplest form.
+Sample Input 1 :5 7 4 9		Sample Output 1 :73 63
+Explanation of Sample Input 1 :Sum of 5/7 + 4/9 = 73/63, which is already in its simplest form because we cannot reduce it further.
+Sample Input 2 :1 500 2 1500		Sample Output 2 :1 300
+Explanation of Sample Input 2 :Sum of 1/500 + 2/1500 = 5/1500, which after reducing in simplest form becomes 1/300.
+
+public class Solution {
+
+    public static long[] addFraction(int a, int b, int c, int d) {
+
+        // Calculate numerator and denominator
+        long numerator = (long) a * d + (long) c * b;
+        long denominator = (long) b * d; // cast one operand before multiplying to avoid integer overflow
+
+        // Find GCD to simplify the fraction
+        long gcd = findGcd(numerator, denominator);
+
+        numerator /= gcd;
+        denominator /= gcd;
+
+        return new long[]{numerator, denominator};
+    }
+
+    // Euclidean algorithm to find GCD
+    private static long findGcd(long a, long b) {
+
+        while (b != 0) {
+            long temp = b;
+            b = a % b;
+            a = temp;
+        }
+
+        return a;
+    }
+}
+========================================================================================================================================================================================================
+You are given an array of size ‘N’ that represents the number of candies given to ‘N’ people. You have to divide candies among all people such that each person receives the same number of candies. For this You can either increase or decrease the number of candies for any person by any amount. Your task is to minimise total increase/decrease for each person i.e. If you increase or decrease ‘Xi’ number of candies for the person ‘i’ ( 1 <= ‘i’ <= ‘N’), then the sum of all ‘Xi’ should be minimum.
+Sample Input 1:4 5 1 2 3				1 1 1 2
+Sample Output 1:6						1
+Explanation of Sample Input 1:Test case 1:We can make the final number of candies equal to [3, 3, 3, 3, 3 ] with total changes equal to 6, which is the minimum possible.
+Test case 2:We can make the last element ‘2’ to ‘1’ by decreasing it one time. Hence the minimum changes is 1.
+Sample Input 2:1					0Sample Output 2:0
+Explanation of Sample Input 2:Test case 1:As there is only one element, we don't need to change anything.
+
+public class Solution {
+
+    public static long minimumChanges(int[] arr) {
+
+        // Sort the array to find the median.
+        Arrays.sort(arr);
+
+        // Median minimizes the sum of absolute differences.
+        int median = arr[arr.length / 2];
+
+        long totalChanges = 0;
+
+        // Calculate the total number of candies
+        // that need to be increased/decreased.
+        for (int num : arr) {
+            totalChanges += Math.abs((long) num - median);
+        }
+
+        return totalChanges;
+    }
+}
+========================================================================================================================================================================================================
+Then, by using a random generator they choose a random integer ‘C’ in the range between 1 and ‘N’ (any integer from 1 to ‘N’ is chosen with the same probability), after which the winner is the player whose number was closer to ‘C’. The boys agreed that if ‘numMisha’ and ‘numAndrew’ are located on the same distance from ‘C’, Misha wins.Andrew wants to win very much, so he asks you to help him. You know the number selected by Ninja Misha, and the number ‘N’. You need to determine which value Ninja Andrew must choose, so that the probability of his victory is the highest possible.More formally, you need to find such integer ‘numAndrew’ (1 ≤ ‘numAndrew’ ≤ n), that the probability that | ‘C’ - ‘numAndrew’| < | ‘C’ - ‘numMisha’ | is maximal, where ‘C’ is the equi-probably chosen integer from 1 to ‘N’ (inclusive).
+For example:Given ‘N’ = 4, ‘numMisha’ = 2.The options available to us are 1, 3, and 4. In this case, choosing 3 would be most optimal because the probability that Andrew wins is 2 / 4, whereas if he chooses 1 or 4 it would be 1 / 4.Detailed explanation ( Input/output format, Notes, Images )
+Sample Input 1 :	4 2				3 1
+Sample Output 1 :   3				2  
+Explanation of the Sample Input 1:In the first test case, The options available to us are 1, 3, and 4. In this case, choosing 3 would be most optimal because the probability that Andrew wins is 2 / 4, whereas if he chooses 1 or 4 it would be 1 / 4.In the second test case, The options available to us are 2 and 3. In this case, choosing 2 would be the most optimal because this is given a probability of 2 / 3 that Andrew might win, whereas choosing 3 given a probability of 1 / 3.    
+Sample Input 2 :	5 4				2 1
+Sample Output 2 : 	3				2
+
+public class Solution {
+
+    public static int optimalChoice(int n, int numMisha) {
+
+        // If Misha selected 1, Andrew must choose 2.
+        if (numMisha == 1) {
+            return 2;
+        }
+
+        // If Misha selected N, Andrew must choose N - 1.
+        if (numMisha == n) {
+            return n - 1;
+        }
+
+        int leftWins = numMisha - 1;
+        int rightWins = n - numMisha;
+
+        // In case of a tie, either side gives the same probability.
+        // We choose the left side.
+        if (leftWins >= rightWins) {
+            return numMisha - 1;
+        }
+
+        return numMisha + 1;
+    }
+}
+========================================================================================================================================================================================================
+You are given a positive integer n. Determine whether n is divisible by the sum of the following two values:The digit sum of n (the sum of its digits).The digit product of n (the product of its digits).Return true if n is divisible by this sum; otherwise, return false.
+Example 1:Input: n = 99				Output: true
+Explanation:Since 99 is divisible by the sum (9 + 9 = 18) plus product (9 * 9 = 81) of its digits (total 99), the output is true.
+Example 2:Input: n = 23				Output: false
+Explanation:Since 23 is not divisible by the sum (2 + 3 = 5) plus product (2 * 3 = 6) of its digits (total 11), the output is false.
+
+class Solution {
+    public boolean checkDivisibility(int n) {
+        int original = n;
+
+        int digitSum = 0;
+        int digitProduct = 1;
+
+        // Process every digit.
+        while (n > 0) {
+
+            // Extract the last digit.
+            int digit = n % 10;
+
+            // Add digit to the digit sum.
+            digitSum += digit;
+
+            // Multiply digit into the digit product.
+            digitProduct *= digit;
+
+            // Remove the last digit.
+            n /= 10;
+        }
+
+        // The divisor is:
+        // digit sum + digit product
+        int divisor = digitSum + digitProduct;
+
+        return original % divisor == 0;
+    }
+}
+========================================================================================================================================================================================================
+You are given an array ‘arr’ that contains an equal number of positive and negative elements. Rearrange the given array such that positive and negative numbers are arranged alternatively. Also, the respective relative order of positive and negative should be maintained.
+For example:For the given arr[ ] = { -1, 3, 5, 0, -2, -5 }  arr[ ] = {3, -1, 5, -2, 0, -5 } is valid rearrangement. arr[ ] = {3, -1, 0, -2, 5, -5 } is invalid rearrangement; order of 0 and 5 is changed. 
+arr[ ] = {3, -1, 5, 0, -2, -5 } is invalid rearrangement; positive and negative elements are not alternative.
+Sample Input 1:1 2 3 -1 -2 -3			1 -10 5 -1 2 -3 0 -2
+Sample Output 1:1 -1 2 -2 3 -3 			1 -10 5 -1 2 -3 0 -2 
+Explanation of Sample Input 1:In the first test case, the output is an array of alternative positive and negative numbers, and also order is maintained (relative order of positive numbers are 1 -> 2 -> 3 and for negative numbers are -1 -> 2 -> -3 )In the first test case, it is already in valid arrangement.
+Sample Input 2:-1 0 0 -1			Sample Output 2:0 -1 0 -1 
+Explanation of Sample Output 2:In the first test case, the output is an array of alternative positive and negative numbers and also order is maintained.
+
+public class Solution {
+
+    public static void rearrange(int[] arr) {
+
+        int n = arr.length;
+
+        // Temporary arrays to preserve the relative order
+        // of positive and negative numbers.
+        int[] positive = new int[n / 2];
+        int[] negative = new int[n / 2];
+
+        int positiveIndex = 0;
+        int negativeIndex = 0;
+
+        // Separate the elements while maintaining their
+        // original relative order.
+        for (int num : arr) {
+
+            // Zero is considered positive.
+            if (num >= 0) {
+                positive[positiveIndex++] = num;
+            } else {
+                negative[negativeIndex++] = num;
+            }
+        }
+
+        // Put them back alternately:
+        // positive, negative, positive, negative...
+        int index = 0;
+
+        for (int i = 0; i < n / 2; i++) {
+
+            arr[index++] = positive[i];
+            arr[index++] = negative[i];
+        }
+    }
+}
+========================================================================================================================================================================================================
+Alice and Bob take turns playing a game, with Alice starting first.You are given a string num of even length consisting of digits and '?' characters. On each turn, a player will do the following if there is still at least one '?' in num:Choose an index i where num[i] == '?'.Replace num[i] with any digit between '0' and '9'.The game ends when there are no more '?' characters in num.For Bob to win, the sum of the digits in the first half of num must be equal to the sum of the digits in the second half. For Alice to win, the sums must not be equal.For example, if the game ended with num = "243801", then Bob wins because 2+4+3 = 8+0+1. If the game ended with num = "243803", then Alice wins because 2+4+3 != 8+0+3.Assuming Alice and Bob play optimally, return true if Alice will win and false if Bob will win.
+Example 1:Input: num = "5023"				Output: false
+Explanation: There are no moves to be made.The sum of the first half is equal to the sum of the second half: 5 + 0 = 2 + 3.
+Example 2:Input: num = "25??"				Output: true
+Explanation: Alice can replace one of the '?'s with '9' and it will be impossible for Bob to make the sums equal.
+Example 3:Input: num = "?3295???"			Output: false
+Explanation: It can be proven that Bob will always win. One possible outcome is:- Alice replaces the first '?' with '9'. num = "93295???".- Bob replaces one of the '?' in the right half with '9'. num = "932959??".- Alice replaces one of the '?' in the right half with '2'. num = "9329592?".- Bob replaces the last '?' in the right half with '7'. num = "93295927".Bob wins because 9 + 3 + 2 + 9 = 5 + 9 + 2 + 7.
+
+class Solution {
+
+    public boolean sumGame(String num) {
+
+        int n = num.length();
+
+        int leftSum = 0;
+        int rightSum = 0;
+
+        int leftQuestion = 0;
+        int rightQuestion = 0;
+
+        // Process the first half
+        for (int i = 0; i < n / 2; i++) {
+
+            if (num.charAt(i) == '?') {
+                leftQuestion++;
+            } else {
+                leftSum += num.charAt(i) - '0';
+            }
+        }
+
+        // Process the second half
+        for (int i = n / 2; i < n; i++) {
+
+            if (num.charAt(i) == '?') {
+                rightQuestion++;
+            } else {
+                rightSum += num.charAt(i) - '0';
+            }
+        }
+
+        // Difference between the known sums.
+        int sumDifference = leftSum - rightSum;
+
+        // Difference between the number of '?'.
+        int questionDifference = leftQuestion - rightQuestion;
+
+        /*
+         * Bob can force equality only when the existing
+         * sum difference can exactly compensate for the
+         * maximum possible contribution difference created
+         * by the '?' characters.
+         *
+         * Each '?' can contribute 0..9.
+         *
+         * The critical condition is:
+         *
+         * 2 * |sumDifference|
+         *     == 9 * |questionDifference|
+         */
+        return 2 * Math.abs(sumDifference)
+                != 9 * Math.abs(questionDifference);
+    }
+}
+or
+class Solution {
+    public boolean sumGame(String num) {
+        int n = num.length();
+        int diff = 0;
+        int count = 0;
+
+        for (int i = 0; i < n; i++) {
+            boolean firstHalf = i < n / 2;
+
+            if (num.charAt(i) == '?') {
+                count += firstHalf ? 1 : -1;
+            } else {
+                int digit = num.charAt(i) - '0';
+                diff += firstHalf ? digit : -digit;
+            }
+        }
+
+        return 2 * diff != -9 * count;
+    }
+}
+========================================================================================================================================================================================================
+You are given two strings 'STR1' and 'STR2'. You need to tell whether the strings are meta strings or not.Meta strings are strings that can be made equal by swapping exactly one pair of distinct characters in one of the strings.
+Sample Input 1:str1= Coding			str2= Codnig , 	str1=Ninjas	str2=Niaxns
+Sample Output 1:YES										NO
+Explanation for Input 1:For test case 1: By swapping ‘i’ and ‘n’ in the second string, it becomes equal to the first string.For test case 2: There is no way we can make both the strings equals by swapping one pair of characters.
+Sample Input 2: Hello  Hello, 	Play	Playes , 	Seek	Seke
+Sample Output 2:NO				NO					YES
+
+public class Solution {
+
+    public static String areMetaStrings(String str1, String str2) {
+
+        // Different lengths can never be made equal
+        // by swapping characters.
+        if (str1.length() != str2.length()) {
+            return "NO";
+        }
+
+        int firstMismatch = -1;
+        int secondMismatch = -1;
+
+        // Find positions where the strings differ.
+        for (int i = 0; i < str1.length(); i++) {
+
+            if (str1.charAt(i) != str2.charAt(i)) {
+
+                // First mismatch
+                if (firstMismatch == -1) {
+                    firstMismatch = i;
+                }
+                // Second mismatch
+                else if (secondMismatch == -1) {
+                    secondMismatch = i;
+                }
+                // More than two mismatches means
+                // one swap cannot fix the strings.
+                else {
+                    return "NO";
+                }
+            }
+        }
+
+        // Equal strings are explicitly NOT meta strings.
+        if (firstMismatch == -1) {
+            return "NO";
+        }
+
+        // Exactly one mismatch is impossible with one swap,
+        // because a swap changes two positions.
+        if (secondMismatch == -1) {
+            return "NO";
+        }
+
+        // The two mismatched characters must be swapped.
+        if (str1.charAt(firstMismatch) == str2.charAt(secondMismatch)
+                && str1.charAt(secondMismatch) == str2.charAt(firstMismatch)) {
+
+            return "YES";
+        }
+
+        return "NO";
+    }
+}
+========================================================================================================================================================================================================

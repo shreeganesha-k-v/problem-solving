@@ -1,0 +1,105 @@
+savingsoverview
+
+API : customerId -> validate (jwt) (is a savings customer , he 18+)
+ Apache camel
+
+
+ISK() IPS() SHARES()
+Spring Boot : CSP (authebticate)
+
+<filter></filter>
+
+Exchange
+
+
+from(MAIN_ENDPOINT)
+	.paralleProcesssing().aggreagtor(Myaggreagtor))
+		.to(ISK_THREAD,IPS,CUSTODU,CUSTOMER_INFO)
+		
+	from(ISK_THREAD)
+		.to()
+		.doTry()
+		.choice()
+		.doCatch()
+		
+		
+		
+		
+read_through :- hit db for first 
+
+
+WEB-CLINT (React.js)
+CSP - String Boot
+DSL_Bank - 
+
+POM -> dependency (Java), spring-data-xyz
+Spring class -> 
+
+
+Datasource -> url , username , pwd 
+
+
+public class Addition{
+
+public int add(int a,int b){return a+b;}
+
+}
+
+@Configuration
+public class SpringClass{
+
+	@Bean
+	public Addition addition(){
+	return new Addition add;
+	}
+	
+}
+
+public class SpringClass{
+	@Autowire
+	public final Addition addition;
+}
+
+
+
+public class Array{
+
+	public void duplicateNumber(List<Integer> list){
+		// 1 5 6 6 8 9  9 10
+		Map<Integer,Integer> freqMap = list.stream()
+											.filter(n->Collections.frequency(n,list)>1)
+											.collect(Collectors.groupingBy(n->n,Collections.counting());
+	}
+}
+
+
+CSP - Redis
+EhCache -> DSL Bank
+
+Akana -> API Management 
+
+Swagger -> /api/savings-overview :
+				fields:
+					name: "customer"
+					type:
+
+
+Angular.js :- React.js -> Components
+
+Spring cloud : 
+
+JWT -> 
+
+DSL Bank : MVC 
+TDD 
+bitbucket -> feature -> junits -> Mockito integration -> Local (deploy local tomcat) -> Mock endpoint (RSimulator)->postman
+Quality security -> code junits 
+CI / CD :
+CSP Azure pipelines: docker OpenShift
+
+
+Iteration planning : 
+	 daily standup : 	
+	
+	
+	

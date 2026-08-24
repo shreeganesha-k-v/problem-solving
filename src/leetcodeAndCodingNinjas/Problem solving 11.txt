@@ -1,0 +1,1317 @@
+Given two integers ‘Left’ and ‘Right’. Your task is to find the total count of ‘megaprime’ numbers from the range ‘Left’ to ‘Right’. A ‘megaprime’ number is a prime number and its individual digits are also prime.For example, ‘53’ is a ‘megaprime’ number because ‘53’ is a prime number and its individual digits,‘3’ and ‘5’, are also prime. ‘13’ is not a ‘megaprime’ number because out of its individual digits (1, 3), ‘1’ is not prime.
+Note :1.’Left’ and ‘Right’ both are inclusive in the range ‘Left’ to ‘Right’.
+Example :‘Left’ = ‘23’  and ‘Right’ = ‘37’ All prime numbers from ‘23’ to ‘37’ are 23, 29, 31, 37 ,23 is ‘megaprime’ number because ‘2’ and ‘3’ both are prime,29 is not ‘megaprime’ number because ‘9’ is not a prime,31 is not a ‘megaprime’ number because ‘1’ is not a prime number,37 is ‘megaprime’ number because ‘3’ and ‘7’ both are prime numbers
+Hence there are two ‘megaprime’ numbers 23, 37 out of 23, 29, 31, 37.
+
+public class Main {
+    public static void main(String[] args) {
+        int left = 23;
+        int right = 37;
+
+        int count = 0;
+        for (int i = left; i <= right; i++) {
+            if (isPrime(i) && hasOnlyPrimeDigits(i)) {
+                count++;
+            }
+        }
+
+        System.out.println("Total megaprime numbers: " + count);
+    }
+
+    // Check if number is prime
+    public static boolean isPrime(int n) {
+        if (n < 2) return false;
+        if (n == 2 || n == 3) return true;
+        if (n % 2 == 0 || n % 3 == 0) return false;
+
+        for (int i = 5; i * i <= n; i += 6) {
+            if (n % i == 0 || n % (i + 2) == 0)
+                return false;
+        }
+
+        return true;
+    }
+
+    // Check if all digits are prime digits
+    public static boolean hasOnlyPrimeDigits(int n) {
+        while (n > 0) {
+            int digit = n % 10;
+            if (digit != 2 && digit != 3 && digit != 5 && digit != 7) {
+                return false;
+            }
+            n /= 10;
+        }
+        return true;
+    }
+}
+==========================================================================================================================================================================
+Given a 0-indexed integer array nums of size n, find the maximum difference between nums[i] and nums[j] (i.e., nums[j] - nums[i]), such that 0 <= i < j < n and nums[i] < nums[j].
+Return the maximum difference. If no such i and j exists, return -1.
+Example 1:Input: nums = [7,1,5,4]		Output: 4
+Explanation:The maximum difference occurs with i = 1 and j = 2, nums[j] - nums[i] = 5 - 1 = 4.
+Note that with i = 1 and j = 0, the difference nums[j] - nums[i] = 7 - 1 = 6, but i > j, so it is not valid.
+Example 2:Input: nums = [9,4,3,2]		Output: -1
+Explanation:There is no i and j such that i < j and nums[i] < nums[j].
+Example 3:Input: nums = [1,5,2,10]		Output: 9
+Explanation:The maximum difference occurs with i = 0 and j = 3, nums[j] - nums[i] = 10 - 1 = 9.
+
+class Solution {
+    public int maximumDifference(int[] nums) {
+        int res = -1;
+        int min = nums[0];
+
+        for(int i=1;i<nums.length;i++){
+            if(nums[i]>min){
+                res = Math.max(res,nums[i]-min);
+            }else{
+                min = nums[i];
+            }
+        }
+        return res;
+    }
+}
+==========================================================================================================================================================================
+You are given an integer array nums of size n where n is a multiple of 3 and a positive integer k.Divide the array nums into n / 3 arrays of size 3 satisfying the following condition:The difference between any two elements in one array is less than or equal to k.
+Return a 2D array containing the arrays. If it is impossible to satisfy the conditions, return an empty array. And if there are multiple answers, return any of them.
+Example 1:Input: nums = [1,3,4,8,7,9,3,5,1], k = 2			Output: [[1,1,3],[3,4,5],[7,8,9]]
+Explanation:The difference between any two elements in each array is less than or equal to 2.
+Example 2:Input: nums = [2,4,2,2,5,2], k = 2				Output: []
+Explanation:Different ways to divide nums into 2 arrays of size 3 are:
+[[2,2,2],[2,4,5]] (and its permutations)
+[[2,2,4],[2,2,5]] (and its permutations)
+Because there are four 2s there will be an array with the elements 2 and 5 no matter how we divide it. since 5 - 2 = 3 > k, the condition is not satisfied and so there is no valid division.
+Example 3:Input: nums = [4,2,9,8,2,12,7,12,10,5,8,5,5,7,9,2,5,11], k = 14			Output: [[2,2,12],[4,8,5],[5,9,7],[7,8,5],[5,9,10],[11,12,2]]
+Explanation:The difference between any two elements in each array is less than or equal to 14.
+
+class Solution {
+    public int[][] divideArray(int[] nums, int k) {
+        Arrays.sort(nums);
+        int n = nums.length;
+        int[][] result = new int[n / 3][3];
+
+        for (int i = 0; i < n; i += 3) {
+            int a = nums[i], b = nums[i + 1], c = nums[i + 2];
+
+            // If the max difference in triplet is more than k, return empty
+            if (c - a > k) return new int[0][0];
+
+            result[i / 3][0] = a;
+            result[i / 3][1] = b;
+            result[i / 3][2] = c;
+        }
+
+        return result;
+    }
+}
+==================================================================================================================================================================
+Ninja is shifting to a new place named NinjaGram. To take admission to the new school, the teacher gives him a sentence and asks him to check whether the sentence is a pangram.A word or a sentence is called a pangram if it contains all the English alphabet letters.
+Sample Input 1:toosmallword							TheQuickBrownFoxJumpsOverTheLazyDog
+Sample Output 1:NO									YES
+Explanation for Sample Input 1:In the first test case, the given string is “toosmallword” which contains the characters [‘t’,’o’,’s’,’m’,’a’,’l’,’w’,’r’,’d’], which doesn’t contain all the 26 alphabetic characters. Hence the answer is “NO”.
+
+public class Main {
+    private static boolean isPangram(String sentence) {
+        Set<Character> letters = new HashSet<>();
+
+        for (char ch : sentence.toLowerCase().toCharArray()) {
+            if (ch >= 'a' && ch <= 'z') {
+                letters.add(ch);
+            }
+        }
+
+        return letters.size() == 26;
+    }
+}
+==============================================================================================================================================================
+You are given an integer array nums and an integer k. You may partition nums into one or more subsequences such that each element in nums appears in exactly one of the subsequences.Return the minimum number of subsequences needed such that the difference between the maximum and minimum values in each subsequence is at most k.
+A subsequence is a sequence that can be derived from another sequence by deleting some or no elements without changing the order of the remaining elements.
+Example 1:Input: nums = [3,6,1,2,5], k = 2						Output: 2
+Explanation:We can partition nums into the two subsequences [3,1,2] and [6,5].The difference between the maximum and minimum value in the first subsequence is 3 - 1 = 2.
+The difference between the maximum and minimum value in the second subsequence is 6 - 5 = 1.Since two subsequences were created, we return 2. It can be shown that 2 is the minimum number of subsequences needed.
+Example 2:Input: nums = [1,2,3], k = 1							Output: 2
+Explanation:We can partition nums into the two subsequences [1,2] and [3].The difference between the maximum and minimum value in the first subsequence is 2 - 1 = 1.
+The difference between the maximum and minimum value in the second subsequence is 3 - 3 = 0.Since two subsequences were created, we return 2. Note that another optimal solution is to partition nums into the two subsequences [1] and [2,3].
+Example 3:Input: nums = [2,2,4,5], k = 0						Output: 3
+Explanation:We can partition nums into the three subsequences [2,2], [4], and [5].The difference between the maximum and minimum value in the first subsequences is 2 - 2 = 0.The difference between the maximum and minimum value in the second subsequences is 4 - 4 = 0.The difference between the maximum and minimum value in the third subsequences is 5 - 5 = 0.Since three subsequences were created, we return 3. It can be shown that 3 is the minimum number of subsequences needed.
+
+public class MinSubsequences {
+
+    public static int minSubsequences(int[] nums, int k) {
+        Arrays.sort(nums); // Sort the array
+        int count = 0;
+        int start = 0;
+
+        for (int i = 0; i < nums.length; i++) {
+            // If difference exceeds k, start a new subsequence
+            if (nums[i] - nums[start] > k) {
+                count++;
+                start = i;
+            }
+        }
+
+        return count + 1; // +1 for the last subsequence
+    }
+}
+==============================================================================================================================================================
+You are given a string ‘str’ of even length. Your task is to find out if we divide the ‘str’ from the middle, will both the substrings contain an equal number of vowels or not.
+Sample Input 1:	codingninjas				helloworld
+Sample Output 2:	True						False
+Explanation:For the first test case, ‘str’= ‘codingninjas’, when we split this string we get, ‘coding’ and ‘ninjas’ which both contain 2 vowels each. Hence the answer is ‘True’.
+For the second test case, ‘str’= ‘helloworld’, when we split this string we get ‘hello and ‘world’, which contain 2 and 1 vowels respectively. Hence the answer is ‘False’.
+Sample Input 2:Aa							AbbaaA
+Sample Output 2:True						False
+
+public class Solution {
+    public static boolean hasEqualVowels(String str) {
+        int mid = str.length() / 2;
+        int leftVowels = countVowels(str.substring(0, mid));
+        int rightVowels = countVowels(str.substring(mid));
+        return leftVowels == rightVowels;
+    }
+
+    private static int countVowels(String s) {
+        int count = 0;
+        for (char c : s.toCharArray()) {
+            if (isVowel(c)) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    private static boolean isVowel(char c) {
+		c = Character.toLowerCase(c); // Handle both uppercase and lowercase
+		return "aeiou".contains(String.valueOf(c)); // return "aeiou".indexOf(c) != -1;
+	}
+}
+===========================================================================================================================================================
+Nina gave him an array of positive integers, ‘ARR’ and asked him to find the sum of divisors of the integers in ‘ARR’ with exactly four divisors. In case there is no such integer with exactly four divisors, then the answer is 0. Ninja has been struggling for a very long time, so he needs your help to solve the problem.
+Sample Input 1:		2 5 6 15								4 18 21
+Sample Output 1:		36										32
+Explanation of Sample Output 1:Test Case 1 :  Divisors of 2 are 1 and 2.Divisors of 5 are 1 and 5.Divisors of 6 are 1, 2, 3 and 6.Divisors of 15 are 1, 3, 5 and 15.
+Since 6 and 15 have exactly four divisors. Sum of their divisors is (1 + 2 + 3 + 6) + (1 + 3 + 5 + 15) = 36.
+Test Case 2 : Divisors of 4 are 1, 2 and 4.Divisors of 18 are 1, 2, 3, 6, 9 and 18.Divisors of 21 are 1, 3, 7 and 21.Since only 21 has exactly four divisors. Sum of its divisors is (1 + 3 + 7 + 21) = 32.
+
+public class Solution {
+	public static int sumFourDivisors(ArrayList<Integer> arr, int n) {
+		int sum = 0;
+		for (int num : arr) {
+			int[] divs = getExactlyFourDivisors(num);
+			if (divs != null) {
+				sum += Arrays.stream(divs).sum();
+			}
+		}
+		return sum;
+	}
+
+	private static int[] getExactlyFourDivisors(int n) {
+		List<Integer> divisors = new ArrayList<>();
+		for (int i = 1; i * i <= n; i++) {
+			if (n % i == 0) {
+				divisors.add(i);
+				if (i != n / i) divisors.add(n / i);
+				if (divisors.size() > 4) return null; // Early exit
+			}
+		}
+		return divisors.size() == 4 ? divisors.stream().mapToInt(Integer::intValue).toArray() : null;
+	}
+}
+===================================================================================================================================================================
+Ninja has been given ‘N’ stars. Ninja has to make a triangle using these stars. The ‘i’th’ level of a triangle contains a ‘i’ number of stars.Can you help Ninja to make a triangle as large as possible using these stars?
+For example:Let the number of stars is 6.Then we can make a triangle of maximum height 3.
+Sample Input 1:	2			5
+Sample Output 1:1			2   
+Explanation for Sample Output 1:
+For sample test case 1: In this example, we can make a triangle of height 1 only. For making a triangle of height 2, we need at least 3 stars but we have only 2 stars.
+For sample test case 2: In this example, we can make a triangle of height 2 only. For making a triangle of height 3, we need at least 6 stars but we have only 5 stars.
+Sample Input 2:6			10
+Sample Output 2:3			4
+
+public class TriangleHeight {
+    public static int maxTriangleHeight(int n) {
+        int low = 1, high = n, ans = 0;
+        
+        while (low <= high) {
+            int mid = low + (high - low) / 2;
+            long starsRequired = (long) mid * (mid + 1) / 2;
+            
+            if (starsRequired <= n) {
+                ans = mid;      // mid is a valid height
+                low = mid + 1;  // try to find a higher valid height
+            } else {
+                high = mid - 1; // too many stars needed
+            }
+        }
+        
+        return ans;
+    }
+}
+===============================================================================================================================================================
+You are given a string word and an integer k.We consider word to be k-special if |freq(word[i]) - freq(word[j])| <= k for all indices i and j in the string.Here, freq(x) denotes the frequency of the character x in word, and |y| denotes the absolute value of y.Return the minimum number of characters you need to delete to make word k-special.
+Example 1:Input: word = "aabcaba", k = 0					Output: 3
+Explanation: We can make word 0-special by deleting 2 occurrences of "a" and 1 occurrence of "c". Therefore, word becomes equal to "baba" where freq('a') == freq('b') == 2.
+Example 2:Input: word = "dabdcbdcdcd", k = 2				Output: 2
+Explanation: We can make word 2-special by deleting 1 occurrence of "a" and 1 occurrence of "d". Therefore, word becomes equal to "bdcbdcdcd" where freq('b') == 2, freq('c') == 3, and freq('d') == 4.
+Example 3:Input: word = "aaabaaa", k = 2					Output: 1
+Explanation: We can make word 2-special by deleting 1 occurrence of "b". Therefore, word becomes equal to "aaaaaa" where each letter's frequency is now uniformly 6.
+
+public class KSpecialString {
+
+    public static int minDeletionsToKSpecial(String word, int k) {
+        Map<Character, Integer> freqMap = new HashMap<>();
+
+        // Step 1: Count frequency of each character
+        for (char ch : word.toCharArray()) {
+            freqMap.put(ch, freqMap.getOrDefault(ch, 0) + 1);
+        }
+
+        // Convert values to a list of frequencies
+        List<Integer> freqs = new ArrayList<>(freqMap.values());
+
+        int minDeletions = Integer.MAX_VALUE;
+
+        // Try every possible target frequency from 1 to max frequency
+        for (int target = 1; target <= Collections.max(freqs); target++) {
+            int deletions = 0;
+
+            for (int freq : freqs) {
+                if (freq < target) {
+                    deletions += freq;  // delete all, can't reach target
+                } else if (freq > target + k) {
+                    deletions += freq - (target + k);  // bring down to target+k
+                }
+                // else in range, no deletion needed
+            }
+
+            minDeletions = Math.min(minDeletions, deletions);
+        }
+
+        return minDeletions;
+    }
+}
+=============================================================================================================================================================
+You are given a string S containing only uppercase English characters. Find whether S is the same as its reflection in the mirror.
+Sample Input 1:ITATI				Sample Output 1:YES
+Explanation of sample input 1:String “ITATI” is the same as its reflection in the mirror.
+Sample Input 2:MMMM							MZM
+Sample Output 2:YES							NO
+
+public class Solution {
+    public static Boolean isReflectionEqual(String s) {
+        int left = 0;
+        int right = s.length() - 1;
+
+        List<Character> mirrors = List.of('A', 'H', 'I', 'M', 'O', 'T', 'U', 'V', 'W', 'X', 'Y');
+
+        while (left <= right) {
+            char l = s.charAt(left);
+            char r = s.charAt(right);
+
+            if (!mirrors.contains(l) || l != r) {
+                return false;
+            }
+
+            left++;
+            right--;
+        }
+        return true;
+    }
+}
+===========================================================================================================================================================================
+A string s can be partitioned into groups of size k using the following procedure:The first group consists of the first k characters of the string, the second group consists of the next k characters of the string, and so on. Each element can be a part of exactly one group.For the last group, if the string does not have k characters remaining, a character fill is used to complete the group.Note that the partition is done so that after removing the fill character from the last group (if it exists) and concatenating all the groups in order, the resultant string should be s.Given the string s, the size of each group k and the character fill, return a string array denoting the composition of every group s has been divided into, using the above procedure.
+Example 1:Input: s = "abcdefghi", k = 3, fill = "x"						Output: ["abc","def","ghi"]
+Explanation:The first 3 characters "abc" form the first group.The next 3 characters "def" form the second group.The last 3 characters "ghi" form the third group.
+Since all groups can be completely filled by characters from the string, we do not need to use fill.Thus, the groups formed are "abc", "def", and "ghi".
+Example 2:Input: s = "abcdefghij", k = 3, fill = "x"					Output: ["abc","def","ghi","jxx"]
+Explanation:Similar to the previous example, we are forming the first three groups "abc", "def", and "ghi".For the last group, we can only use the character 'j' from the string. To complete this group, we add 'x' twice.Thus, the 4 groups formed are "abc", "def", "ghi", and "jxx".
+
+class Solution {
+    public String[] divideString(String s, int k, char fill) {
+        List<String> res = new ArrayList<>();
+        int n = s.length();
+
+        for (int i = 0; i < n; i += k) {
+            if (i + k <= n) {
+                res.add(s.substring(i, i + k));
+            } else {
+                // Get remaining substring and pad with fill
+                StringBuilder sb = new StringBuilder(s.substring(i));
+                while (sb.length() < k) {
+                    sb.append(fill);
+                }
+                res.add(sb.toString());
+            }
+        }
+
+        return res.toArray(String[]::new);
+    }
+}
+===========================================================================================================================================================================
+Levi Ackerman has two arrays, ‘A’ and ‘B’ consisting of ‘N’ integers each. He wants to divide these two arrays into two parts each, such that the sum of all the elements in the first part is equal to the sum of elements in the second part, and the index ‘k’ where the splitting is done, must be the same in both the arrays.In simple terms, If he splits the array at index k, then (A[0]+A[1]....A[k]), (A[k + 1] + A[k + 2]....A[n - 1]), (B[0] + B[1]....B[k]), (B[k + 1] + B[k + 2]....B[n - 1]) are all equal.Find the total number of all the Indexes which satisfy the given condition.
+For Example :n = 4, A = {2, 4, 5, 1}, B = {3, 3, 10, -4} Now in this example, if we split the array at index 1 then the sum of all the subarrays is 2 + 4 = 6, 5 + 1 = 6, 3 + 3 = 6, 10 + (-4) = 6, and no other index satisfies this condition, hence the answer is 1.
+Sample Input 1 :A=[1 2 3]	B=[2 1 3]             A=[6 6] B=[10 2]
+Sample Output 1 :1										0
+Explanation For Sample Output 1 :In the first test case, at index 1, the sum of the first array is 3, 3, and the sum of the second array is also 3, 3. Hence the answer is 1.In the second test case, There is no index satisfying the given condition. Hence, the answer is 0.
+
+public class Solution {
+    public static int totalIndexes(int[] A, int[] B) {
+        int n = A.length;
+        long totalA = 0, totalB = 0;
+        long prefixA = 0, prefixB = 0;
+        int count = 0;
+
+        for (int i = 0; i < n; i++) {
+            totalA += A[i];
+            totalB += B[i];
+        }
+
+        for (int i = 0; i < n - 1; i++) {
+            prefixA += A[i];
+            prefixB += B[i];
+
+            if (2 * prefixA == totalA && 2 * prefixB == totalB) {
+                count++;
+            }
+        }
+
+        return count;
+    }
+}
+===========================================================================================================================================================================
+Given a 2D array grid G of 'O's and 'X's. The task is to replace all 'O' with 'X' contained in each island. Where, an island is a set of 'O's connected horizontally or vertically and surrounded by 'X' from all of it's boundaries. (Boundary means top, bottom, left and right)
+Sample Input 1:
+5 4
+X X O O
+X O X X
+X O O X
+X O X X
+X X X X
+Sample Output 1:
+X X O O
+X X X X
+X X X X
+X X X X
+X X X X
+Explanation of Sample Output 1:
+There is only one island in the above input. Considering zero based indexing, The co-ordinates of the island are (1, 1), (2, 1), (2, 2) and (3, 1). We just need to replace the O's at this co-ordinates with X's. Hence the output.
+Sample Input 2:
+3 4
+X X O X
+X O X X
+X X O O
+Sample Output 2:
+X X O X
+X X X X
+X X O O
+
+public class ReplaceSurroundedRegions {
+
+    public static void solve(char[][] grid) {
+        int n = grid.length;
+        int m = grid[0].length;
+
+        // Step 1: Mark boundary connected 'O's
+        for (int i = 0; i < n; i++) {
+            dfs(grid, i, 0, n, m);
+            dfs(grid, i, m - 1, n, m);
+        }
+        for (int j = 0; j < m; j++) {
+            dfs(grid, 0, j, n, m);
+            dfs(grid, n - 1, j, n, m);
+        }
+
+        // Step 2: Flip remaining 'O' to 'X' and 'S' back to 'O'
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < m; j++) {
+                if (grid[i][j] == 'O') {
+                    grid[i][j] = 'X';
+                } else if (grid[i][j] == 'S') {
+                    grid[i][j] = 'O';
+                }
+            }
+        }
+    }
+
+    // DFS to mark boundary-connected 'O' as 'S'
+    private static void dfs(char[][] grid, int i, int j, int n, int m) {
+        if (i < 0 || i >= n || j < 0 || j >= m || grid[i][j] != 'O') {
+            return;
+        }
+        grid[i][j] = 'S';
+
+        dfs(grid, i + 1, j, n, m);
+        dfs(grid, i - 1, j, n, m);
+        dfs(grid, i, j + 1, n, m);
+        dfs(grid, i, j - 1, n, m);
+    }
+}
+=================================================================================================================================================================
+Every year, on the day of Christmas, Everyone at The Dunder Mifflin paper company exchanges gifts. Jim always gives Pam the best Christmas gifts. But this time, Pam decided to give Jim a string having at most two different characters. Pam has a ternary string ‘s’. She wants to know how many total numbers of contiguous strings she can make from ‘s’ to gift Jim.
+Sample Input 1 :	abc				aabc
+Sample Output 1 :	5				8
+Explanation For Sample Output 1 :For the first test case, she can make strings: a, b, c, ab, bc.Hence the answer is 5.For the second test case, she can make the following strings - a, a, b, c, aa, ab, bc, and aab. Hence the final answer is 8.
+
+public class TernarySubstringCounter {
+    public static int countValidSubstrings(String s) {
+        int left = 0, count = 0;
+        Map<Character, Integer> freqMap = new HashMap<>();
+
+        for (int right = 0; right < s.length(); right++) {
+            char c = s.charAt(right);
+            freqMap.put(c, freqMap.getOrDefault(c, 0) + 1);
+
+            // Shrink the window until we have at most 2 distinct characters
+            while (freqMap.size() > 2) {
+                char leftChar = s.charAt(left);
+                freqMap.put(leftChar, freqMap.get(leftChar) - 1);
+                if (freqMap.get(leftChar) == 0) {
+                    freqMap.remove(leftChar);
+                }
+                left++;
+            }
+
+            // All substrings ending at 'right' with start from 'left' to 'right'
+            count += right - left + 1;
+        }
+
+        return count;
+    }
+}
+====================================================================================================================================================================
+You are given a 0-indexed integer array nums and two integers key and k. A k-distant index is an index i of nums for which there exists at least one index j such that |i - j| <= k and nums[j] == key.Return a list of all k-distant indices sorted in increasing order.
+Example 1:Input: nums = [3,4,9,1,3,9,5], key = 9, k = 1									Output: [1,2,3,4,5,6]
+Explanation: Here, nums[2] == key and nums[5] == key.
+- For index 0, |0 - 2| > k and |0 - 5| > k, so there is no j where |0 - j| <= k and nums[j] == key. Thus, 0 is not a k-distant index.
+- For index 1, |1 - 2| <= k and nums[2] == key, so 1 is a k-distant index.
+- For index 2, |2 - 2| <= k and nums[2] == key, so 2 is a k-distant index.
+- For index 3, |3 - 2| <= k and nums[2] == key, so 3 is a k-distant index.
+- For index 4, |4 - 5| <= k and nums[5] == key, so 4 is a k-distant index.
+- For index 5, |5 - 5| <= k and nums[5] == key, so 5 is a k-distant index.
+- For index 6, |6 - 5| <= k and nums[5] == key, so 6 is a k-distant index.
+Thus, we return [1,2,3,4,5,6] which is sorted in increasing order. 
+Example 2:Input: nums = [2,2,2,2,2], key = 2, k = 2											Output: [0,1,2,3,4]
+Explanation: For all indices i in nums, there exists some index j such that |i - j| <= k and nums[j] == key, so every index is a k-distant index. 
+Hence, we return [0,1,2,3,4].
+ 
+class Solution {
+    public List<Integer> findKDistantIndices(int[] nums, int key, int k) {
+        int n = nums.length;
+        boolean[] marked = new boolean[n];
+
+        for (int i = 0; i < n; i++) {
+            if (nums[i] == key) {
+                int start = Math.max(0, i - k);
+                int end = Math.min(n - 1, i + k);
+
+                for (int j = start; j <= end; j++) {
+                    marked[j] = true;
+                }
+            }
+        }
+
+        List<Integer> result = new ArrayList<>();
+        for (int i = 0; i < n; i++) {
+            if (marked[i]) {
+                result.add(i);
+            }
+        }
+
+        return result;
+    }
+}
+====================================================================================================================================================================
+Ninja has been assigned to convert temperature from Fahrenheit to Celsius. He has been given a starting Fahrenheit Value (S), ending Fahrenheit value (E), and step size (W). Unfortunately, he does not know how to convert from Fahrenheit to Celsius. Please help him to find the result.
+Sample Input 1:		0 100 20								25 50 25
+Sample Output 1:
+0 -17
+20 -6
+40 4
+60 15
+80 26
+100 37
+25 -3
+50 10
+Explanation Of Sample Input 1:
+Test case 1:For the first test case of sample output 1, we start from Fahrenheit temperature 0 and move up to 100 with a step size of 20 units. For every temperature, we have a corresponding celsius temperature present in the output table.Test case 2:   For the second test case of sample output 1, we start from Fahrenheit temperature 25 and move up to 50 with a step size of 25 units. For every temperature, we have a corresponding celsius temperature present in the output table.
+
+public class Solution {
+	public static List<List<Integer>> fahrenheitToCelsius(int s, int e, int w) {
+		// Write your code here
+		List<List<Integer>> res = new ArrayList<>();
+
+		for(int f=s;f<=e;f+=w){
+			int c = (int)((f-32)*5.0/9);
+			res.add(Arrays.asList(f,c));
+		}
+		return res;
+	}
+
+}
+================================================================================================================================================================
+Self dividing numbers , number which is divisible by all its digits and doesn’t contain zero . example : 128
+
+public class Solution {
+    public static ArrayList<Integer> findAllSelfDividingNumbers(int lower, int upper) {
+        // Write your code here.
+        return IntStream.rangeClosed(lower,upper)
+					.parallel()
+                    .filter(Solution::isSelfDividing)
+                    .boxed()
+                    .collect(Collectors.toCollection(ArrayList::new));
+    }
+
+    public static boolean isSelfDividing(int num){
+        int temp = num;
+
+        while(temp>0){
+            int rem = temp%10;
+            if(rem==0)return false;
+            if(num%rem!=0)return false;
+            temp /= 10;
+        }
+        return true;
+    }
+}
+================================================================================================================================================================
+You are given a binary string s and a positive integer k.Return the length of the longest subsequence of s that makes up a binary number less than or equal to k.
+Note:The subsequence can contain leading zeroes.The empty string is considered to be equal to 0.A subsequence is a string that can be derived from another string by deleting some or no characters without changing the order of the remaining characters.
+Example 1:Input: s = "1001010", k = 5					Output: 5
+Explanation: The longest subsequence of s that makes up a binary number less than or equal to 5 is "00010", as this number is equal to 2 in decimal.Note that "00100" and "00101" are also possible, which are equal to 4 and 5 in decimal, respectively.The length of this subsequence is 5, so 5 is returned.
+Example 2:Input: s = "00101001", k = 1					Output: 6
+Explanation: "000001" is the longest subsequence of s that makes up a binary number less than or equal to 1, as this number is equal to 1 in decimal.
+The length of this subsequence is 6, so 6 is returned.
+
+public class Solution {
+    public int longestSubsequence(String s, int k) {
+        int length = 0;
+        int n = s.length();
+        long value = 0;
+        int power = 0;
+
+        // Traverse from right to left (LSB to MSB)
+        for (int i = n - 1; i >= 0; i--) {
+            char ch = s.charAt(i);
+
+            if (ch == '0') {
+                // Always include zero
+                length++;
+            } else {
+                if (power < 32) { // prevent overflow: 2^31 > 1e9
+                    long potential = value + (1L << power);
+                    if (potential <= k) {
+                        value = potential;
+                        length++;
+                    }
+                }
+            }
+            power++;
+        }
+
+        return length;
+    }
+}
+=======================================================================================================================================================
+You are given two binary grids ‘MAT1’ and ‘MAT2’ of size N x N each. Both grids either have 0 or 1 written in each cell.You can perform four types of operations to MAT1-
+• Right Shift
+• Left Shift
+• Up Shift
+• Down Shift
+Sample Input 1 :
+1 1 0
+0 0 0
+0 0 0
+mat2
+0 1 1
+0 0 0
+0 0 0
+2
+1 1
+1 1
+mat2
+1 1
+1 1
+Sample Output 1:
+2
+4
+Explanation for Sample 1:The optimal answer for the first test case:
+After applying one right shift to MAT1, we get it as-
+  0 1 1
+  0 0 0
+  0 0 0
+The overlap of MAT1 with MAT2 will be 2.The optimal answer for the second test case:
+We do not apply any shift to MAT1.The overlap of MAT1 with MAT2 will be 4.
+
+public class Solution {
+    public static int gridOverlap(ArrayList<ArrayList<Integer>> mat1, ArrayList<ArrayList<Integer>> mat2, int n) {
+        int max = 0;
+
+        for (int row = -n + 1; row < n; row++) {
+            for (int col = -n + 1; col < n; col++) {
+                int overLap = 0;
+
+                for (int i = 0; i < n; i++) {
+                    for (int j = 0; j < n; j++) {
+                        int newI = i + row;
+                        int newJ = j + col;
+
+                        if (newI >= 0 && newI < n && newJ >= 0 && newJ < n &&
+                            mat1.get(i).get(j) == 1 && mat2.get(newI).get(newJ) == 1) {
+                            overLap++;
+                        }
+                    }
+                }
+
+                max = Math.max(max, overLap);
+            }
+        }
+        return max;
+    }
+}
+================================================================================================================================================================
+Given an infinite supply of Indian currency i.e. [1, 2, 5, 10, 20, 50, 100, 500, 1000] valued coins and an amount 'N'.Find the minimum coins needed to make the sum equal to 'N'. You have to return the list containing the value of coins required in decreasing order.
+For Example For Amount = 70, the minimum number of coins required is 2 i.e an Rs. 50 coin and a Rs. 20 coin.NoteIt is always possible to find the minimum number of coins for the given amount. So, the answer will always exist.
+Sample Input 1: 13	Sample Output 1: 10 2 1
+Explanation of Sample Input 1:The minimum number of coins to change is 3 {1, 2, 10}.
+
+public class IndianCurrency {
+    public static List<Integer> minimumCoins(int N) {
+        // List of Indian denominations in decreasing order
+        int[] denominations = {1000, 500, 100, 50, 20, 10, 5, 2, 1};
+        List<Integer> result = new ArrayList<>();
+
+        for (int coin : denominations) {
+            while (N >= coin) {
+                N -= coin;
+                result.add(coin);
+            }
+        }
+        return result;
+    }
+}
+==================================================================================================================================================================
+You are given an array of integers nums and an integer target.Return the number of non-empty subsequences of nums such that the sum of the minimum and maximum element on it is less or equal to target. Since the answer may be too large, return it modulo 109 + 7.
+Example 1:Input: nums = [3,5,6,7], target = 9					Output: 4
+Explanation: There are 4 subsequences that satisfy the condition.
+[3] -> Min value + max value <= target (3 + 3 <= 9)
+[3,5] -> (3 + 5 <= 9)
+[3,5,6] -> (3 + 6 <= 9)
+[3,6] -> (3 + 6 <= 9)
+Example 2:Input: nums = [3,3,6,8], target = 10					Output: 6
+Explanation: There are 6 subsequences that satisfy the condition. (nums can have repeated numbers).
+[3] , [3] , [3,3], [3,6] , [3,6] , [3,3,6]
+Example 3:Input: nums = [2,3,3,4,6,7], target = 12				Output: 61
+Explanation: There are 63 non-empty subsequences, two of them do not satisfy the condition ([6,7], [7]).
+Number of valid subsequences (63 - 2 = 61).
+
+class Solution {
+    public int numSubseq(int[] nums, int target) {
+        int n = nums.length;
+        int left = 0 , right = n-1;
+        int count = 0;
+        Arrays.sort(nums);
+        final int MOD = 1_000_000_007;
+
+        int[] pow = new int[n];
+        pow[0]=1;
+
+        for(int i=1;i<n;i++){
+            pow[i]= (pow[i-1]*2)% MOD ;
+        }
+
+        while(left<=right){
+            if(nums[left]+nums[right]<=target){
+                count = (count + pow[right-left])%MOD;  // Idea is if sum of nums at left + right is less than or equal to target then possible combinations are 2**(right-left)
+                left++;
+            }else{
+                right--;
+            }
+            
+        }
+        return count;
+    }
+}
+===============================================================================================================================================================
+We define a harmonious array as an array where the difference between its maximum value and its minimum value is exactly 1.Given an integer array nums, return the length of its longest harmonious subsequence among all its possible subsequences.
+Example 1:Input: nums = [1,3,2,2,5,2,3,7]			Output: 5
+Explanation:The longest harmonious subsequence is [3,2,2,2,3].
+Example 2:Input: nums = [1,2,3,4]					Output: 2
+Explanation:The longest harmonious subsequences are [1,2], [2,3], and [3,4], all of which have a length of 2.
+Example 3:Input: nums = [1,1,1,1]					Output: 0
+Explanation:No harmonic subsequence exists.
+
+public class HarmoniousSubsequence {
+    public static int findLHS(int[] nums) {
+        Map<Integer, Integer> freq = new HashMap<>();
+
+        for (int num : nums) {
+            freq.put(num, freq.getOrDefault(num, 0) + 1);
+        }
+
+        int maxLength = 0;
+
+        for (int key : freq.keySet()) {
+            if (freq.containsKey(key + 1)) {
+                int length = freq.get(key) + freq.get(key + 1);
+                maxLength = Math.max(maxLength, length);
+            }
+        }
+
+        return maxLength;
+    }
+}
+===============================================================================================================================================================
+You have been given a positive integer N. Your task is to find the Nth term of the Look-And-Say sequence.The Look-And-Say sequence is a sequence of positive integers. The sequence is as follows:1, 11, 21, 1211, 111221, 312211, 13112221,... This sequence is constructed in the following way:
+The first number is 1.This is read as “One 1”. Hence, the second number will be 11.The second number is read as “Two 1s”. Hence, the third number will be 21.The third number is read as “One 2, One 1”. Hence, the fourth number will be 1211.The fourth term is read as “One 1, One 2, Two 1s”.Hence, the fifth term will be 111221. And so on.
+Sample Input 1:
+1
+2
+3
+Sample Output 1:
+1
+11
+21
+
+public class LookAndSay {
+    public static String lookAndSay(int n) {
+        String term = "1";
+        
+        for (int i = 1; i < n; i++) {
+            StringBuilder nextTerm = new StringBuilder();
+            int count = 1;
+            for (int j = 1; j < term.length(); j++) {
+                if (term.charAt(j) == term.charAt(j - 1)) {
+                    count++;
+                } else {
+                    nextTerm.append(count).append(term.charAt(j - 1));
+                    count = 1;
+                }
+            }
+            // Append last counted group
+            nextTerm.append(count).append(term.charAt(term.length() - 1));
+            term = nextTerm.toString();
+        }
+        
+        return term;
+    }
+}
+===============================================================================================================================================================
+Alice is attempting to type a specific string on her computer. However, she tends to be clumsy and may press a key for too long, resulting in a character being typed multiple times.Although Alice tried to focus on her typing, she is aware that she may still have done this at most once.You are given a string word, which represents the final output displayed on Alice's screen.Return the total number of possible original strings that Alice might have intended to type.
+Example 1:Input: word = "abbcccc"								Output: 5
+Explanation:The possible strings are: "abbcccc", "abbccc", "abbcc", "abbc", and "abcccc".
+Example 2:Input: word = "abcd"									Output: 1
+Explanation:The only possible string is "abcd".
+Example 3:Input: word = "aaaa"									Output: 4
+
+public class AliceTyping {
+    public static int countOriginalStrings(String word) {
+        int n = word.length();
+        int total = 1; // original string is always valid
+
+        int i = 0;
+        while (i < n) {
+            int j = i;
+            // Count group length
+            while (j < n && word.charAt(j) == word.charAt(i)) {
+                j++;
+            }
+            int len = j - i;
+            if (len > 1) {
+                // We can shorten this group in (len - 1) ways
+                total += (len - 1);
+            }
+            i = j;
+        }
+        return total;
+    }
+}
+or
+class Solution {
+    public int possibleStringCount(String word) {
+      int res = 0;
+
+      for(int i=1;i<word.length();i++){
+        if(word.charAt(i-1)==word.charAt(i)) res++;
+      }
+      return res+1; // +1 because for scenario where alice have typed correclty 
+
+    }
+}
+=======================================================================================================================================================================
+You are given a string ‘STR’ consisting of lowercase English alphabets. Your take is to find out the minimum number of character deletions required such that each character in the final string has a unique frequency.
+Sample Input 1 :babccbc					gttqtq
+Sample Output 1 :1						0
+Explanation For Sample Input 1 :Test Case 1 :The frequency of ‘a’ is 1, of ‘b’ is 3 and of ‘c’ is 3. Therefore after deletion of one character of either ‘b’ or ‘c’ makes the frequencies 1,2 and 3.Test Case 2 :The frequency of 'g' is 1, 't' is 3 and 'q' is 2. Therefore there is no need for a delete operation.
+Sample Input 2 :abbccc						cbbd
+Sample Output 2 :0							1
+Explanation For Sample Input 2 :For the first test case, each character already has a unique frequency(1 for ‘a’, 2 for ‘b’ and 3 for ‘c’), hence we don’t need to do any deletions.
+For the second test case frequency of ‘c’ and ‘d’ is equal hence we need to delete either of them. Therefore the answer is 1.
+
+public class UniqueFrequencyDeletions {
+
+    public static int minDeletions(String str) {
+        int[] freq = new int[26];
+
+        // Step 1: Count frequency of each character
+        for (char c : str.toCharArray()) {
+            freq[c - 'a']++;
+        }
+
+        Set<Integer> usedFreqs = new HashSet<>();
+        int deletions = 0;
+
+        // Step 2: Make frequencies unique
+        for (int f : freq) {
+            while (f > 0 && !usedFreqs.add(f)) {
+                f--; // delete one occurrence
+                deletions++;
+            }
+        }
+
+        return deletions;
+    }
+}
+=======================================================================================================================================================================
+Alice and Bob are playing a game. Initially, Alice has a string word = "a".You are given a positive integer k.Now Bob will ask Alice to perform the following operation forever:Generate a new string by changing each character in word to its next character in the English alphabet, and append it to the original word.For example, performing the operation on "c" generates "cd" and performing the operation on "zb" generates "zbac".Return the value of the kth character in word, after enough operations have been done for word to have at least k characters.Note that the character 'z' can be changed to 'a' in the operation.
+Example 1:Input: k = 5					Output: "b"
+Explanation:Initially, word = "a". We need to do the operation three times:
+Generated string is "b", word becomes "ab".Generated string is "bc", word becomes "abbc".Generated string is "bccd", word becomes "abbcbccd".
+Example 2:Input: k = 10					Output: "c"
+
+public class AliceBobGame {
+    public static char getKthCharacter(int k) {
+        StringBuilder word = new StringBuilder("a");
+
+        while (word.length() < k) {
+            int len = word.length();
+            StringBuilder next = new StringBuilder();
+
+            for (int i = 0; i < len; i++) {
+                char ch = word.charAt(i);
+                char nextChar = (char) ((ch == 'z') ? 'a' : ch + 1);
+                next.append(nextChar);
+            }
+
+            word.append(next);
+        }
+
+        return word.charAt(k - 1);
+    }
+}
+=======================================================================================================================================================================
+Longest balanced length
+Input: [0, 1, 0, 0, 1, 1, 0]
+Output: 6
+Explanation: The subarray [1, 0, 0, 1, 1, 0] has equal 0s and 1s.
+Solution: convert 0's to -1 so that problem would be to find the longest sequence that retruns 0
+public class Main{
+    public static void main(String[] args){
+       List<Integer> list = List.of(0, 1, 0, 0, 1, 1, 0);
+       
+       int sum = 0;
+       Map<Integer,Integer> map = new HashMap<>();
+       map.put(0,-1);
+       int max = Integer.MIN_VALUE;
+       for(int i=0;i<list.size();i++){
+           sum += list.get(i)==0?-1:1;
+           if(map.containsKey(sum)){
+               max = Math.max(max,i-map.get(sum));
+           }else{
+               map.put(sum,i);
+           }
+       }
+       System.out.println(max);
+    }
+}
+FOllow same approach for largest sequence that sums to Zero problem 
+=======================================================================================================================================================================
+Given an array of integers arr, a lucky integer is an integer that has a frequency in the array equal to its value.Return the largest lucky integer in the array. If there is no lucky integer return -1.
+Example 1:Input: arr = [2,2,3,4]				Output: 2
+Explanation: The only lucky number in the array is 2 because frequency[2] == 2.
+Example 2:Input: arr = [1,2,2,3,3,3]			Output: 3
+Explanation: 1, 2 and 3 are all lucky numbers, return the largest of them.
+Example 3:Input: arr = [2,2,2,3,3]				Output: -1
+Explanation: There are no lucky numbers in the array.
+
+class Solution {
+    public int findLucky(int[] arr) {
+        Map<Integer,Integer> map = Arrays.stream(arr)
+                                        .boxed()
+                                        .collect(Collectors.toMap(k->k,v->1,(a,b)->a+b));
+        int largest = Integer.MIN_VALUE;
+        for(int key:map.keySet()){
+            if(key==map.get(key))largest = Math.max(largest,key);
+        }
+        return largest==Integer.MIN_VALUE?-1:largest;
+    }
+}
+=======================================================================================================================================================================
+You’re given a square matrix 'MAT' of order N. Your task is to find the number of non-empty sub-matrices such that the sum of all the elements inside the submatrix is zero.
+NOTE:1. The matrix may also contain some negative elements.2. A square matrix is a matrix with the same number of rows and columns.A matrix obtained by deleting some (possibly 
+Sample Input 1:
+1
+2
+1 -1
+0 0
+Sample Output 1:
+5
+Explanation of Sample Input 1:
+As there are only 5 submatrices whose sum is equal to 0, we get our answer to be 0. The submatrices are as follows, the elements in bold represent the elements that are in that submatrix.
+
+Sample Input 2:
+-8 5  7
+3  7 -8
+5 -8  9
+Sample Output 2:
+2
+Explanation of Sample Input 2:
+As there are only 2 submatrices whose sum is equal to 0, we get our answer to be 0. The submatrices are as follows, the elements in bold represent the elements that are in that submatrix.
+
+public class Solution {
+
+    public static int subMatrices(int[][] mat, int n) {
+        int count = 0;
+
+        for (int top = 0; top < n; top++) {
+            int[] temp = new int[n];
+
+            for (int bottom = top; bottom < n; bottom++) {
+                for (int col = 0; col < n; col++) {
+                    temp[col] += mat[bottom][col]; // ✅ Corrected here
+                }
+
+                count += countZeroes(temp);
+            }
+        }
+
+        return count;
+    }
+
+    private static int countZeroes(int[] temp) {
+        Map<Integer, Integer> map = new HashMap<>();
+        map.put(0, 1);
+        int curr = 0, count = 0;
+
+        for (int num : temp) {
+            curr += num;
+            count += map.getOrDefault(curr, 0);
+            map.put(curr, map.getOrDefault(curr, 0) + 1);
+        }
+
+        return count;
+    }
+}
+=======================================================================================================================================================================
+You are given two integer arrays nums1 and nums2. You are tasked to implement a data structure that supports queries of two types:Add a positive integer to an element of a given index in the array nums2.Count the number of pairs (i, j) such that nums1[i] + nums2[j] equals a given value (0 <= i < nums1.length and 0 <= j < nums2.length).
+Implement the FindSumPairs class:FindSumPairs(int[] nums1, int[] nums2) Initializes the FindSumPairs object with two integer arrays nums1 and nums2.void add(int index, int val) Adds val to nums2[index], i.e., apply nums2[index] += val.int count(int tot) Returns the number of pairs (i, j) such that nums1[i] + nums2[j] == tot.
+Example 1:Input ["FindSumPairs", "count", "add", "count", "count", "add", "add", "count"] [[[1, 1, 2, 2, 2, 3], [1, 4, 5, 2, 5, 4]], [7], [3, 2], [8], [4], [0, 1], [1, 1], [7]]
+Output:[null, 8, null, 2, 1, null, null, 11]
+Explanation :- FindSumPairs findSumPairs = new FindSumPairs([1, 1, 2, 2, 2, 3], [1, 4, 5, 2, 5, 4]);findSumPairs.count(7);  // return 8; pairs (2,2), (3,2), (4,2), (2,4), (3,4), (4,4) make 2 + 5 and pairs (5,1), (5,5) make 3 + 4,findSumPairs.add(3, 2); // now nums2 = [1,4,5,4,5,4],findSumPairs.count(8);  // return 2; pairs (5,2), (5,4) make 3 + 5,findSumPairs.count(4);  // return 1; pair (5,0) makes 3 + 1,findSumPairs.add(0, 1); // now nums2 = [2,4,5,4,5,4],findSumPairs.add(1, 1); // now nums2 = [2,5,5,4,5,4],findSumPairs.count(7);  // return 11; pairs (2,1), (2,2), (2,4), (3,1), (3,2), (3,4), (4,1), (4,2), (4,4) make 2 + 5 and pairs (5,3), (5,5) make 3 + 4
+ 
+class FindSumPairs {
+    int[] nums1;
+    int[] nums2;
+    Map<Integer, Integer> map;
+
+    public FindSumPairs(int[] nums1, int[] nums2) {
+        this.nums1 = nums1;
+        this.nums2 = nums2;
+        this.map = new HashMap<>();
+
+        for (int num : nums2) {
+            map.put(num, map.getOrDefault(num, 0) + 1);
+        }
+    }
+
+    public void add(int index, int val) {
+        int oldVal = nums2[index];
+        int newVal = oldVal + val;
+
+        map.put(oldVal, map.get(oldVal) - 1);
+        if (map.get(oldVal) == 0) map.remove(oldVal);
+
+        nums2[index] = newVal;
+        map.put(newVal, map.getOrDefault(newVal, 0) + 1);
+    }
+
+    public int count(int tot) {
+        int count = 0;
+
+        for (int num : nums1) {
+            int complement = tot - num;
+            count += map.getOrDefault(complement, 0);
+        }
+
+        return count;
+    }
+}
+=======================================================================================================================================================================
+You are given three integers ‘X’, ‘Y’ and ‘N’. Find the value of division X / Y up to ‘N’ decimal places.You should return a string that represents the value X / Y up to ‘N’ decimal places. This string must have ‘N’ digits after decimals. You don’t need to round off the result to ‘N’ decimal places, just find the first ‘N’ places after decimals.
+Sample Input 1:	5 4 1							5 4 5   
+Sample Output 1: 1.2							1.25000
+Explanation of Sample Input 1:
+Test case 1:Division 5/4 = 1.25, but we need to print only ‘1’ digit after decimals, thus we should print 1.2.
+Test case 2:See the problem statement for an explanation.
+
+public class Solution {
+    public static String findDivision(int x, int y, int n) {
+        StringBuilder sb = new StringBuilder();
+        boolean sign = (x < 0) ^ (y < 0); // XOR for sign check
+
+        long num = Math.abs((long)x);
+        long deno = Math.abs((long)y);
+
+        long div = num / deno;
+        long rem = num % deno;
+
+        if(sign && (div > 0 || rem > 0)) {
+            sb.append("-");
+        }
+
+        sb.append(div).append(".");
+
+        while(n-- > 0){
+            rem *= 10;
+            sb.append(rem / deno);
+            rem %= deno; 
+        }
+
+        return sb.toString();
+    }
+}
+=======================================================================================================================================================================
+You are given an integer ‘N’. Your task is to find all palindromic numbers from 1 to ‘N’.Palindromic integers are those integers that read the same backward or forwards.
+Sample Input 1:
+ 12
+ 5
+Sample Output 1:
+1 2 3 4 5 6 7 8 9 11
+1 2 3 4 5
+Explanation:For the first test case, all the single-digit numbers are palindromic, and the number 11 is also palindromic. Hence the output is [1, 2, 3, 4, 5, 6, 7, 8, 9, 11].
+For the second test case, N is less than 9. Therefore all the numbers from 1 to N are palindromes. Hence the output is [1, 2, 3, 4, 5].
+
+import java.util.*;
+import java.util.stream.*;
+
+public class Solution {
+    public static int[] getPalindromes(int n) {
+        List<Integer> res = new ArrayList<>();
+
+        // Single-digit palindromes
+        for (int i = 1; i <= 9 && i <= n; i++) {
+            res.add(i);
+        }
+
+        // Generate even and odd length palindromes
+        for (int i = 1; ; i++) {
+            String s = String.valueOf(i);
+
+            // Even-length palindrome
+            String evenPal = s + new StringBuilder(s).reverse().toString();
+            int evenVal = Integer.parseInt(evenPal);
+            if (evenVal > n) break;
+            res.add(evenVal);
+
+            // Odd-length palindrome
+            for (int d = 0; d <= 9; d++) {
+                String oddPal = s + d + new StringBuilder(s).reverse().toString();
+                int oddVal = Integer.parseInt(oddPal);
+                if (oddVal > n) continue;
+                res.add(oddVal);
+            }
+        }
+
+        Collections.sort(res); // Optional: ensures non-decreasing order
+        return res.stream().mapToInt(Integer::intValue).toArray();
+    }
+}
+=========================================================================================================================================================
+Anish is teaching his brother about sub-arrays. However, his brother is sometimes very inattentive. So, he wants to test whether his brother has understood the concept of sub-arrays or not. He gives his brother two numbers and asks him to find the number of sub-arrays of a certain array ARR such that the maximum element of the sub-array lies between X and Y.
+Sample Input 1 :
+3 1 3
+1 2 3
+
+4 2 3
+10 2 3 4
+Sample Output 1 :
+6
+3
+Explanation for Sample Output 1 :
+In the first test case, the answer should be 6 because every sub-array satisfies the conditions.
+In the second test case, the answer should be 3 because the sub-arrays [2], [3], and [2, 3] satisfy the conditions.
+
+public class Solution {
+
+    public static int find(int n, int[] arr, int x, int y) {
+        return (int)(countSubarrays(arr, y) - countSubarrays(arr, x - 1));
+    }
+
+    // Helper to count subarrays where max element is ≤ bound
+    private static long countSubarrays(int[] arr, int bound) {
+        long count = 0;
+        int length = 0;
+
+        for (int value : arr) {
+            if (value <= bound) {
+                length++;
+                count += length;
+            } else {
+                length = 0;
+            }
+        }
+
+        return count;
+    }
+}
+===========================================================================================================================================================================
+boolean isAnagram(String s1, String s2) {
+    if (s1.length() != s2.length()) return false;
+    int[] count = new int[26];
+    for (int i = 0; i < s1.length(); i++) {
+        count[s1.charAt(i) - 'a']++;
+        count[s2.charAt(i) - 'a']--;
+    }
+    for (int i : count) if (i != 0) return false;
+    return true;
+}
+==========================================================================================================================================================================
+A word is considered valid if:It contains a minimum of 3 characters.It contains only digits (0-9), and English letters (uppercase and lowercase).It includes at least one vowel.It includes at least one consonant.You are given a string word.Return true if word is valid, otherwise, return false.Notes:'a', 'e', 'i', 'o', 'u', and their uppercases are vowels.
+A consonant is an English letter that is not a vowel.
+Example 1:Input: word = "234Adas"	Output: true
+Explanation:This word satisfies the conditions.
+Example 2:Input: word = "b3"		Output: false
+Explanation:The length of this word is fewer than 3, and does not have a vowel.
+Example 3:Input: word = "a3$e"		Output: false
+Explanation:This word contains a '$' character and does not have a consonant.
+
+public class WordValidator {
+    public boolean isValid(String word) {
+        if (word.length() < 3) {
+            return false;
+        }
+
+        boolean hasVowel = false;
+        boolean hasConsonant = false;
+
+        for (char ch : word.toCharArray()) {
+            if (!Character.isLetterOrDigit(ch)) {
+                return false; // contains invalid character like $, @, etc.
+            }
+
+            if (Character.isLetter(ch)) {
+                char lower = Character.toLowerCase(ch);
+                if ("aeiou".indexOf(lower) != -1) {
+                    hasVowel = true;
+                } else {
+                    hasConsonant = true;
+                }
+            }
+        }
+
+        return hasVowel && hasConsonant;
+    }
+}
+==========================================================================================================================================================================
+You are given a string ‘STR’ containing space-separated words. A word is a sequence of non-space characters. Your task is to reverse the order of words in ‘STR’.Note: Try to do it in-place without allocating extra space.
+Sample input 1:	when all else fails reboot					java is to javascript what a car is to carpet
+Sample output 1:reboot fails else all when					carpet to is car a what javascript to is java
+Sample input 2:	no code has zero defects					whitespace is never white
+Sample output 2:defects zero has code no					white never is whitespace
+
+public class Solution {
+
+    public static String reverseOrderWords(String str) {
+        // Split the input string by whitespace
+        String[] arr = str.split("\\s+");
+
+        // Two-pointer approach to reverse the array of words in-place
+        int left = 0;
+        int right = arr.length - 1;
+
+        while (left < right) {
+            String temp = arr[left];
+            arr[left] = arr[right];
+            arr[right] = temp;
+            left++;
+            right--;
+        }
+
+        // Join the words back into a single string with spaces
+        return String.join(" ", arr);
+    }
+}
+=======================================================================================================================================================================
+Given two strings s1 and s2, return the lowest ASCII sum of deleted characters to make two strings equal.
+Example 1:Input: s1 = "sea", s2 = "eat"				Output: 231
+Explanation: Deleting "s" from "sea" adds the ASCII value of "s" (115) to the sum.Deleting "t" from "eat" adds 116 to the sum.At the end, both strings are equal, and 115 + 116 = 231 is the minimum sum possible to achieve this.
+Example 2:Input: s1 = "delete", s2 = "leet"			Output: 403
+Explanation: Deleting "dee" from "delete" to turn the string into "let",adds 100[d] + 101[e] + 101[e] to the sum.Deleting "e" from "leet" adds 101[e] to the sum.At the end, both strings are equal to "let", and the answer is 100+101+101+101 = 403.If instead we turned both strings into "lee" or "eet", we would get answers of 433 or 417, which are higher.
+
+class Solution {
+    public int minimumDeleteSum(String s1, String s2) {
+        int m = s1.length();
+        int n = s2.length();
+        int[][] dp = new int[m + 1][n + 1];
+
+        // Fill base case: s2 is empty, delete everything from s1
+        for (int i = 1; i <= m; i++) {
+            dp[i][0] = dp[i - 1][0] + s1.charAt(i - 1);
+        }
+
+        // Fill base case: s1 is empty, delete everything from s2
+        for (int j = 1; j <= n; j++) {
+            dp[0][j] = dp[0][j - 1] + s2.charAt(j - 1);
+        }
+
+        // Fill the rest of the DP table
+        for (int i = 1; i <= m; i++) {
+            for (int j = 1; j <= n; j++) {
+                if (s1.charAt(i - 1) == s2.charAt(j - 1)) {
+                    // Characters match, no cost added
+                    dp[i][j] = dp[i - 1][j - 1];
+                } else {
+                    // Take the minimum of deleting from s1 OR deleting from s2
+                    dp[i][j] = Math.min(
+                        dp[i - 1][j] + s1.charAt(i - 1), 
+                        dp[i][j - 1] + s2.charAt(j - 1)
+                    );
+                }
+            }
+        }
+
+        return dp[m][n];
+    }
+}
+=======================================================================================================================================================================
+Ninja’s favorite numbers are the numbers whose all digits are ‘1’. So Let's consider numbers that have only the digit ‘1’. For example, [ ‘1’, ‘11’, ‘111’ … ]You are given an integer ‘K’, Your task is to find the number of digits in the Ninja’s smallest favorite number that is divisible by ‘K’. If there is no such number that is divisible by ‘K’, then return -1.Detailed explanation ( Input/output format, Notes, Images )
+Sample Input 1:	1				8
+Sample Output 1:1				-1
+Explanation of Sample Input 1:Test case 1:‘1’ is itself divided by one, that has only 1 digit, hence the answer will be 1.
+Test case 2:There is no number whose all digits are ‘1’ and divisible 8 , so the answer will be -1.
+Sample Input 2:11
+Sample Output 2:2
+Explanation of Sample Input 2:Test case 1:‘11’ is itself divided by 11 which have 2 digits hence the answer will be 2.
+
+import java.util.Scanner;
+
+public class Solution {
+    public static int findSmallestFavorite(int k) {
+        // If K is divisible by 2 or 5, no number ending in '1' can be divisible by K
+        if (k % 2 == 0 || k % 5 == 0) {
+            return -1;
+        }
+
+        int remainder = 0;
+        // We iterate through possible lengths 'n' from 1 up to k
+        for (int n = 1; n <= k; n++) {
+            // Update the remainder for a number with 'n' ones
+            // (remainder * 10 + 1) % k is the remainder of the next repunit
+            remainder = (remainder * 10 + 1) % k;
+
+            if (remainder == 0) {
+                return n;
+            }
+        }
+
+        return -1;
+    }
+}

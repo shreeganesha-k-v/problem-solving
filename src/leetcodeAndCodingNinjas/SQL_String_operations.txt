@@ -1,0 +1,75 @@
+-- 1. LENGTH / LEN
+-- Returns the length of a string
+SELECT LENGTH('Hello World');       -- MySQL, PostgreSQL, Oracle
+SELECT LEN('Hello World');          -- SQL Server
+
+-- 2. CONCAT
+-- Concatenates strings together
+SELECT CONCAT('Hello', ' ', 'SQL'); -- 'Hello SQL'
+
+-- 3. CONCAT using ||
+-- Alternative in PostgreSQL and Oracle
+SELECT 'Hello' || ' ' || 'SQL';     -- 'Hello SQL'
+
+-- 4. SUBSTRING / SUBSTR
+-- Extracts a part of a string
+SELECT SUBSTRING('Database', 5, 3); -- 'bas'
+SELECT SUBSTR('Database', 5, 3);    -- 'bas' (Oracle)
+
+-- 5. UPPER and LOWER
+-- Changes case of strings
+SELECT UPPER('sql functions');      -- 'SQL FUNCTIONS'
+SELECT LOWER('SQL FUNCTIONS');      -- 'sql functions'
+
+-- 6. TRIM, LTRIM, RTRIM
+-- Removes spaces from string ends
+SELECT TRIM('   SQL   ');           -- 'SQL'
+SELECT LTRIM('   SQL');             -- 'SQL'
+SELECT RTRIM('SQL   ');             -- 'SQL'
+
+-- 7. REPLACE
+-- Replaces part of a string
+SELECT REPLACE('SQL is fun', 'fun', 'cool'); -- 'SQL is cool'
+
+-- 8. INSTR / POSITION
+-- Finds position of substring
+SELECT INSTR('Database', 'base');   -- 5 (MySQL, Oracle)
+SELECT POSITION('base' IN 'Database'); -- 5 (PostgreSQL)
+
+-- 9. REVERSE
+-- Reverses the string (Not in Oracle)
+SELECT REVERSE('SQL');              -- 'LQS'
+
+-- 10. LEFT and RIGHT
+-- Gets characters from left or right
+SELECT LEFT('Database', 4);         -- 'Data'
+SELECT RIGHT('Database', 4);        -- 'base'
+
+-- 11. ASCII
+-- Gets ASCII value of first character
+SELECT ASCII('A');                  -- 65
+
+-- 12. CHAR
+-- Gets character from ASCII value
+SELECT CHAR(65);                    -- 'A'
+
+SELECT SUBSTR('Oracle', 1, 3) FROM DUAL;
+
+
+LENGTH(str) / LEN(str)	Returns length of string	SELECT LENGTH('hello');	5
+CONCAT(str1, str2, ...)	Concatenates strings	SELECT CONCAT('SQL', ' ', 'Rocks');	'SQL Rocks'
+`		` (PostgreSQL)	Alternate way to concat
+SUBSTRING(str, start, length) / SUBSTR(str, start, length)	Extract substring	SELECT SUBSTRING('Database', 5, 4);	'base'
+UPPER(str)	Converts to uppercase	SELECT UPPER('sql');	'SQL'
+LOWER(str)	Converts to lowercase	SELECT LOWER('SQL');	'sql'
+TRIM(str)	Removes spaces from both ends	SELECT TRIM(' SQL ');	'SQL'
+LTRIM(str)	Removes spaces from left	SELECT LTRIM(' SQL');	'SQL'
+RTRIM(str)	Removes spaces from right	SELECT RTRIM('SQL ');	'SQL'
+REPLACE(str, find, replace)	Replaces part of string	SELECT REPLACE('SQL Rocks', 'Rocks', 'Rules');	'SQL Rules'
+INSTR(str, substr) / POSITION(substr IN str)	Finds position of substring	SELECT INSTR('SQL', 'Q');	2
+REVERSE(str)	Reverses the string	SELECT REVERSE('SQL');	'LQS'
+LEFT(str, n)	Returns leftmost n chars	SELECT LEFT('Database', 4);	'Data'
+RIGHT(str, n)	Returns rightmost n chars	SELECT RIGHT('Database', 4);	'base'
+ASCII(char)	Returns ASCII code	SELECT ASCII('A');	65
+CHAR(code)	Returns char from ASCII	SELECT CHAR(65);	'A'
+REPLICATE(str,count) returns character  3 times ; REPLICATE('S',3) ; SSS

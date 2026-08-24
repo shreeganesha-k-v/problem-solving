@@ -1,0 +1,111 @@
+
+public final class A{
+	
+	private final B b;    
+	
+	public A(B b){this.b=b;}
+	
+	public B getB(){return b;}
+	
+	public B checkNull()                   ==   .equals()
+{
+return Optional.ofNullable(b)
+			.orElseThrow(()-> new NotFoundException(""));
+}
+
+Supplier<T>
+Consumer<T> 
+BiFunction<T,V,R> 
+Function<T,R>
+Predicate<T> 
+Unaryoperator<T>
+
+Comparator -> compare  and Comparable -> compareTo 
+
+
+
+	int sum = IntStream.rangeClosed(1,n)
+					.filleter()
+					.sorted()
+					  .sum()
+					//.reduce(0,(a,b)->a+b);	
+
+
+
+1,2,3,4,2,5,6
+
+Set<Integer>
+
+public class FindUnique{
+
+	private List<Integer> method1(List<Integer> nums){
+	
+		Set<Integer> set = new HashSet<>();
+		
+		for(int num:nums) set.add(num);
+		
+		return new ArrayList<>(set);
+	}
+	
+	private List<Integer> method2(List<Integer> nums){
+	
+		return nums.stream().distinct().collect(Collectors.toList());
+	}
+	
+	private List<Integer> method3(List<Integer> nums){
+		List<Integer> res = new ArrayList<>();
+		
+		for(int num:nums){
+			if(!res.contains(num)) res.add(num);
+		}
+		return res;
+		
+	}
+}
+
+
+@SpringBootAppli -> @ComponentScan @EnableAuto @C
+
+@Entity 
+@Table("")
+@NoArgs
+@Data
+
+
+@OneToOne(mappedBy,)
+@JoinColumn
+@NotNull
+@Email
+@Id(stargety=)
+Address addres mappedBy 
+
+
+@OneToMany(fetchType = )
+
+
+@ManytoMany
+@JOinTable(name="
+@JOin=
+@InverseJoin= )
+
+
+
+Table Company -> empid , empname , manager_id
+
+SELECT e.empname as employee_name, m.empname as manager_name
+FROM Company c
+JOIN Company m ON c.manager_id = m.empid 
+
+
+Company -> dept , empid , salary
+
+WITH cte (
+	
+	SELECT * , ROW_NUMBER() OVER (PARTITION BY dept ORDER BY salary DESC) as rank
+	FROM Company
+)
+
+SELECT dept , empid , salary FROM cte where rank = 5;
+
+
+

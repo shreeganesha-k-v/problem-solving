@@ -1,0 +1,255 @@
+Vertex AI is Google Cloud's unified machine learning (ML) platform. It empowers you to build, train, and deploy ML models and AI applications. For multiple modalities (text, code, images, speech), Vertex AI gives you access to Google's large generative AI models through Model Garden. You can tune Google's large language models (LLMs) to meet your needs, and then deploy them for use in your AI-powered applications.Vertex AI is Google Cloud's core platform for building and deploying custom generative AI solutions. It provides access to powerful models like Gemini and tools like Vertex AI Search, enabling you to create applications that leverage multimodal gen AI to solve complex business problems.
+
+Foundation models are large-scale, general-purpose models trained on a massive amount of data. They can be adapted to a wide range of downstream tasks. In contrast, traditional machine learning models are often designed for specific tasks and trained on smaller, more focused datasets.
+
+Key features of foundation models:
+-Foundation models are trained on a wide variety of data, allowing them to learn general patterns and relationships that can be applied to different tasks.
+-With foundation models, one AI model can support a wide range of use cases.
+-Foundation models can be specialized for particular domains or use cases through additional, targeted training.
+
+Examples of foundation models : Gemini , Imagen , Chirp
+Gemini: Trained on a massive dataset of text, images, code, audio, video, and more. This multimodal training allows Gemini to perform tasks across various domains, including language understanding, image generation, code generation, and more.
+
+Prompting models: Foundation models, like other AI models, take in inputs, which are called prompts, to produce outputs.While all AI models have inputs or prompts, foundation models are usually much more flexible in what you can prompt. For example, some AI models have strict requirements on the type of inputs they can handle. They may only handle numbers, emails, or images.Foundation models, and especially multimodal foundation models, can take in a much broader set of inputs.
+
+Using gen AI responsibly, ethically, and securely is extremely important for all organizations. Google has a commitment to building AI responsibly by building an ecosystem that is built securely and ethically and, at the same time, providing you educational resources for doing the same as you build your own solutions. Here are some examples:
+Secure AI Framework (SAIF): A comprehensive suite of tools and best practices for building secure AI systems.
+Mandiant: Leverage Mandiant's threat intelligence and expertise to protect your AI systems from cyberattacks.
+AI Principles: Google's published AI Principles guide the development and deployment of AI technologies.
+Responsible AI Toolkit: Resources and tools to help developers and organizations build AI systems that are fair, unbiased, and socially beneficial.
+
+Augmentation versus automation:Use gen AI to enhance or augment your strategic thinking for:Critical thinking and problem solving: Gen AI can provide data and insights, but humans are still needed to interpret those insights and make informed decisions.Creativity and innovation: Gen AI can assist in generating ideas and exploring possibilities, but human ingenuity is still essential for pushing boundaries and developing truly innovative solutions.
+Relationship building and collaboration: Gen AI can facilitate communication and information sharing, but strong interpersonal skills are still crucial for building trust, fostering collaboration, and navigating complex human dynamics.Strategic planning and vision: Gen AI can help with forecasting and trend analysis, but human leadership is essential for setting a long-term vision, defining goals, and charting a course for the future.
+
+Artificial intelligence (AI): The broad field of building machines that can perform tasks requiring human intelligence.
+Machine learning (ML): A subset of AI where machines learn from data.
+Generative AI: An application of AI that creates new content.
+
+ML models analyze the data they've been given, identify patterns, and then calculate the likelihood of different outcomes when presented with new information.
+The data quality is important because it effects accuracy , completeness, representative , consistency , relevance 
+The ability of AI systems to effectively utilize this data is directly tied to data accessibility. Data accessibility ensures that the necessary data is readily available, usable, and of high quality, allowing for comprehensive model training and reducing potential biases. Without accessible data, even the most sophisticated algorithms are limited in their ability to learn and provide accurate predictions.
+Data is the foundation of any AI system, with data quality and accessibility being essential for effective AI development. Understanding the types and quality of your data, including accuracy, completeness, consistency, relevance, availability, cost, and format is crucial for successful AI initiatives.
+
+Labeled data has tags, such as a name, type, or number. These tags, whether applied manually or by automated systems, assign meaning to the data. For instance, an image dataset for training a cat-detection model would label each picture as either a cat or dog. Similarly, a set of customer reviews might be labeled as positive, negative, or neutral. These labels enable algorithms to learn relationships and make accurate predictions.
+Unlabeled data is simply data that is not tagged or labeled in any way. It's raw, unprocessed information without inherent meaning. 
+Examples of unlabeled data include a collection of unorganized photos, a stream of audio recordings, or website traffic logs without user categorization. In these cases, algorithms must independently discover patterns and structures within the data, as there are no pre-existing labels to guide the learning process.
+
+Supervised machine learning trains models on labeled data, where each input is paired with its correct output, allowing the model to learn the relationship between them. The model's goal is to identify patterns and relationships within this labeled data, enabling it to accurately predict outputs for new, unseen inputs.Predicting housing prices is a common example of supervised learning. A model is trained on a dataset where each house has labeled data, such as its size, number of bedrooms, location, and the corresponding sale price. This labeled data allows the algorithm to learn the relationship between the features of a house and its price. Once trained, the model can then predict the price of a new house based on its features.
+
+Unsupervised ML models deal with raw, unlabeled data to find natural groupings. Instead of learning from labeled data, it dives headfirst into a sea of unlabeled data. For example, an unsupervised learning algorithm could analyze customer purchase history from your company's database. It might uncover hidden segments of customers with similar buying habits, even though you never explicitly labeled those segments beforehand. This can be incredibly valuable for targeted marketing or product recommendations.Think of it as exploratory analysis. Unsupervised learning helps you understand the underlying structure of your data and uncover insights that you might not have even known to look for.
+
+Reinforcement learning is all about learning through interaction and feedback. Imagine a robot learning to navigate a maze. It starts with no knowledge of the maze's layout. As it explores and interacts with the maze, it collects data—bumping into walls (negative feedback) or finding shortcuts (positive feedback). Through this process of trial and error, the algorithm learns which actions lead to the best outcomes.It's like training a pet. You reward good behavior and discourage bad behavior. And over time, the pet learns to perform the desired actions. Similarly, in reinforcement learning, the algorithm learns to maximize rewards and minimize penalties by interacting with its environment.This type of learning is particularly useful in situations where you can't provide explicit instructions or labeled data. For example, you could use reinforcement learning to train a self-driving car to navigate complex traffic situations or to optimize the performance of a robot in a manufacturing plant.
+
+Steps in training model are : gather data , prepare your data , train the model , deploy and predict , manage ur model
+
+Model management is the process of managing and maintaining your models over time. Google Cloud offers tools for managing the entire lifecycle of ML models. This includes the following:
+Versioning: Keep track of different versions of the model.
+Performance tracking: Review the model metrics to check the model's performance.
+Drift monitoring: Watch for changes in the model's accuracy over time.
+Data management: Use Vertex AI Feature Store to manage the data features the model uses.
+Storage: Use Vertex AI Model Garden to store and organize the models in one place.
+Automate: Use Vertex AI Pipelines to automate your machine learning tasks.
+
+Deep learning : A powerful subset of machine learning, distinguished by its use of artificial neural networks. These networks enable the processing of highly complex patterns and the generation of sophisticated predictions.
+Neural networks can leverage both labeled and unlabeled data, a strategy known as semi-supervised learning. They train on a blend of a small amount of labeled data and a large amount of unlabeled data. That way, they learn foundational concepts and generalize effectively to novel examples.
+
+Large language models (LLMs)​​​ One particularly exciting type of foundation model is the LLM. These models are specifically designed to understand and generate human language. They can translate languages, write different kinds of creative content, and answer your questions in an informative way, even if they are open ended, challenging, or strange. This is likely the most common foundation model you've encountered, such as in popular generative AI chatbots like Gemini. They also help power many search engines you use today.
+
+Diffusion models are another type of foundational model. They excel in generating high-quality images, audio, and even video by iteratively refining noise (or unstructured/random data and patterns) into structured data.
+
+When choosing a generative AI model, consider factors such as modality, context window, security, availability, cost, performance, fine-tuning, and ease of integration. Google Cloud offers a suite of foundation models, including Gemini, Gemma, Imagen, and Veo, each with unique strengths and capabilities. These models can be accessed and customized through Vertex AI, empowering businesses to enhance customer experiences, increase productivity, foster innovation, and improve decision-making.
+Vertex AI streamlines the integration of advanced artificial intelligence capabilities into business applications, allowing for seamless discovery, deployment, and customization. These models empower businesses to leverage cutting-edge AI, providing the flexibility to work with many different models without the need for extensive in-house model development. With Vertex AI you can access models developed by Google including Gemini, Gemma, Imagen, and Veo. You can also access proprietary third-party models, and openly available models.
+
+The limitations of AI models are : Data dependency , Knowledge cutoff , Bias , Fairness , hallucinations , Edge cases
+Techniques to overcome these are 
+1. Grounding : Grounding is the process of connecting the AI's output to verifiable sources of information—like giving AI a reality check. By providing the model with access to specific data sources, we tether its output to real-world information, reducing the risk of invented content. 
+2. Retrieval-augmented generation (RAG): RAG is a grounding method that uses search to find relevant information from a knowledge base and provides that information to the LLM, giving it necessary context.
+The first step is retrieval. When you ask an AI a question, RAG uses a search engine to find relevant information. This search engine uses an index that understands the semantic meaning of the text, not just keywords. This means it finds information based on meaning, ensuring higher relevance. The retrieved information is then added to the prompt given to the AI. This is the augmentation phase. The AI then uses this augmented prompt, along with its existing knowledge, to generate a response. This is referred to as the generation phase.
+3. Prompt engineering: Prompting offers the most rapid and straightforward approach to supplying supplementary background information to models. 
+4. Fine-tuning : Tuning involves further training a pre-trained or foundation model on a new dataset specific to your task. This process adjusts the model's parameters, making it more specialized for your needs. Google Cloud Vertex AI provides tooling to facilitate tuning.
+
+Humans in the loop (HITL)
+Beyond these techniques, we must remember the invaluable role of humans in the loop (HITL). Machine learning models are powerful, but they sometimes need a human touch. For tasks requiring judgment, context, or handling incomplete data, human expertise is essential. HITL systems integrate human input and feedback directly into the ML process. This collaboration makes models more adaptable, especially in areas like the following.
+Content moderation , Sensitive applications , High-risk decisions , Pre-generation review , Post-generation review
+
+Secure AI is about preventing intentional harm being done to your applications. This is about protecting AI systems from malicious attacks and misuse. For all applications, including AI, you need to ensure security throughout the full lifecycle from development through deployment. This includes considering the data, infrastructure, and how and where applications are deployed.
+
+To better understand how these security principles apply, let's reexamine the machine learning lifecycle from an earlier lesson.
+Gather your data: The foundation of any robust AI system is secure data. Therefore, data must be protected and secured at all times. Access controls must be implemented to restrict who can access the data. They are also necessary to restrict who can add or input to the data. This is crucial to prevent data poisoning, a malicious attack where bad actors corrupt your AI model’s training data by introducing manipulated data. This can cause your model to learn incorrect patterns and make flawed (biased, inaccurate, or even harmful) predictions. It's akin to someone secretly swapping out vital ingredients in a recipe, leading to a disastrous final dish.
+
+Prepare your data: During data preparation, special attention should be paid to confidential or sensitive data that might be present in the training data. Where feasible, anonymization techniques should be applied to this data, mitigating potential privacy risks. Data also should be rigorously validated, using integrity checks and anomaly detection to prevent poisoning. Data should be securely processed with encryption both at rest and in use. Logging and real-time monitoring should also be performed.
+
+Train your model: Securing the model and the training process is paramount. This means safeguarding both the training data and model parameters from unauthorized access or modification. Model theft, where attackers steal proprietary or sensitive AI models, is a significant threat. Beyond gaining a competitive advantage, the stolen models could be used for malicious purposes, exploiting vulnerabilities or replicating sensitive functionality.
+
+Deploy and predict: Once your model is trained and ready for action, it's crucial to safeguard it within its operating environment. This means controlling access to the model, determining who can interact with it and how. If you're using a pre-built model, it's essential to verify its source and check for any potential vulnerabilities.
+
+Manage your model : Continuous monitoring and maintenance of the model's security are essential. Stay up to date on the latest security best practices in the field, specifically for your platform and model, and regularly update to patch vulnerabilities. Monitor model performance and outputs for anomalies or signs of tampering, and regularly review access permissions.
+
+Responsible AI means ensuring your AI applications avoid intentional and unintentional harm. It’s important to consider ethical development and positive outcomes for the software you develop. The same holds true, and perhaps even more so, for AI applications.
+Transparency is paramount for responsible applications. Users need to understand how their information is being used and how the AI system works. This transparency should extend to all aspects of the AI's operation, including data handling, decision-making processes, and potential biases
+Protecting privacy often involves anonymizing or pseudonymizing data, ensuring individuals can't be easily identified. AI models can sometimes inadvertently leak sensitive information from their training data, so it's crucial to implement safeguards to prevent this.
+Machine learning and generative AI applications are fundamentally based on data. Therefore, responsible AI requires high-quality data. Inaccurate or incomplete data can lead to biased outcomes. Remember, technology often reflects existing societal biases. Without careful consideration, AI can amplify these biases, leading to unfair and discriminatory results. Beyond data quality, it's crucial to consider the responsible use of the data itself. Was it collected consensually? Could it perpetuate harmful biases?
+AI systems are not independent of the world they are built in. They can inherit and amplify existing societal biases. This can lead to unfair outcomes, such as a resume-screening tool that favors a certain demographic of candidates due to historical biases in hiring data. It's like training a dog with biased commands; the dog will learn and replicate those biases. To counter this, fairness must be a core principle in AI development.
+Fairness requires accountability. We need to know who is responsible for the AI's actions and understand how it makes decisions. This is where explainability comes in. Explainable AI makes the decision-making processes of AI models transparent and understandable. This is crucial for building trust, debugging errors, and uncovering hidden biases. Think of it like a judge explaining their verdict; without a clear explanation, it's hard to trust the decision. Tools like Google Cloud’s Vertex Explainable AI can help understand model outputs and identify potential biases. Understanding how your application uses and interprets the AI's output is crucial for ensuring responsible use.
+
+Layers of Gen AI :
+1. Gen AI powered application : This is the layer that delivers the AI capability to users through interfaces.
+2. Agent : This layer utilizes the capabilities of the model layer to perform more complex actions. This layer interacts with the environment, gathers information and makes decisions and executes actions based on the information received.
+3. Platform : This is the layer that consists of tools and services that help with building and deploying AI models. This includes model training platforms like Vertex AI and data management tools.
+4. Model : The model is where the brains of the AI system reside. It comprises various algorithms that learn patterns from data and can make predictions or generate new content. Examples are large language models (LLMs) like Gemini, image recognition models, and recommendation systems.
+5. Infrastructure : The foundation of any AI system, comprising the hardware (physical servers, cloud computing resources, specialized chips like GPUs and TPUs) and software (operating systems, networking) that provide the necessary computing power, storage, and connectivity to train, deploy, and scale AI models.
+
+A gen AI agent is an application that tries to achieve a goal by observing the world and acting upon it using the tools it has at its disposal.With generative AI, you have the flexibility to leverage either pre-built agents and applications, or create custom ones tailored to your specific needs. No matter which path you choose, you can apply generative AI's capabilities in a way that best aligns with your objectives.Think of gen AI powered applications as the user-facing layer. They provide the structure and context for agents to operate within. They define the user interface, the overall goals, and the specific tasks that agents will help with. Often, multiple agents with different specializations work together within a single application to create a richer, more dynamic user experience. This is known as a multi-agent system. You can review some examples below.
+Conversational agents are designed to understand what you mean, not just what you say, and respond in a way that makes sense. You provide input: You can type a message or speak to the agent.
+The agent understands: Using powerful AI, it figures out the meaning and intention behind your words.
+The agent calls a tool: Based on your request, the agent might need to gather additional information or perform an action. This could involve searching the web, accessing a database, or interacting with another software application.
+The agent generates a response: It formulates an answer that's relevant to your request and sounds natural.
+The agent delivers the response: You'll see or hear the answer depending on how you interacted with it.
+
+Workflow agents are designed to streamline your work and make sure things get done efficiently and correctly by automating tasks or going through complex processes.
+You provide input: You define a task or trigger a process like submitting a form, uploading a file, initiating a scheduled event, or even ordering a product online.
+The agent understands: The agent is the software that automates those steps. It interprets the task's requirements and defines the series of steps needed to complete the task.
+The agent calls a tool: Based on the workflow's definition, the agent executes a series of actions. This could involve data transformation, file transfer, sending notifications, integrating with external systems, or initiating other automated processes using APIs.
+The agent generates a result/output: It compiles the outcome of the executed actions, which might be a report, a data file, a confirmation message, or an updated status within a system.
+The agent delivers the result/output: The agent delivers the output to the designated recipient(s) or system(s), such as via email, a dashboard, a database update, or a file storage location.
+
+Platform layer (Vertex AI):The platform layer provides the foundation for building and scaling your AI initiatives. Vertex AI is Google Cloud's unified machine learning (ML) platform designed to streamline the entire ML workflow. It provides the infrastructure, tools, and pre-trained models you need to build, deploy, and manage your ML and generative AI solutions.Vertex AI simplifies the complexities of machine learning, making it easier to build and deploy AI solutions. Its unified platform, comprehensive tooling, and MLOps capabilities empower developers and data scientists to innovate and accelerate their AI initiatives.
+
+Model layer : At the heart of every AI and machine learning system lies the model. Think of it as the brain of the operation. These aren't just any algorithms. They're sophisticated mathematical structures trained on massive amounts of data. This training process allows them to learn patterns and relationships, ultimately enabling them to perform a wide range of tasks, such as generating content, analyzing data, and classifying information.Within the Vertex AI platform, you have multiple options for how to handle AI models for your project. You can choose to build a model from scratch or use an existing model.
+Use models with Model Garden : For many use cases, your organization won’t need to develop a new model. There are many AI models that already exist today that you can fine-tune and leverage for so many different use cases. Model Garden on Vertex AI is a service that lets you discover, customize, and deploy existing models from Google and Google partners.Model Garden gives you options to pick from over 160 models and offers options of Google models, third-party models, and open-source models. With Vertex AI, you can customize these models with your own data and deploy them to your custom applications. Additionally, some pre-trained models can be used out-of-the-box without tuning.
+With Vertex AI, you have two options for training and using your own models. You can go fully custom and create and train models at scale using any ML framework (PyTorch, TensorFlow, scikit-learn, or XGBoost), or there are also options for using AutoML to create and train models with minimal technical knowledge and effort.
+AutoML allows you to build these types of models:
+Data type	Supported objectives
+Image data	Classification, object detection.
+Video data	Action recognition, classification, object tracking.
+Tabular data	Classification/regression, forecasting.
+
+Follow this standard workflow when creating your models in Vertex AI.
+
+1. Gather your data: Determine the data you need for training and testing your model based on the outcome you want to achieve.
+2. Prepare your data : Make sure your data is properly formatted and labeled.
+3. Train : Set parameters and build your model.
+4. Manage your model : Review model metrics to evaluate the model’s performance and monitor changes over time.
+5. Deploy and predict : Make your model available to use.
+
+The infrastructure layer: The "infrastructure layer" is the foundation upon which any AI system is built. It's the combination of hardware and software that provides the necessary computing power, storage, and networking capabilities to train, deploy, and scale AI models. This layer is crucial for handling the massive datasets and complex computations involved in modern AI, especially with the rise of large language models and generative AI.Google has invested heavily in building a robust and cutting-edge AI infrastructure, designed to handle the most demanding AI workloads. Here are some key components.
+GPU's and TPU's : These specialized processors are the workhorses of AI. They excel at parallel processing, or doing multiple things at once, which is crucial for training large neural networks quickly and efficiently. GPUs were originally designed for graphics rendering, but since they offer general-purpose parallel processing power they’ve increasingly been used in the AI domain. TPUs are Google's custom-designed chips specifically optimized for AI tasks.
+Hypercomputers: A hypercomputer is essentially a supercomputer built by connecting many individual computers (nodes) together. These nodes contain GPUs and TPUs. By linking them with high-speed networks, they work together as one massive computing unit. They provide the massive scale necessary for training and running the most demanding generative AI models.
+
+Networking : Fast and efficient communication is essential for coordinating the work all of the processors in a high performance computing cluster are undertaking. Google's global fiber network provides high-bandwidth, low-latency connectivity, ensuring smooth data flow and efficient communication between different parts of the AI infrastructure.Using Google Cloud infrastructure can benefit teams in several ways, particularly with respect to scalability, performance, and cost-effectiveness.
+
+Pricing metrics for using models: 
+1. Characters: Some providers, like Google, charge based on the number of characters processed.
+2. Tokens: A token represents a piece of text, like a word or part of a word.
+3. Requests: Sometimes you can be charged per request, regardless of the complexity or volume of the task.
+4. Compute time: The time taken to process your requests can also factor into the cost, especially for resource-intensive tasks.
+
+Factors affecting cost 
+1. Model size and complexity: Larger, more capable models generally cost more.
+2. Context window: A larger context window (the amount of text the model can consider) can increase costs.
+3. Features: Specialized features like fine-tuning or embedding can have separate pricing.
+4. Deployment: Depending on where you deploy your model and application, you may have compute based costs.
+
+Google Workspace is a collection of cloud-based productivity and collaboration tools that help people create, communicate, and collaborate, such as Gmail, Google Docs, Google Sheets, Google Meet, and Google Slides.
+You learned about the Gemini app, but remember, Gemini is a gen AI model that is then used in many other applications. Some of those applications were built in Google Workspace, so you can access Gemini directly within your Workspace apps through Google Workspace with Gemini. Depending on your version of Google Workspace, you may have access to a different range of features and security protections
+Google Workspace business and enterprise licenses come with extra enterprise-grade data protection for your organization. These protections extend to the Google Workspace with Gemini features and the Gemini app (with Gemini Advanced). The licenses also come with administrative features for managing your organization's usage and access.
+
+Prompting techniques
+Using examples in your prompts: When it comes to prompting techniques, there are a few different approaches. 
+Zero-shot prompting is like asking a foundation model to complete a task with no prior examples, relying solely on its existing knowledge. 
+One-shot prompting involves showing the foundation model just one example, allowing it to learn and apply that knowledge to similar situations. 
+Few-shot prompting, on the other hand, provides the foundation model with multiple examples to learn from, which helps it better understand the task and improve its performance.
+
+Role prompting
+Role prompting is a technique used to guide the behavior of LLMs by assigning them a specific role or persona. This can be anything from a business analyst or Shakespearean actor to a helpful customer service agent. By instructing the model to adopt a particular role, you influence the style, tone, and focus of its responses.
+
+Prompt chaining is a powerful technique for getting more complex and nuanced results from large language models like Gemini. It's like having a conversation with the AI where each response builds upon the previous one, leading to a more sophisticated and refined outcome. This is where the concept of a chatbot comes in. You can have a back and forth with Gemini.Prompt chaining is a technique for refining AI outputs by building on previous prompts. Instead of trying to achieve the final result in a single request, start with a broad, initial prompt. Then, use subsequent prompts to ask clarifying questions, provide more specific information, or request a different format to refine the AI's output incrementally until it meets the desired goal.
+
+Reusing prompts: You may already find yourself reusing prompts or parts of prompts in your day-to-day workflow. As a start, you can save these prompts as templates in a document somewhere like a Google Doc and a Google Sheet.
+
+Gemini Advanced is an upgraded version of Gemini with extra features, making it far more capable at highly complex tasks, like coding, logical reasoning, following nuanced instructions, and creative collaboration. You can adjust your data retention settings to determine how long information is stored and delete your conversation history at any time.
+
+Like agents, these AI assistants can process information and reason over complex ideas within the context of your chosen task. You can have Gems dedicated to:
+Creative writing: This Gem could be pre-loaded with your preferred writing style, tone, and commonly used resources. It could even help you brainstorm ideas, generate different creative text formats (poems, scripts, articles), and provide feedback on your drafts.
+Coding: A coding Gem could be equipped with your favorite libraries, coding conventions, and even access to relevant documentation. It could assist with debugging, suggest code optimizations, and even generate code snippets based on your instructions.
+Marketing: This Gem could be pre-loaded with your target audience demographics, competitor information, and campaign performance data. It could help you brainstorm campaign ideas, generate different marketing copy (social media posts, email newsletters, website content), analyze campaign performance, and suggest optimizations.
+
+Gems can be tailored with specific instructions and information. This allows them to provide responses that are more relevant to your needs and preferences within that particular use case.Gems can help you streamline repetitive tasks by providing templates, prompts, or guided interactions. This can save you time and effort when working on familiar projects or activities.
+
+Grounding refers to the ability of the AI model to connect its output to verifiable and specific sources of information. This is a critical aspect of building trust and reliability in AI systems. This is something you can already do in a Gem or Gemini prompt with no coding at all to improve accuracy and relevance to the task you need your agent to solve.
+For example, you can create a Gemini prompt that helps you refine your writing by editing your text to meet your organization’s specific guidelines and standards. You can provide Gemini with resources, such as your company’s style guides within the prompt itself, or by uploading relevant files.By grounding with this additional information, you provide the AI model with a richer context. This can lead to more accurate and insightful results.
+
+RAG empowers AI models to go beyond simply memorizing information and instead learn to effectively access and utilize external knowledge sources to generate more insightful and reliable outputs.Improved accuracy and relevance: By accessing and utilizing relevant information directly, RAG models can produce more accurate and informative outputs.Improved explainability and transparency: RAG can increase transparency and trust in the AI system by showing the specific sources used to generate the output, ensuring that claims can be checked for accuracy. Extending LLM capabilities: RAG can constrain the output from an LLM so that it only generates a response based on the specific context it was provided. 
+
+NotebookLM is an AI-first notebook, grounded in your own documents, designed to help you gain insights faster. It’s a unique tool that is built using Gemini models and is designed to help you learn and understand information better by acting as a virtual research assistant. You can "ground" NotebookLM in specific sources like documents, presentations, or even audio and video files. This means your AI assistant will only use information from those sources to answer your questions and generate summaries.
+NotebookLM Plus:For users who want to take their research to the next level, there's NotebookLM Plus, a subscription plan that offers benefits like increased capacity, customization of response length and style, and usage analytics. 
+NotebookLM Enterprise:NotebookLM Enterprise takes NotebookLM Plus to the next level by adding compliance and administrative features necessary for enterprise environments. This includes extra privacy and security features to give you enhanced control over your data. Your notebook information is only shared with your chosen collaborators, and you can manage access using predefined identity and access management (IAM) roles
+
+NotebookLM versus Gems
+Hyper-focused knowledge: Instead of drawing from a broad knowledge base, NotebookLM focuses solely on the sources you provide. This could be anything from research papers and articles to meeting notes and presentations.
+Interactive learning: NotebookLM goes beyond simply summarizing information. It encourages active learning by allowing you to ask questions, generate different types of summaries, and even create quizzes to test your understanding.
+Source-based answers: Every answer and insight provided by NotebookLM is directly grounded in your uploaded sources. This ensures accuracy and allows you to easily trace back to the original information. If you ask NotebookLM a question that isn't covered in the materials you've provided, it will honestly tell you that it can't answer. It won't invent information or speculate. This ensures that the information you get is always grounded in your sources and reliable.
+
+Generative AI Agents:
+
+Components of an agent:
+1. Foundational model : This is the underlying language model (LLM) that powers the agent. It could be a small or large language model, a Google model like Gemini, or a model from another provider. The key is to select a model with training data relevant to the agent's intended use case.
+2. Tools : ools enable the agent to interact with the outside world. These can include extensions that connect to APIs, functions that act as mock API calls, and data stores like vector databases. Tools allow the agent to not only observe the world but also act upon it.
+3. Reasoning Loop: This is the core of the agent, responsible for making decisions and taking actions. It's an iterative process where the agent considers its goal, the available tools, and the information it has gathered. Frameworks like ReAct (Reason and Act) are commonly used to guide the reasoning process.
+
+Sampling parameters and settings
+Sampling parameters act as settings that influence the AI model's behavior, giving you more customized results. Think of these as knobs and dials you can adjust with your prompt input to impact the model's output. By tweaking these settings, you can ensure the model's output aligns with your specific needs, whether it's generating more creative text, providing more concise summaries, or staying within a certain tone.
+The most common parameters you can adjust are
+1. Token count : Think of tokens as the basic building blocks of text for the model. Rather than reading whole sentences at once, the model breaks text down into these chunks. A token can be a whole word, part of a word, or even a single space or punctuation mark.Models have limits on how many tokens they can handle. A higher token count allows for longer conversations but requires more processing power. As a rule of thumb, one token is roughly four characters in English. So, 100 tokens are about 60 to 80 words.
+2. Temperature : This parameter controls the "creativity" of the model, because it adjusts the randomness of word choices during text generation, influencing the diversity and unpredictability of the output. A higher temperature makes the output more random and unpredictable, while a lower temperature makes it more focused, deterministic and repeatable.
+3. Top-p (nucleus sampling) : "Top-p" stands for the cumulative probability of the most likely tokens considered during text generation. This is another way to control the randomness of the model's output. It concentrates the probability on the most likely tokens, making the output more coherent and relevant. A lower top-p value leads to more focused responses (i.e. only the most probable tokens), while a higher value allows for more diversity (i.e. extending to lower probability tokens as well).
+4. Safety settings : These settings allow you to filter out potentially harmful or inappropriate content from the model's output. You can adjust the level of filtering based on your specific needs and preferences.
+5. Output length : This determines the maximum length of the generated text. You can set it to a specific number of words or characters or allow the model to generate text until it reaches a natural stopping point.
+
+Google’s generative AI APIs : Google’s generative AI APIs offer pre-trained large language models that can be fine-tuned for specific tasks. These APIs include capabilities for text completion, multi-turn chat, code generation, and image generation. For example, the Imagen API can be used to generate and customize images.
+Google AI Studio : Google AI Studio is a web-based tool that allows developers, students, and researchers to try Gemini models and begin building with the Gemini Developer API. It is designed for ease of use and accessibility, targeting a broad audience, including non-technical users who want to leverage AI capabilities without deep expertise in machine learning.
+Vertex AI Studio : Vertex AI Studio is a Google Cloud console tool for rapidly prototyping and testing generative AI models. It provides developers with a space to test models using prompt samples, design and save prompts, and tune foundation models.
+
+The reasoning loop
+The reasoning loop is a key component of a generative AI agent that governs how the agent takes in information, performs internal reasoning, and uses that reasoning to inform its next action or decision. It is an iterative, introspective process that continues until the agent achieves its goal or reaches a stopping point. The complexity of the reasoning loop can vary greatly depending on the agent and the task it is performing.
+the key aspects of the reasoning loop:
+1. Iterative process: The reasoning loop is not a one-time operation, but rather a cyclical process where the agent continuously evaluates its progress and determines the next best action to take. This loop involves steps for action, tool selection, and observation.
+2. Internal reasoning : The agent uses its underlying language model to think through the steps it needs to take to complete a task. The language model provides the agent with reasoning and logic capabilities.
+2. Decision making : Based on its internal reasoning, the agent decides on the next course of action. This involves choosing the appropriate tools to use and determining the necessary inputs for those tools.
+4. Reasoning frameworks : The reasoning loop utilizes various prompt engineering frameworks and techniques to guide its reasoning and planning.
+
+Prompt engineering techniques
+There are many different prompting techniques that one can use, but we will highlight two of the most common for this course: ReAct prompting and chain-of-thought (CoT) prompting.
+1. ReAct prompting: ReAct, which stands for "reasoning and acting," is like giving an LLM a brain and a pair of hands. It allows the LLM to not only think about a problem but also take actions to solve it. This is a big step up from traditional prompting, where the LLM could only passively generate text. It does all of think , act , observe , respond opeartions.
+Why is ReAct important?Dynamic problem solving: ReAct allows LLMs to tackle complex tasks that require interacting with external resources and adapting to new information.Reduced hallucination: By grounding the LLM's reasoning in real-world data, ReAct can help reduce the risk of generating incorrect or nonsensical information.Increased trustworthiness: The ability to see the LLM's reasoning process and how it interacts with external sources makes its responses more transparent and trustworthy.
+Key components of ReAct
+Think: The LLM generates a thought about the problem, similar to CoT.
+Act: The LLM decides what action to take, such as searching the web, accessing a database, or using a specific tool; the LLM specifies the input for the action, like a search query or database command.
+Observe: The LLM receives feedback from the action, such as search results or database entries.
+Respond: The LLM generates a response, which could involve providing an answer to the user, taking further actions, or formulating a new thought for the next iteration.
+
+2. Chain-of-thought (CoT)
+Remember prompt chaining? Where you keep prompting in the same thread so the LLM keeps your chat history and learns more as you go? Well, you can do something very similar behind the scenes for your user using chain-of-thought (CoT) prompting. CoT enables reasoning capabilities through intermediate steps. Think of CoT as a way to make LLMs even smarter by teaching them to think step-by-step, just like a human would. Instead of just giving the LLM a prompt and expecting an answer, you guide it through the reasoning process. You provide examples of how to solve similar problems, showing the steps involved. This helps the LLM learn to approach problems in a more logical and structured way. It is similar to teaching a student to think out loud. You're teaching the LLM to think out loud. By showing it the intermediate steps, you're helping it develop a "chain of thought" that leads to the correct answer.
+CoT is a powerful technique that helps LLMs think a bit more like humans. By guiding them through the reasoning process, we can unlock their full potential and achieve even more impressive results.
+Improved reasoning: CoT helps LLMs solve complex problems that require logical thinking.
+Better accuracy: By breaking down problems into smaller steps, CoT can lead to more accurate results.
+Enhanced explainability: CoT makes it easier to understand how the LLM arrived at an answer, which is important for building trust and transparency.
+
+Key components of CoT : Just like there are different ways to solve a problem, there are different ways to implement CoT. Some popular techniques include:
+Self-consistency: Encouraging the LLM to generate multiple solutions and choose the most consistent one.
+Active-prompting: Allowing the LLM to ask clarifying questions or request additional information.
+Multimodal CoT: Combining text with other forms of data, like images or videos, to enhance reasoning.
+
+Types of agent tools
+Agent tooling equips agents with the resources they need to be effective. Think of it as providing the agent with the right skills, connections, and knowledge to achieve its goals. These tools allow agents to access information, perform actions, and interact with various systems.
+We can categorize agent tools into four key types.
+1. Extensions (APIs) : Extensions bridge the gap between an agent and external APIs. APIs (application programming interfaces) are sets of rules that govern how software interacts. Extensions provide a standardized way for agents to use APIs, regardless of the API's specific design. This simplifies API interaction, making it easier for agents to access external services and data.
+2. Functions : Functions are like specialized tools within the agent's toolbox. They represent specific actions the agent can perform. An agent's reasoning system selects the appropriate function based on the task at hand. Functions can encapsulate complex logic or interactions, making them reusable and manageable
+3. Data stores : Data stores provide agents with access to information. This can include real-time data, historical data, or knowledge bases. Data stores ensure that the agent's responses are accurate, relevant, and up-to-date.
+4. Plugins : Plugins extend the agent's capabilities by adding new skills or integrations. They can connect the agent to specific services, provide access to specialized tools, or enable interaction with particular platforms.
+
+A key strength of Vertex AI Search lies in its ability to ground gen AI LLM responses with your first-party data, curated third-party data, and even Google's knowledge graph (Grounding with Google Search), minimizing "hallucinations" and ensuring trustworthy information.This grounding is where the connection to RAG comes in. By using your own data sources as the foundation for LLM responses, Vertex AI Search implements a RAG approach, ensuring that the information provided is relevant, accurate, and grounded in the context of your specific data.
+
+Vertex AI Search also gives you the options of adding extra generative AI features to your search functionality.Search summaries: Vertex AI Search can generate concise and informative summaries of search results, saving users time and effort. These summaries can be tailored to different needs, providing a quick overview of a document, a comparison of multiple products, or a synthesis of key findings from a set of search results. Answers and follow ups: Vertex AI Search can add AI generated answers to your search results. Users can ask questions in natural language to your website’s search and get AI generated answers based on the search results. Users can then follow up with further questions.
+
+Vertex AI Search is built for enterprise and offers granular access controls to help ensure data security. It also provides advanced analytics to understand search trends and user behavior and scalable infrastructure to handle large volumes of data and search requests. It's designed to meet the demanding requirements of organizations of all sizes. Vertex AI Search is built to easily integrate with existing enterprise systems through APIs and SDKs. Whether you're building a customer-facing search experience or an internal knowledge base for employees, Vertex AI Search can be seamlessly integrated into your workflow.

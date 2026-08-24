@@ -1,0 +1,25 @@
+1) gRPC 
+2) Different transaction propagation
+3) ACID
+4) How will you ensure immutability if the corresponding variable is mutable
+5) Aggregation vs composition
+6) Kafka zookeeper , consumer group , partiton key
+7) Can you convert .class to .java
+8) DSA time complexity of different DSA
+9) Stream problem find factorial , find distinct (without set)
+10) Find frequency of character without Map
+12) Max elements towards right of array
+11) Pairs in array whose difference is a perfect square
+12) Spring boot annotation , explain JPA 
+13) Thread wait , notify notifyall , thread lifecycle , runnable callable
+14) Permutation of all characters in a string
+15) Find managers of an employee where manager data and employee data are in same table
+16) 5th highest salary in each dept
+17) Query to return name and salary of all employee whose salary is greater than "Rita"
+18) Bean lifecycle
+20) Stream all operations map flatMap filter collect
+21) JPA transaction propagation
+22) System design (realtime scenario)
+23) Stream question to sort , collect group employee data based on department
+24) React.js lifecycle hook and functional components
+25) Javascript async , promise , simple coding problem (reverse a string , pallindrome check)

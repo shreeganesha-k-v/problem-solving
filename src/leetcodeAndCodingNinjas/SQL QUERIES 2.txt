@@ -1,0 +1,1646 @@
+Table: Visits
++-------------+---------+
+| Column Name | Type    |
++-------------+---------+
+| visit_id    | int     |
+| customer_id | int     |
++-------------+---------+
+visit_id is the column with unique values for this table.This table contains information about the customers who visited the mall.
+Table: Transactions
++----------------+---------+
+| Column Name    | Type    |
++----------------+---------+
+| transaction_id | int     |
+| visit_id       | int     |
+| amount         | int     |
++----------------+---------+
+transaction_id is column with unique values for this table.This table contains information about the transactions made during the visit_id.Write a solution to find the IDs of the users who visited without making any transactions and the number of times they made these types of visits.Return the result table sorted in any order.The result format is in the following example.
+Example 1:Input: Visits
++----------+-------------+
+| visit_id | customer_id |
++----------+-------------+
+| 1        | 23          |
+| 2        | 9           |
+| 4        | 30          |
+| 5        | 54          |
+| 6        | 96          |
+| 7        | 54          |
+| 8        | 54          |
++----------+-------------+
+Transactions
++----------------+----------+--------+
+| transaction_id | visit_id | amount |
++----------------+----------+--------+
+| 2              | 5        | 310    |
+| 3              | 5        | 300    |
+| 9              | 5        | 200    |
+| 12             | 1        | 910    |
+| 13             | 2        | 970    |
++----------------+----------+--------+
+Output: 
++-------------+----------------+
+| customer_id | count_no_trans |
++-------------+----------------+
+| 54          | 2              |
+| 30          | 1              |
+| 96          | 1              |
++-------------+----------------+
+Explanation: 
+Customer with id = 23 visited the mall once and made one transaction during the visit with id = 12.
+Customer with id = 9 visited the mall once and made one transaction during the visit with id = 13.
+Customer with id = 30 visited the mall once and did not make any transactions.
+Customer with id = 54 visited the mall three times. During 2 visits they did not make any transactions, and during one visit they made 3 transactions.
+Customer with id = 96 visited the mall once and did not make any transactions.
+As we can see, users with IDs 30 and 96 visited the mall one time without making any transactions. Also, user 54 visited the mall twice and did not make any transactions.
+
+SELECT v.customer_id , count(*) as count_no_trans 
+FROM Visits v
+LEFT JOIN Transactions t ON t.visit_id = v.visit_id
+WHERE t.transaction_id IS NULL
+GROUP BY v.customer_id 
+ORDER BY count_no_trans DESC
+==========================================================================================================================
+Table: Activity
++----------------+---------+
+| Column Name    | Type    |
++----------------+---------+
+| machine_id     | int     |
+| process_id     | int     |
+| activity_type  | enum    |
+| timestamp      | float   |
++----------------+---------+
+The table shows the user activities for a factory website.(machine_id, process_id, activity_type) is the primary key (combination of columns with unique values) of this table.machine_id is the ID of a machine.process_id is the ID of a process running on the machine with ID machine_id.activity_type is an ENUM (category) of type ('start', 'end').timestamp is a float representing the current time in seconds.'start' means the machine starts the process at the given timestamp and 'end' means the machine ends the process at the given timestamp.The 'start' timestamp will always be before the 'end' timestamp for every (machine_id, process_id) pair.It is guaranteed that each (machine_id, process_id) pair has a 'start' and 'end' timestamp.There is a factory website that has several machines each running the same number of processes. Write a solution to find the average time each machine takes to complete a process.The time to complete a process is the 'end' timestamp minus the 'start' timestamp. The average time is calculated by the total time to complete every process on the machine divided by the number of processes that were run.The resulting table should have the machine_id along with the average time as processing_time, which should be rounded to 3 decimal places.Return the result table in any order.The result format is in the following example.
+Example 1:Input: Activity table:
++------------+------------+---------------+-----------+
+| machine_id | process_id | activity_type | timestamp |
++------------+------------+---------------+-----------+
+| 0          | 0          | start         | 0.712     |
+| 0          | 0          | end           | 1.520     |
+| 0          | 1          | start         | 3.140     |
+| 0          | 1          | end           | 4.120     |
+| 1          | 0          | start         | 0.550     |
+| 1          | 0          | end           | 1.550     |
+| 1          | 1          | start         | 0.430     |
+| 1          | 1          | end           | 1.420     |
+| 2          | 0          | start         | 4.100     |
+| 2          | 0          | end           | 4.512     |
+| 2          | 1          | start         | 2.500     |
+| 2          | 1          | end           | 5.000     |
++------------+------------+---------------+-----------+
+Output: 
++------------+-----------------+
+| machine_id | processing_time |
++------------+-----------------+
+| 0          | 0.894           |
+| 1          | 0.995           |
+| 2          | 1.456           |
++------------+-----------------+
+Explanation: 
+There are 3 machines running 2 processes each.
+Machine 0's average time is ((1.520 - 0.712) + (4.120 - 3.140)) / 2 = 0.894
+Machine 1's average time is ((1.550 - 0.550) + (1.420 - 0.430)) / 2 = 0.995
+Machine 2's average time is ((4.512 - 4.100) + (5.000 - 2.500)) / 2 = 1.456
+
+SELECT 
+    machine_id,
+    ROUND(AVG(end_time - start_time), 3) AS processing_time
+FROM (
+    SELECT 
+        machine_id,
+        process_id,
+        MAX(CASE WHEN activity_type = 'start' THEN timestamp END) AS start_time,
+        MAX(CASE WHEN activity_type = 'end' THEN timestamp END) AS end_time
+    FROM Activity
+    GROUP BY machine_id, process_id
+) AS process_durations
+GROUP BY machine_id;
+==========================================================================================================================================================
+Table: Users
++-------------+---------+
+| Column Name | Type    |
++-------------+---------+
+| user_id     | int     |
+| user_name   | varchar |
++-------------+---------+
+user_id is the primary key (column with unique values) for this table.Each row of this table contains the name and the id of a user.
+Table: Register
++-------------+---------+
+| Column Name | Type    |
++-------------+---------+
+| contest_id  | int     |
+| user_id     | int     |
++-------------+---------+
+(contest_id, user_id) is the primary key (combination of columns with unique values) for this table.Each row of this table contains the id of a user and the contest they registered into.Write a solution to find the percentage of the users registered in each contest rounded to two decimals.Return the result table ordered by percentage in descending order. In case of a tie, order it by contest_id in ascending order.The result format is in the following example.
+Example 1:Input: Users table:
++---------+-----------+
+| user_id | user_name |
++---------+-----------+
+| 6       | Alice     |
+| 2       | Bob       |
+| 7       | Alex      |
++---------+-----------+
+Register table:
++------------+---------+
+| contest_id | user_id |
++------------+---------+
+| 215        | 6       |
+| 209        | 2       |
+| 208        | 2       |
+| 210        | 6       |
+| 208        | 6       |
+| 209        | 7       |
+| 209        | 6       |
+| 215        | 7       |
+| 208        | 7       |
+| 210        | 2       |
+| 207        | 2       |
+| 210        | 7       |
++------------+---------+
+Output: 
++------------+------------+
+| contest_id | percentage |
++------------+------------+
+| 208        | 100.0      |
+| 209        | 100.0      |
+| 210        | 100.0      |
+| 215        | 66.67      |
+| 207        | 33.33      |
++------------+------------+
+Explanation: 
+All the users registered in contests 208, 209, and 210. The percentage is 100% and we sort them in the answer table by contest_id in ascending order.
+Alice and Alex registered in contest 215 and the percentage is ((2/3) * 100) = 66.67%
+Bob registered in contest 207 and the percentage is ((1/3) * 100) = 33.33%
+
+SELECT
+    r.contest_id,
+    ROUND(COUNT(DISTINCT r.user_id) * 100.0 / (SELECT COUNT(*) FROM Users), 2) AS percentage
+FROM Register r
+GROUP BY r.contest_id
+ORDER BY percentage DESC, r.contest_id ASC;
+===================================================================================================================================
+Table: Signups
++----------------+----------+
+| Column Name    | Type     |
++----------------+----------+
+| user_id        | int      |
+| time_stamp     | datetime |
++----------------+----------+
+user_id is the column of unique values for this table.Each row contains information about the signup time for the user with ID user_id.
+Table: Confirmations
++----------------+----------+
+| Column Name    | Type     |
++----------------+----------+
+| user_id        | int      |
+| time_stamp     | datetime |
+| action         | ENUM     |
++----------------+----------+
+(user_id, time_stamp) is the primary key (combination of columns with unique values) for this table.user_id is a foreign key (reference column) to the Signups table.action is an ENUM (category) of the type ('confirmed', 'timeout')Each row of this table indicates that the user with ID user_id requested a confirmation message at time_stamp and that confirmation message was either confirmed ('confirmed') or expired without confirming ('timeout').The confirmation rate of a user is the number of 'confirmed' messages divided by the total number of requested confirmation messages. The confirmation rate of a user that did not request any confirmation messages is 0. Round the confirmation rate to two decimal places.Write a solution to find the confirmation rate of each user.Return the result table in any order.The result format is in the following example.
+Example 1:Input: Signups table:
++---------+---------------------+
+| user_id | time_stamp          |
++---------+---------------------+
+| 3       | 2020-03-21 10:16:13 |
+| 7       | 2020-01-04 13:57:59 |
+| 2       | 2020-07-29 23:09:44 |
+| 6       | 2020-12-09 10:39:37 |
++---------+---------------------+
+Confirmations table:
++---------+---------------------+-----------+
+| user_id | time_stamp          | action    |
++---------+---------------------+-----------+
+| 3       | 2021-01-06 03:30:46 | timeout   |
+| 3       | 2021-07-14 14:00:00 | timeout   |
+| 7       | 2021-06-12 11:57:29 | confirmed |
+| 7       | 2021-06-13 12:58:28 | confirmed |
+| 7       | 2021-06-14 13:59:27 | confirmed |
+| 2       | 2021-01-22 00:00:00 | confirmed |
+| 2       | 2021-02-28 23:59:59 | timeout   |
++---------+---------------------+-----------+
+Output: 
++---------+-------------------+
+| user_id | confirmation_rate |
++---------+-------------------+
+| 6       | 0.00              |
+| 3       | 0.00              |
+| 7       | 1.00              |
+| 2       | 0.50              |
++---------+-------------------+
+Explanation: 
+User 6 did not request any confirmation messages. The confirmation rate is 0.
+User 3 made 2 requests and both timed out. The confirmation rate is 0.
+User 7 made 3 requests and all were confirmed. The confirmation rate is 1.
+User 2 made 2 requests where one was confirmed and the other timed out. The confirmation rate is 1 / 2 = 0.5.
+
+WITH stats AS (
+    SELECT 
+        user_id,
+        COUNT(*) AS total,
+        SUM(CASE WHEN action = 'confirmed' THEN 1 ELSE 0 END) AS confirmed
+    FROM Confirmations
+    GROUP BY user_id
+)
+
+SELECT 
+    s.user_id,
+    ROUND(COALESCE(1.0 * st.confirmed / st.total, 0), 2) AS confirmation_rate
+FROM Signups s
+LEFT JOIN stats st ON s.user_id = st.user_id;
+==============================================================================================================================================
+Table: Delivery
++-----------------------------+---------+
+| Column Name                 | Type    |
++-----------------------------+---------+
+| delivery_id                 | int     |
+| customer_id                 | int     |
+| order_date                  | date    |
+| customer_pref_delivery_date | date    |
++-----------------------------+---------+
+delivery_id is the column of unique values of this table.The table holds information about food delivery to customers that make orders at some date and specify a preferred delivery date (on the same order date or after it).If the customer's preferred delivery date is the same as the order date, then the order is called immediate; otherwise, it is called scheduled.The first order of a customer is the order with the earliest order date that the customer made. It is guaranteed that a customer has precisely one first order.Write a solution to find the percentage of immediate orders in the first orders of all customers, rounded to 2 decimal places.The result format is in the following example.
+Example 1:Input: Delivery table:
++-------------+-------------+------------+-----------------------------+
+| delivery_id | customer_id | order_date | customer_pref_delivery_date |
++-------------+-------------+------------+-----------------------------+
+| 1           | 1           | 2019-08-01 | 2019-08-02                  |
+| 2           | 2           | 2019-08-02 | 2019-08-02                  |
+| 3           | 1           | 2019-08-11 | 2019-08-12                  |
+| 4           | 3           | 2019-08-24 | 2019-08-24                  |
+| 5           | 3           | 2019-08-21 | 2019-08-22                  |
+| 6           | 2           | 2019-08-11 | 2019-08-13                  |
+| 7           | 4           | 2019-08-09 | 2019-08-09                  |
++-------------+-------------+------------+-----------------------------+
+Output: 
++----------------------+
+| immediate_percentage |
++----------------------+
+| 50.00                |
++----------------------+
+Explanation: 
+The customer id 1 has a first order with delivery id 1 and it is scheduled.
+The customer id 2 has a first order with delivery id 2 and it is immediate.
+The customer id 3 has a first order with delivery id 5 and it is scheduled.
+The customer id 4 has a first order with delivery id 7 and it is immediate.
+Hence, half the customers have immediate first orders.
+
+SELECT
+  ROUND(
+    100.0 * SUM(CASE WHEN order_date = customer_pref_delivery_date THEN 1 ELSE 0 END) 
+    / COUNT(*), 
+    2
+  ) AS immediate_percentage
+FROM Delivery
+WHERE (customer_id, order_date) IN (
+  SELECT customer_id, MIN(order_date)
+  FROM Delivery
+  GROUP BY customer_id
+);
+================================================================================================================
+To copy one table with both schema and data to another table in SQL
+
+SELECT * INTO new_table FROM original_table; (SQL Server) all these copies only columns and data and not the constraints
+
+CREATE TABLE new_table AS SELECT * FROM original_table; (Oracle)
+====================================================================================================================
+Table: Employees
++-------------+----------+
+| Column Name | Type     |
++-------------+----------+
+| employee_id | int      |
+| name        | varchar  |
+| reports_to  | int      |
+| age         | int      |
++-------------+----------+
+employee_id is the column with unique values for this table.This table contains information about the employees and the id of the manager they report to. Some employees do not report to anyone (reports_to is null). For this problem, we will consider a manager an employee who has at least 1 other employee reporting to them.Write a solution to report the ids and the names of all managers, the number of employees who report directly to them, and the average age of the reports rounded to the nearest integer.Return the result table ordered by employee_id.The result format is in the following example.
+Example 1:Input: Employees table:
++-------------+---------+------------+-----+
+| employee_id | name    | reports_to | age |
++-------------+---------+------------+-----+
+| 9           | Hercy   | null       | 43  |
+| 6           | Alice   | 9          | 41  |
+| 4           | Bob     | 9          | 36  |
+| 2           | Winston | null       | 37  |
++-------------+---------+------------+-----+
+Output: 
++-------------+-------+---------------+-------------+
+| employee_id | name  | reports_count | average_age |
++-------------+-------+---------------+-------------+
+| 9           | Hercy | 2             | 39          |
++-------------+-------+---------------+-------------+
+Explanation: Hercy has 2 people report directly to him, Alice and Bob. Their average age is (41+36)/2 = 38.5, which is 39 after rounding it to the nearest integer.
+Example 2:Input: Employees table:
++-------------+---------+------------+-----+ 
+| employee_id | name    | reports_to | age |
+|-------------|---------|------------|-----|
+| 1           | Michael | null       | 45  |
+| 2           | Alice   | 1          | 38  |
+| 3           | Bob     | 1          | 42  |
+| 4           | Charlie | 2          | 34  |
+| 5           | David   | 2          | 40  |
+| 6           | Eve     | 3          | 37  |
+| 7           | Frank   | null       | 50  |
+| 8           | Grace   | null       | 48  |
++-------------+---------+------------+-----+ 
+Output: 
++-------------+---------+---------------+-------------+
+| employee_id | name    | reports_count | average_age |
+| ----------- | ------- | ------------- | ----------- |
+| 1           | Michael | 2             | 40          |
+| 2           | Alice   | 2             | 37          |
+| 3           | Bob     | 1             | 37          |
++-------------+---------+---------------+-------------+
+
+SELECT m.employee_id  , m.name , count(*) as reports_count ,ROUND(AVG(e.age)) as average_age 
+FROM Employees e
+JOIN Employees m on e.reports_to = m.employee_id
+GROUP BY m.employee_id 
+ORDER BY m.employee_id
+===================================================================================================================================
+Table: Activity
++--------------+---------+
+| Column Name  | Type    |
++--------------+---------+
+| player_id    | int     |
+| device_id    | int     |
+| event_date   | date    |
+| games_played | int     |
++--------------+---------+
+(player_id, event_date) is the primary key (combination of columns with unique values) of this table.This table shows the activity of players of some games.Each row is a record of a player who logged in and played a number of games (possibly 0) before logging out on someday using some device.Write a solution to report the fraction of players that logged in again on the day after the day they first logged in, rounded to 2 decimal places. In other words, you need to count the number of players that logged in for at least two consecutive days starting from their first login date, then divide that number by the total number of players.The result format is in the following example.
+Input: Activity table:
++-----------+-----------+------------+--------------+
+| player_id | device_id | event_date | games_played |
++-----------+-----------+------------+--------------+
+| 1         | 2         | 2016-03-01 | 5            |
+| 1         | 2         | 2016-03-02 | 6            |
+| 2         | 3         | 2017-06-25 | 1            |
+| 3         | 1         | 2016-03-02 | 0            |
+| 3         | 4         | 2018-07-03 | 5            |
++-----------+-----------+------------+--------------+
+Output: 
++-----------+
+| fraction  |
++-----------+
+| 0.33      |
++-----------+
+Explanation: 
+Only the player with id 1 logged back in after the first day he had logged in so the answer is 1/3 = 0.33
+WITH first_login AS (
+    SELECT player_id, MIN(event_date) AS first_date
+    FROM Activity 
+    GROUP BY player_id
+),
+consecutive AS (
+    SELECT a.player_id
+    FROM first_login f
+    JOIN Activity a 
+      ON f.player_id = a.player_id 
+     AND a.event_date = DATE_ADD(f.first_date, INTERVAL 1 DAY)
+)
+SELECT 
+    ROUND(COUNT(DISTINCT c.player_id) / COUNT(DISTINCT f.player_id), 2) AS fraction
+FROM first_login f
+LEFT JOIN consecutive c ON f.player_id = c.player_id;
+===============================================================================================================================
+Table: Employee
++---------------+---------+
+| Column Name   |  Type   |
++---------------+---------+
+| employee_id   | int     |
+| department_id | int     |
+| primary_flag  | varchar |
++---------------+---------+
+(employee_id, department_id) is the primary key (combination of columns with unique values) for this table.employee_id is the id of the employee.
+department_id is the id of the department to which the employee belongs.primary_flag is an ENUM (category) of type ('Y', 'N'). If the flag is 'Y', the department is the primary department for the employee. If the flag is 'N', the department is not the primary.Employees can belong to multiple departments. When the employee joins other departments, they need to decide which department is their primary department. Note that when an employee belongs to only one department, their primary column is 'N'.Write a solution to report all the employees with their primary department. For employees who belong to one department, report their only department.Return the result table in any order.The result format is in the following example.
+Example 1:Input: Employee table:
++-------------+---------------+--------------+
+| employee_id | department_id | primary_flag |
++-------------+---------------+--------------+
+| 1           | 1             | N            |
+| 2           | 1             | Y            |
+| 2           | 2             | N            |
+| 3           | 3             | N            |
+| 4           | 2             | N            |
+| 4           | 3             | Y            |
+| 4           | 4             | N            |
++-------------+---------------+--------------+
+Output: 
++-------------+---------------+
+| employee_id | department_id |
++-------------+---------------+
+| 1           | 1             |
+| 2           | 1             |
+| 3           | 3             |
+| 4           | 3             |
++-------------+---------------+
+Explanation: 
+- The Primary department for employee 1 is 1.
+- The Primary department for employee 2 is 1.
+- The Primary department for employee 3 is 3.
+- The Primary department for employee 4 is 3.
+
+SELECT employee_id , department_id
+FROM Employee
+WHERE primary_flag = 'Y' OR employee_id IN (
+    SELECT employee_id from Employee group by employee_id having count(*)=1
+)
+============================================================================================================================================================
+Table: Queue
++-------------+---------+
+| Column Name | Type    |
++-------------+---------+
+| person_id   | int     |
+| person_name | varchar |
+| weight      | int     |
+| turn        | int     |
++-------------+---------+
+person_id column contains unique values.This table has the information about all people waiting for a bus.The person_id and turn columns will contain all numbers from 1 to n, where n is the number of rows in the table.turn determines the order of which the people will board the bus, where turn=1 denotes the first person to board and turn=n denotes the last person to board.weight is the weight of the person in kilograms.There is a queue of people waiting to board a bus. However, the bus has a weight limit of 1000 kilograms, so there may be some people who cannot board.Write a solution to find the person_name of the last person that can fit on the bus without exceeding the weight limit. The test cases are generated such that the first person does not exceed the weight limit.Note that only one person can board the bus at any given turn.The result format is in the following example.
+Example 1:Input: Queue table:
++-----------+-------------+--------+------+
+| person_id | person_name | weight | turn |
++-----------+-------------+--------+------+
+| 5         | Alice       | 250    | 1    |
+| 4         | Bob         | 175    | 5    |
+| 3         | Alex        | 350    | 2    |
+| 6         | John Cena   | 400    | 3    |
+| 1         | Winston     | 500    | 6    |
+| 2         | Marie       | 200    | 4    |
++-----------+-------------+--------+------+
+Output: 
++-------------+
+| person_name |
++-------------+
+| John Cena   |
++-------------+
+Explanation: The folowing table is ordered by the turn for simplicity.
++------+----+-----------+--------+--------------+
+| Turn | ID | Name      | Weight | Total Weight |
++------+----+-----------+--------+--------------+
+| 1    | 5  | Alice     | 250    | 250          |
+| 2    | 3  | Alex      | 350    | 600          |
+| 3    | 6  | John Cena | 400    | 1000         | (last person to board)
+| 4    | 2  | Marie     | 200    | 1200         | (cannot board)
+| 5    | 4  | Bob       | 175    | ___          |
+| 6    | 1  | Winston   | 500    | ___          |
++------+----+-----------+--------+--------------+
+
+WITH WeightSum AS (
+    SELECT 
+        person_name,
+        turn,
+        SUM(weight) OVER (ORDER BY turn) AS cum_weight
+    FROM Queue
+)
+SELECT person_name
+FROM WeightSum
+WHERE cum_weight <= 1000
+ORDER BY cum_weight DESC
+LIMIT 1;
+===========================================================================================================================================
+Table: Accounts
++-------------+------+
+| Column Name | Type |
++-------------+------+
+| account_id  | int  |
+| income      | int  |
++-------------+------+
+account_id is the primary key (column with unique values) for this table.Each row contains information about the monthly income for one bank account.Write a solution to calculate the number of bank accounts for each salary category. The salary categories are:"Low Salary": All the salaries strictly less than $20000."Average Salary": All the salaries in the inclusive range [$20000, $50000]."High Salary": All the salaries strictly greater than $50000.The result table must contain all three categories. If there are no accounts in a category, return 0.Return the result table in any order.The result format is in the following example.
+Example 1:Input: Accounts table:
++------------+--------+
+| account_id | income |
++------------+--------+
+| 3          | 108939 |
+| 2          | 12747  |
+| 8          | 87709  |
+| 6          | 91796  |
++------------+--------+
+Output: 
++----------------+----------------+
+| category       | accounts_count |
++----------------+----------------+
+| Low Salary     | 1              |
+| Average Salary | 0              |
+| High Salary    | 3              |
++----------------+----------------+
+Explanation: Low Salary: Account 2.Average Salary: No accounts.High Salary: Accounts 3, 6, and 8.
+
+SELECT 'Low Salary' AS category, 
+       COUNT(*) AS accounts_count
+FROM Accounts
+WHERE income < 20000
+
+UNION ALL
+
+SELECT 'Average Salary' AS category, 
+       COUNT(*) AS accounts_count
+FROM Accounts
+WHERE income BETWEEN 20000 AND 50000
+
+UNION ALL
+
+SELECT 'High Salary' AS category, 
+       COUNT(*) AS accounts_count
+FROM Accounts
+WHERE income > 50000;
+=======================================================================================================================
+Table: Seat
++-------------+---------+
+| Column Name | Type    |
++-------------+---------+
+| id          | int     |
+| student     | varchar |
++-------------+---------+
+id is the primary key (unique value) column for this table.Each row of this table indicates the name and the ID of a student.The ID sequence always starts from 1 and increments continuously.Write a solution to swap the seat id of every two consecutive students. If the number of students is odd, the id of the last student is not swappedReturn the result table ordered by id in ascending order.The result format is in the following example.
+Example 1:Input: Seat table:
++----+---------+
+| id | student |
++----+---------+
+| 1  | Abbot   |
+| 2  | Doris   |
+| 3  | Emerson |
+| 4  | Green   |
+| 5  | Jeames  |
++----+---------+
+Output: 
++----+---------+
+| id | student |
++----+---------+
+| 1  | Doris   |
+| 2  | Abbot   |
+| 3  | Green   |
+| 4  | Emerson |
+| 5  | Jeames  |
++----+---------+
+Explanation: Note that if the number of students is odd, there is no need to change the last one's seat.
+
+SELECT
+    CASE
+        WHEN id % 2 = 1 AND id + 1 <= (SELECT MAX(id) FROM Seat) THEN id + 1
+        WHEN id % 2 = 0 THEN id - 1
+        ELSE id
+    END AS id,
+    student
+FROM Seat
+ORDER BY id;
+
+OR
+
+SELECT 
+    id,
+    CASE 
+        WHEN id % 2 = 1 THEN LEAD(student, 1) OVER (ORDER BY id)
+        WHEN id % 2 = 0 THEN LAG(student, 1) OVER (ORDER BY id)
+    END AS student
+FROM Seat
+ORDER BY id;
+# if u swap id using LAG and LEAD and the order by id the result doesnt work as Changing one column with a window function doesn’t affect the other columns unless you explicitly swap them too
+
+=========================================================================================================
+Table: Employees
++-------------+----------+
+| Column Name | Type     |
++-------------+----------+
+| employee_id | int      |
+| name        | varchar  |
+| manager_id  | int      |
+| salary      | int      |
++-------------+----------+
+In SQL, employee_id is the primary key for this table.This table contains information about the employees, their salary, and the ID of their manager. Some employees do not have a manager (manager_id is null). Find the IDs of the employees whose salary is strictly less than $30000 and whose manager left the company. When a manager leaves the company, their information is deleted from the Employees table, but the reports still have their manager_id set to the manager that left.Return the result table ordered by employee_id.The result format is in the following example.
+Example 1:Input:  Employees table:
++-------------+-----------+------------+--------+
+| employee_id | name      | manager_id | salary |
++-------------+-----------+------------+--------+
+| 3           | Mila      | 9          | 60301  |
+| 12          | Antonella | null       | 31000  |
+| 13          | Emery     | null       | 67084  |
+| 1           | Kalel     | 11         | 21241  |
+| 9           | Mikaela   | null       | 50937  |
+| 11          | Joziah    | 6          | 28485  |
++-------------+-----------+------------+--------+
+Output: 
++-------------+
+| employee_id |
++-------------+
+| 11          |
++-------------+
+Explanation: The employees with a salary less than $30000 are 1 (Kalel) and 11 (Joziah).Kalel's manager is employee 11, who is still in the company (Joziah).
+Joziah's manager is employee 6, who left the company because there is no row for employee 6 as it was deleted.
+
+SELECT employee_id 
+FROM Employees 
+WHERE salary < 30000 
+  AND manager_id NOT IN (SELECT employee_id FROM total)
+ORDER BY employee_id;
+==========================================================================================================================================
+Table Activities:
++-------------+---------+
+| Column Name | Type    |
++-------------+---------+
+| sell_date   | date    |
+| product     | varchar |
++-------------+---------+
+There is no primary key (column with unique values) for this table. It may contain duplicates.Each row of this table contains the product name and the date it was sold in a market.Write a solution to find for each date the number of different products sold and their names.The sold products names for each date should be sorted lexicographically.Return the result table ordered by sell_date.The result format is in the following example.
+Example 1:Input: Activities table:
++------------+------------+
+| sell_date  | product     |
++------------+------------+
+| 2020-05-30 | Headphone  |
+| 2020-06-01 | Pencil     |
+| 2020-06-02 | Mask       |
+| 2020-05-30 | Basketball |
+| 2020-06-01 | Bible      |
+| 2020-06-02 | Mask       |
+| 2020-05-30 | T-Shirt    |
++------------+------------+
+Output: 
++------------+----------+------------------------------+
+| sell_date  | num_sold | products                     |
++------------+----------+------------------------------+
+| 2020-05-30 | 3        | Basketball,Headphone,T-shirt |
+| 2020-06-01 | 2        | Bible,Pencil                 |
+| 2020-06-02 | 1        | Mask                         |
++------------+----------+------------------------------+
+Explanation: 
+For 2020-05-30, Sold items were (Headphone, Basketball, T-shirt), we sort them lexicographically and separate them by a comma.For 2020-06-01, Sold items were (Pencil, Bible), we sort them lexicographically and separate them by a comma.For 2020-06-02, the Sold item is (Mask), we just return it.
+
+SELECT 
+    sell_date,
+    COUNT(DISTINCT product) AS num_sold,
+    GROUP_CONCAT(DISTINCT product ORDER BY product SEPARATOR ',') AS products
+FROM Activities
+GROUP BY sell_date
+ORDER BY sell_date;
+===========================================================================================================================================
+Table: Patients
++--------------+---------+
+| Column Name  | Type    |
++--------------+---------+
+| patient_id   | int     |
+| patient_name | varchar |
+| conditions   | varchar |
++--------------+---------+
+patient_id is the primary key (column with unique values) for this table.'conditions' contains 0 or more code separated by spaces. This table contains information of the patients in the hospital.Write a solution to find the patient_id, patient_name, and conditions of the patients who have Type I Diabetes. Type I Diabetes always starts with DIAB1 prefix.Return the result table in any order.The result format is in the following example.
+Example 1:Input: Patients table:
++------------+--------------+--------------+
+| patient_id | patient_name | conditions   |
++------------+--------------+--------------+
+| 1          | Daniel       | YFEV COUGH   |
+| 2          | Alice        |              |
+| 3          | Bob          | DIAB100 MYOP |
+| 4          | George       | ACNE DIAB100 |
+| 5          | Alain        | DIAB201      |
++------------+--------------+--------------+
+Output: 
++------------+--------------+--------------+
+| patient_id | patient_name | conditions   |
++------------+--------------+--------------+
+| 3          | Bob          | DIAB100 MYOP |
+| 4          | George       | ACNE DIAB100 | 
++------------+--------------+--------------+
+Explanation: Bob and George both have a condition that starts with DIAB1.
+SELECT * 
+FROM Patients
+WHERE conditions LIKE 'DIAB1%' or conditions like '% DIAB1%'
+
+OR
+
+SELECT *
+FROM Patients
+WHERE conditions REGEXP 'DIAB1'
+
+============================================================================================
+Table: Users
++----------------+---------+
+| Column Name    | Type    |
++----------------+---------+
+| user_id        | int     |
+| name           | varchar |
++----------------+---------+
+user_id is the primary key (column with unique values) for this table.This table contains the ID and the name of the user. The name consists of only lowercase and uppercase characters.Write a solution to fix the names so that only the first character is uppercase and the rest are lowercase.Return the result table ordered by user_id.The result format is in the following example.
+Example 1:Input: Users table:
++---------+-------+
+| user_id | name  |
++---------+-------+
+| 1       | aLice |
+| 2       | bOB   |
++---------+-------+
+Output: 
++---------+-------+
+| user_id | name  |
++---------+-------+
+| 1       | Alice |
+| 2       | Bob   |
++---------+-------+
+# Write your MySQL query statement below
+SELECT user_id,CONCAT(UPPER(SUBSTR(name,1,1)),LOWER(SUBSTR(name,2,length(name)))) AS name
+FROM Users ORDER BY user_id;
+# SUBSTR(string_name , start_index ,end_index)
+
+# second method 
+SELECT user_id, concat(upper(LEFT(name, 1)), lower(RIGHT(name, length(name)-1))) as name
+FROM users
+ORDER BY user_id;
+===========================================================================================================================================
+Table: Movies
++---------------+---------+
+| Column Name   | Type    |
++---------------+---------+
+| movie_id      | int     |
+| title         | varchar |
++---------------+---------+
+movie_id is the primary key (column with unique values) for this table.title is the name of the movie.
+Table: Users
++---------------+---------+
+| Column Name   | Type    |
++---------------+---------+
+| user_id       | int     |
+| name          | varchar |
++---------------+---------+
+user_id is the primary key (column with unique values) for this table.The column 'name' has unique values.
+Table: MovieRating
++---------------+---------+
+| Column Name   | Type    |
++---------------+---------+
+| movie_id      | int     |
+| user_id       | int     |
+| rating        | int     |
+| created_at    | date    |
++---------------+---------+
+(movie_id, user_id) is the primary key (column with unique values) for this table.This table contains the rating of a movie by a user in their review.created_at is the user's review date. Write a solution to:Find the name of the user who has rated the greatest number of movies. In case of a tie, return the lexicographically smaller user name.Find the movie name with the highest average rating in February 2020. In case of a tie, return the lexicographically smaller movie name.The result format is in the following example.
+Example 1:Input: Movies table:
++-------------+--------------+
+| movie_id    |  title       |
++-------------+--------------+
+| 1           | Avengers     |
+| 2           | Frozen 2     |
+| 3           | Joker        |
++-------------+--------------+
+Users table:
++-------------+--------------+
+| user_id     |  name        |
++-------------+--------------+
+| 1           | Daniel       |
+| 2           | Monica       |
+| 3           | Maria        |
+| 4           | James        |
++-------------+--------------+
+MovieRating table:
++-------------+--------------+--------------+-------------+
+| movie_id    | user_id      | rating       | created_at  |
++-------------+--------------+--------------+-------------+
+| 1           | 1            | 3            | 2020-01-12  |
+| 1           | 2            | 4            | 2020-02-11  |
+| 1           | 3            | 2            | 2020-02-12  |
+| 1           | 4            | 1            | 2020-01-01  |
+| 2           | 1            | 5            | 2020-02-17  | 
+| 2           | 2            | 2            | 2020-02-01  | 
+| 2           | 3            | 2            | 2020-03-01  |
+| 3           | 1            | 3            | 2020-02-22  | 
+| 3           | 2            | 4            | 2020-02-25  | 
++-------------+--------------+--------------+-------------+
+Output: 
++--------------+
+| results      |
++--------------+
+| Daniel       |
+| Frozen 2     |
++--------------+
+Daniel and Monica have rated 3 movies ("Avengers", "Frozen 2" and "Joker") but Daniel is smaller lexicographically.
+Frozen 2 and Joker have a rating average of 3.5 in February but Frozen 2 is smaller lexicographically.
+
+WITH UserRatings AS (
+    SELECT u.name, COUNT(*) AS rating_count
+    FROM MovieRating mr
+    JOIN Users u ON mr.user_id = u.user_id
+    GROUP BY u.name
+),
+TopUser AS (
+    SELECT name
+    FROM UserRatings
+    ORDER BY rating_count DESC, name ASC
+    LIMIT 1
+),
+FebRatings AS (
+    SELECT m.title, AVG(mr.rating) AS avg_rating
+    FROM MovieRating mr
+    JOIN Movies m ON mr.movie_id = m.movie_id
+    WHERE mr.created_at BETWEEN '2020-02-01' AND '2020-02-29'
+    GROUP BY m.title
+),
+TopMovie AS (
+    SELECT title
+    FROM FebRatings
+    ORDER BY avg_rating DESC, title ASC
+    LIMIT 1
+)
+
+SELECT name AS results FROM TopUser
+UNION ALL
+SELECT title FROM TopMovie; # No need of alias for this second table because UNION OR UNION ALL uses uses the column name of the first SELECT as the column name for the 	final result.
+===============================================================================================================================
+Table: Customer
++---------------+---------+
+| Column Name   | Type    |
++---------------+---------+
+| customer_id   | int     |
+| name          | varchar |
+| visited_on    | date    |
+| amount        | int     |
++---------------+---------+
+In SQL,(customer_id, visited_on) is the primary key for this table.This table contains data about customer transactions in a restaurant.visited_on is the date on which the customer with ID (customer_id) has visited the restaurant.amount is the total paid by a customer.You are the restaurant owner and you want to analyze a possible expansion (there will be at least one customer every day).Compute the moving average of how much the customer paid in a seven days window (i.e., current day + 6 days before). average_amount should be rounded to two decimal places.Return the result table ordered by visited_on in ascending order.
+The result format is in the following example.Example 1:Input: Customer table:
++-------------+--------------+--------------+-------------+
+| customer_id | name         | visited_on   | amount      |
++-------------+--------------+--------------+-------------+
+| 1           | Jhon         | 2019-01-01   | 100         |
+| 2           | Daniel       | 2019-01-02   | 110         |
+| 3           | Jade         | 2019-01-03   | 120         |
+| 4           | Khaled       | 2019-01-04   | 130         |
+| 5           | Winston      | 2019-01-05   | 110         | 
+| 6           | Elvis        | 2019-01-06   | 140         | 
+| 7           | Anna         | 2019-01-07   | 150         |
+| 8           | Maria        | 2019-01-08   | 80          |
+| 9           | Jaze         | 2019-01-09   | 110         | 
+| 1           | Jhon         | 2019-01-10   | 130         | 
+| 3           | Jade         | 2019-01-10   | 150         | 
++-------------+--------------+--------------+-------------+
+Output: 
++--------------+--------------+----------------+
+| visited_on   | amount       | average_amount |
++--------------+--------------+----------------+
+| 2019-01-07   | 860          | 122.86         |
+| 2019-01-08   | 840          | 120            |
+| 2019-01-09   | 840          | 120            |
+| 2019-01-10   | 1000         | 142.86         |
++--------------+--------------+----------------+
+Explanation: 
+1st moving average from 2019-01-01 to 2019-01-07 has an average_amount of (100 + 110 + 120 + 130 + 110 + 140 + 150)/7 = 122.86
+2nd moving average from 2019-01-02 to 2019-01-08 has an average_amount of (110 + 120 + 130 + 110 + 140 + 150 + 80)/7 = 120
+3rd moving average from 2019-01-03 to 2019-01-09 has an average_amount of (120 + 130 + 110 + 140 + 150 + 80 + 110)/7 = 120
+4th moving average from 2019-01-04 to 2019-01-10 has an average_amount of (130 + 110 + 140 + 150 + 80 + 110 + 130 + 150)/7 = 142.86
+
+SELECT visited_on, amount, average_amount 
+FROM (SELECT DISTINCT visited_on, SUM(amount) OVER
+ (ORDER BY visited_on RANGE BETWEEN INTERVAL 6 DAY PRECEDING AND CURRENT ROW) AS amount,
+  ROUND(SUM(amount) OVER (ORDER BY visited_on RANGE BETWEEN INTERVAL 6 DAY PRECEDING AND CURRENT ROW)/7,2)
+   AS average_amount
+FROM Customer) as whole_totals
+WHERE DATEDIFF(visited_on, (SELECT MIN(visited_on) FROM Customer)) >= 6
+======================================================================================================================================
+Employee working in weekends total hours count
+
+SELECT 
+    employee_id, 
+    SUM(TIMESTAMPDIFF(HOUR, logged_in, logged_out)) AS extra_hours
+FROM 
+    attendance_table
+WHERE 
+    DAYOFWEEK(logged_in) IN (1, 7)  -- 1 = Sunday, 7 = Saturday
+GROUP BY 
+    employee_id;
+
+==========================================================================================================================================
+# Get 7-Day Moving Average of Amount Paid
+
+SELECT visited_on, 
+       SUM(amount) AS amount,
+       ROUND(SUM(amount) OVER (ORDER BY visited_on RANGE BETWEEN INTERVAL 6 DAY PRECEDING AND CURRENT ROW) / 7, 2) AS average_amount
+FROM Customer
+GROUP BY visited_on
+HAVING DATEDIFF(visited_on, (SELECT MIN(visited_on) FROM Customer)) >= 6
+ORDER BY visited_on;
+
+#Get Monthly Total Sales
+
+SELECT 
+  YEAR(visited_on) AS year, 
+  MONTH(visited_on) AS month, 
+  SUM(amount) AS total_amount
+FROM Customer
+GROUP BY YEAR(visited_on), MONTH(visited_on)
+ORDER BY year, month;
+
+#Find Number of Customers Who Visited in Last 7 Days
+
+SELECT COUNT(DISTINCT customer_id) AS recent_customers
+FROM Customer
+WHERE visited_on >= CURRENT_DATE() - INTERVAL 7 DAY;
+
+# Find All Records in February 2019
+SELECT * FROM Customer
+WHERE YEAR(visited_on) = 2019 AND MONTH(visited_on) = 2;
+==========================================================================================================================================
+Table: Insurance
++-------------+-------+
+| Column Name | Type  |
++-------------+-------+
+| pid         | int   |
+| tiv_2015    | float |
+| tiv_2016    | float |
+| lat         | float |
+| lon         | float |
++-------------+-------+
+pid is the primary key (column with unique values) for this table.Each row of this table contains information about one policy where:pid is the policyholder's policy ID.tiv_2015 is the total investment value in 2015 and tiv_2016 is the total investment value in 2016.lat is the latitude of the policy holder's city. It's guaranteed that lat is not NULL.lon is the longitude of the policy holder's city. It's guaranteed that lon is not NULL.Write a solution to report the sum of all total investment values in 2016 tiv_2016, for all policyholders who:have the same tiv_2015 value as one or more other policyholders, and are not located in the same city as any other policyholder (i.e., the (lat, lon) attribute pairs must be unique).Round tiv_2016 to two decimal places.
+Example 1:Input: Insurance table:
++-----+----------+----------+-----+-----+
+| pid | tiv_2015 | tiv_2016 | lat | lon |
++-----+----------+----------+-----+-----+
+| 1   | 10       | 5        | 10  | 10  |
+| 2   | 20       | 20       | 20  | 20  |
+| 3   | 10       | 30       | 20  | 20  |
+| 4   | 10       | 40       | 40  | 40  |
++-----+----------+----------+-----+-----+
+Output: 
++----------+
+| tiv_2016 |
++----------+
+| 45.00    |
++----------+
+Explanation: 
+The first record in the table, like the last record, meets both of the two criteria.
+The tiv_2015 value 10 is the same as the third and fourth records, and its location is unique.
+The second record does not meet any of the two criteria. Its tiv_2015 is not like any other policyholders and its location is the same as the third record, which makes the third record fail, too.
+So, the result is the sum of tiv_2016 of the first and last record, which is 45.
+
+SELECT ROUND(SUM(tiv_2016),2) as tiv_2016
+FROM Insurance
+WHERE tiv_2015 IN (
+    SELECT tiv_2015 FROM 
+    Insurance 
+    GROUP BY tiv_2015
+    HAVING COUNT(*)>1
+) AND (lat,lon) NOT IN (
+    SELECT lat,lon from
+    INSURANCE 
+    GROUP BY lat,lon
+    HAVING COUNT(*)>1
+)
+==========================================================================================================================================
+Table: Users
++--------------+---------+
+| Column Name  | Type    |
++--------------+---------+
+| account      | int     |
+| name         | varchar |
++--------------+---------+
+account is the primary key (column with unique values) for this table.Each row of this table contains the account number of each user in the bank.
+There will be no two users having the same name in the table.Table: Transactions
++---------------+---------+
+| Column Name   | Type    |
++---------------+---------+
+| trans_id      | int     |
+| account       | int     |
+| amount        | int     |
+| transacted_on | date    |
++---------------+---------+
+trans_id is the primary key (column with unique values) for this table.Each row of this table contains all changes made to all accounts.amount is positive if the user received money and negative if they transferred money.All accounts start with a balance of 0.Write a solution to report the name and balance of users with a balance higher than 10000. The balance of an account is equal to the sum of the amounts of all transactions involving that account.Return the result table in any order.The result format is in the following example.
+Example 1:Input: Users table:
++------------+--------------+
+| account    | name         |
++------------+--------------+
+| 900001     | Alice        |
+| 900002     | Bob          |
+| 900003     | Charlie      |
++------------+--------------+
+Transactions table:
++------------+------------+------------+---------------+
+| trans_id   | account    | amount     | transacted_on |
++------------+------------+------------+---------------+
+| 1          | 900001     | 7000       |  2020-08-01   |
+| 2          | 900001     | 7000       |  2020-09-01   |
+| 3          | 900001     | -3000      |  2020-09-02   |
+| 4          | 900002     | 1000       |  2020-09-12   |
+| 5          | 900003     | 6000       |  2020-08-07   |
+| 6          | 900003     | 6000       |  2020-09-07   |
+| 7          | 900003     | -4000      |  2020-09-11   |
++------------+------------+------------+---------------+
+Output: 
++------------+------------+
+| name       | balance    |
++------------+------------+
+| Alice      | 11000      |
++------------+------------+
+Explanation: Alice's balance is (7000 + 7000 - 3000) = 11000.Bob's balance is 1000.Charlie's balance is (6000 + 6000 - 4000) = 8000.
+
+SELECT u.name, 
+       SUM(t.amount) AS balance
+FROM Users u
+JOIN Transactions t 
+  ON u.account = t.account
+GROUP BY u.account, u.name
+HAVING SUM(t.amount) > 10000;
+=======================================================================================================================================================
+Table: Users
++----------------+---------+
+| Column Name    | Type    |
++----------------+---------+
+| user_id        | int     |
+| join_date      | date    |
+| favorite_brand | varchar |
++----------------+---------+
+user_id is the primary key (column with unique values) of this table.This table has the info of the users of an online shopping website where users can sell and buy items.
+Table: Orders
++---------------+---------+
+| Column Name   | Type    |
++---------------+---------+
+| order_id      | int     |
+| order_date    | date    |
+| item_id       | int     |
+| buyer_id      | int     |
+| seller_id     | int     |
++---------------+---------+
+order_id is the primary key (column with unique values) of this table.item_id is a foreign key (reference column) to the Items table.buyer_id and seller_id are foreign keys to the Users table.Table: Items
++---------------+---------+
+| Column Name   | Type    |
++---------------+---------+
+| item_id       | int     |
+| item_brand    | varchar |
++---------------+---------+
+item_id is the primary key (column with unique values) of this table.Write a solution to find for each user, the join date and the number of orders they made as a buyer in 2019.Return the result table in any order.The result format is in the following example.
+Example 1:Input: Users table:
++---------+------------+----------------+
+| user_id | join_date  | favorite_brand |
++---------+------------+----------------+
+| 1       | 2018-01-01 | Lenovo         |
+| 2       | 2018-02-09 | Samsung        |
+| 3       | 2018-01-19 | LG             |
+| 4       | 2018-05-21 | HP             |
++---------+------------+----------------+
+Orders table:
++----------+------------+---------+----------+-----------+
+| order_id | order_date | item_id | buyer_id | seller_id |
++----------+------------+---------+----------+-----------+
+| 1        | 2019-08-01 | 4       | 1        | 2         |
+| 2        | 2018-08-02 | 2       | 1        | 3         |
+| 3        | 2019-08-03 | 3       | 2        | 3         |
+| 4        | 2018-08-04 | 1       | 4        | 2         |
+| 5        | 2018-08-04 | 1       | 3        | 4         |
+| 6        | 2019-08-05 | 2       | 2        | 4         |
++----------+------------+---------+----------+-----------+
+Items table:
++---------+------------+
+| item_id | item_brand |
++---------+------------+
+| 1       | Samsung    |
+| 2       | Lenovo     |
+| 3       | LG         |
+| 4       | HP         |
++---------+------------+
+Output: 
++-----------+------------+----------------+
+| buyer_id  | join_date  | orders_in_2019 |
++-----------+------------+----------------+
+| 1         | 2018-01-01 | 1              |
+| 2         | 2018-02-09 | 2              |
+| 3         | 2018-01-19 | 0              |
+| 4         | 2018-05-21 | 0              |
++-----------+------------+----------------+
+
+SELECT 
+    u.user_id AS buyer_id,
+    u.join_date,
+    COUNT(o.order_id) AS orders_in_2019
+FROM Users u
+LEFT JOIN Orders o 
+    ON u.user_id = o.buyer_id 
+    AND o.order_date BETWEEN '2019-01-01' AND '2019-12-31'
+GROUP BY u.user_id, u.join_date;
+===========================================================================================================================================
+Table: Employees
++-------------+---------+
+| Column Name | Type    |
++-------------+---------+
+| employee_id | int     |
+| name        | varchar |
++-------------+---------+
+employee_id is the column with unique values for this table.Each row of this table indicates the name of the employee whose ID is employee_id.
+Table: Salaries
++-------------+---------+
+| Column Name | Type    |
++-------------+---------+
+| employee_id | int     |
+| salary      | int     |
++-------------+---------+
+employee_id is the column with unique values for this table.Each row of this table indicates the salary of the employee whose ID is employee_id.Write a solution to report the IDs of all the employees with missing information. The information of an employee is missing if:The employee's name is missing, orThe employee's salary is missing.Return the result table ordered by employee_id in ascending order.The result format is in the following example.
+Example 1:Input: Employees table:
++-------------+----------+
+| employee_id | name     |
++-------------+----------+
+| 2           | Crew     |
+| 4           | Haven    |
+| 5           | Kristian |
++-------------+----------+
+Salaries table:
++-------------+--------+
+| employee_id | salary |
++-------------+--------+
+| 5           | 76071  |
+| 1           | 22517  |
+| 4           | 63539  |
++-------------+--------+
+Output: 
++-------------+
+| employee_id |
++-------------+
+| 1           |
+| 2           |
++-------------+
+Explanation: Employees 1, 2, 4, and 5 are working at this company.The name of employee 1 is missing.The salary of employee 2 is missing.
+
+SELECT employee_id
+FROM Employees
+LEFT JOIN Salaries USING (employee_id)
+WHERE salary IS NULL
+
+UNION
+
+SELECT employee_id
+FROM Salaries
+LEFT JOIN Employees USING (employee_id)
+WHERE name IS NULL
+ORDER BY employee_id;
+=====================================================================================================================================================
+Table: DailySales
++-------------+---------+
+| Column Name | Type    |
++-------------+---------+
+| date_id     | date    |
+| make_name   | varchar |
+| lead_id     | int     |
+| partner_id  | int     |
++-------------+---------+
+There is no primary key (column with unique values) for this table. It may contain duplicates.This table contains the date and the name of the product sold and the IDs of the lead and partner it was sold to.The name consists of only lowercase English letters.For each date_id and make_name, find the number of distinct lead_id's and distinct partner_id's.Return the result table in any order.The result format is in the following example.
+Example 1:Input: DailySales table:
++-----------+-----------+---------+------------+
+| date_id   | make_name | lead_id | partner_id |
++-----------+-----------+---------+------------+
+| 2020-12-8 | toyota    | 0       | 1          |
+| 2020-12-8 | toyota    | 1       | 0          |
+| 2020-12-8 | toyota    | 1       | 2          |
+| 2020-12-7 | toyota    | 0       | 2          |
+| 2020-12-7 | toyota    | 0       | 1          |
+| 2020-12-8 | honda     | 1       | 2          |
+| 2020-12-8 | honda     | 2       | 1          |
+| 2020-12-7 | honda     | 0       | 1          |
+| 2020-12-7 | honda     | 1       | 2          |
+| 2020-12-7 | honda     | 2       | 1          |
++-----------+-----------+---------+------------+
+Output: 
++-----------+-----------+--------------+-----------------+
+| date_id   | make_name | unique_leads | unique_partners |
++-----------+-----------+--------------+-----------------+
+| 2020-12-8 | toyota    | 2            | 3               |
+| 2020-12-7 | toyota    | 1            | 2               |
+| 2020-12-8 | honda     | 2            | 2               |
+| 2020-12-7 | honda     | 3            | 2               |
++-----------+-----------+--------------+-----------------+
+Explanation: For 2020-12-8, toyota gets leads = [0, 1] and partners = [0, 1, 2] while honda gets leads = [1, 2] and partners = [1, 2].For 2020-12-7, toyota gets leads = [0] and partners = [1, 2] while honda gets leads = [0, 1, 2] and partners = [1, 2].
+
+SELECT date_id , make_name , COUNT(DISTINCT lead_id) as unique_leads , COUNT(DISTINCT partner_id )as unique_partners
+FROM DailySales 
+GROUP BY date_id,make_name
+ORDER BY date_id,make_name
+============================================================================================================================================
+Table: Products
++-------------+---------+
+| Column Name | Type    |
++-------------+---------+
+| product_id  | int     |
+| store1      | int     |
+| store2      | int     |
+| store3      | int     |
++-------------+---------+
+product_id is the primary key (column with unique values) for this table.Each row in this table indicates the product's price in 3 different stores: store1, store2, and store3.
+If the product is not available in a store, the price will be null in that store's column.Write a solution to rearrange the Products table so that each row has (product_id,store, price). If a product is not available in a store, do not include a row with that product_id and store combination in the result table.Return the result table in any order.The result format is in the following example.
+Example 1:Input: Products table:
++------------+--------+--------+--------+
+| product_id | store1 | store2 | store3 |
++------------+--------+--------+--------+
+| 0          | 95     | 100    | 105    |
+| 1          | 70     | null   | 80     |
++------------+--------+--------+--------+
+Output: 
++------------+--------+-------+
+| product_id | store  | price |
++------------+--------+-------+
+| 0          | store1 | 95    |
+| 0          | store2 | 100   |
+| 0          | store3 | 105   |
+| 1          | store1 | 70    |
+| 1          | store3 | 80    |
++------------+--------+-------+
+Explanation: Product 0 is available in all three stores with prices 95, 100, and 105 respectively.Product 1 is available in store1 with price 70 and store3 with price 80. The product is not available in store2.
+
+SELECT product_id, 'store1' AS store, store1 AS price
+FROM Products
+WHERE store1 IS NOT NULL
+
+UNION ALL
+
+SELECT product_id, 'store2' AS store, store2 AS price
+FROM Products
+WHERE store2 IS NOT NULL
+
+UNION ALL
+
+SELECT product_id, 'store3' AS store, store3 AS price
+FROM Products
+WHERE store3 IS NOT NULL;
+=========================================================================================================================================
+Table: Employees
++-------------+------+
+| Column Name | Type |
++-------------+------+
+| emp_id      | int  |
+| event_day   | date |
+| in_time     | int  |
+| out_time    | int  |
++-------------+------+
+(emp_id, event_day, in_time) is the primary key (combinations of columns with unique values) of this table.The table shows the employees' entries and exits in an office.event_day is the day at which this event happened, in_time is the minute at which the employee entered the office, and out_time is the minute at which they left the office.in_time and out_time are between 1 and 1440.It is guaranteed that no two events on the same day intersect in time, and in_time < out_time.Write a solution to calculate the total time in minutes spent by each employee on each day at the office. Note that within one day, an employee can enter and leave more than once. The time spent in the office for a single entry is out_time - in_time.Return the result table in any order.The result format is in the following example.
+Employees table:
++--------+------------+---------+----------+
+| emp_id | event_day  | in_time | out_time |
++--------+------------+---------+----------+
+| 1      | 2020-11-28 | 4       | 32       |
+| 1      | 2020-11-28 | 55      | 200      |
+| 1      | 2020-12-03 | 1       | 42       |
+| 2      | 2020-11-28 | 3       | 33       |
+| 2      | 2020-12-09 | 47      | 74       |
++--------+------------+---------+----------+
+Output: 
++------------+--------+------------+
+| day        | emp_id | total_time |
++------------+--------+------------+
+| 2020-11-28 | 1      | 173        |
+| 2020-11-28 | 2      | 30         |
+| 2020-12-03 | 1      | 41         |
+| 2020-12-09 | 2      | 27         |
++------------+--------+------------+
+Explanation: 
+Employee 1 has three events: two on day 2020-11-28 with a total of (32 - 4) + (200 - 55) = 173, and one on day 2020-12-03 with a total of (42 - 1) = 41.
+Employee 2 has two events: one on day 2020-11-28 with a total of (33 - 3) = 30, and one on day 2020-12-09 with a total of (74 - 47) = 27.
+
+SELECT 
+    event_day AS day,
+    emp_id,
+    SUM(out_time - in_time) AS total_time
+FROM 
+    Employees
+GROUP BY 
+    emp_id, event_day;
+===========================================================================================================================================
+Table: transactions
++------------------+------+
+| Column Name      | Type | 
++------------------+------+
+| transaction_id   | int  |
+| amount           | int  |
+| transaction_date | date |
++------------------+------+
+The transactions_id column uniquely identifies each row in this table.Each row of this table contains the transaction id, amount and transaction date.Write a solution to find the sum of amounts for odd and even transactions for each day. If there are no odd or even transactions for a specific date, display as 0.
+Example:transactions table:
+----------------+--------+------------------+
+| transaction_id | amount | transaction_date |
++----------------+--------+------------------+
+| 1              | 150    | 2024-07-01       |
+| 2              | 200    | 2024-07-01       |
+| 3              | 75     | 2024-07-01       |
+| 4              | 300    | 2024-07-02       |
+| 5              | 50     | 2024-07-02       |
+| 6              | 120    | 2024-07-03       |
++----------------+--------+------------------+
+  
++------------------+---------+----------+
+| transaction_date | odd_sum | even_sum |
++------------------+---------+----------+
+| 2024-07-01       | 75      | 350      |
+| 2024-07-02       | 0       | 350      |
+| 2024-07-03       | 0       | 120      |
++------------------+---------+----------+
+Explanation:For transaction dates:2024-07-01:Sum of amounts for odd transactions: 75Sum of amounts for even transactions: 150 + 200 = 350 2024-07-02:Sum of amounts for odd transactions: 0Sum of amounts for even transactions: 300 + 50 = 350 2024-07-03:Sum of amounts for odd transactions: 0Sum of amounts for even transactions: 120
+
+SELECT 
+    transaction_date, 
+    SUM(CASE WHEN amount % 2 <> 0 THEN amount ELSE 0 END) AS odd_sum,
+    SUM(CASE WHEN amount % 2 = 0 THEN amount ELSE 0 END) AS even_sum
+FROM 
+    transactions
+GROUP BY 
+    transaction_date
+ORDER BY 
+    transaction_date;
+============================================================================================================================
+Table: Employees
++-------------+---------+
+| Column Name | Type    |
++-------------+---------+
+| employee_id | int     |
+| name        | varchar |
+| salary      | int     |
++-------------+---------+
+employee_id is the primary key (column with unique values) for this table.Each row of this table indicates the employee ID, employee name, and salary.Write a solution to calculate the bonus of each employee. The bonus of an employee is 100% of their salary if the ID of the employee is an odd number and the employee's name does not start with thecharacter 'M'. The bonus of an employee is 0 otherwise.Return the result table ordered by employee_id.The result format is in the following example.
+Example 1:Input: Employees table:
++-------------+---------+--------+
+| employee_id | name    | salary |
++-------------+---------+--------+
+| 2           | Meir    | 3000   |
+| 3           | Michael | 3800   |
+| 7           | Addilyn | 7400   |
+| 8           | Juan    | 6100   |
+| 9           | Kannon  | 7700   |
++-------------+---------+--------+
+Output: 
++-------------+-------+
+| employee_id | bonus |
++-------------+-------+
+| 2           | 0     |
+| 3           | 0     |
+| 7           | 7400  |
+| 8           | 0     |
+| 9           | 7700  |
++-------------+-------+
+Explanation: The employees with IDs 2 and 8 get 0 bonus because they have an even employee_id.The employee with ID 3 gets 0 bonus because their name starts with 'M'.The rest of the employees get a 100% bonus.
+
+SELECT employee_id ,
+(
+    CASE WHEN employee_id % 2 <> 0 AND name NOT LIKE 'M%' THEN salary 
+    ELSE 0
+    END
+) as bonus
+
+FROM Employees
+ORDER BY employee_id
+
+or
+
+SELECT employee_id , salary * (employee_id % 2) * (name not like 'M%') as bonus 
+FROM employess 
+ORDER BY employee_id
+============================================================================================================================
+Table: Score
++-------------+---------+
+| Column Name | Type    |
++-------------+---------+
+| student_id  | int     |
+| subject     | varchar |
+| score       | int     |
+| exam_date   | varchar |
++-------------+---------+
+(student_id, subject, exam_date) is the primary key for this table.Each row contains information about a student's score in a specific subject on a particular exam date. score is between 0 and 100 (inclusive).Write a solution to find the students who have shown improvement. A student is considered to have shown improvement if they meet both of these conditions:Have taken exams in the same subject on at least two different datesTheir latest score in that subject is higher than their first scoreReturn the result table ordered by student_id, subject in ascending order.The result format is in the following example.
+Example:Input:Scores table:
++------------+----------+-------+------------+
+| student_id | subject  | score | exam_date  |
++------------+----------+-------+------------+
+| 101        | Math     | 70    | 2023-01-15 |
+| 101        | Math     | 85    | 2023-02-15 |
+| 101        | Physics  | 65    | 2023-01-15 |
+| 101        | Physics  | 60    | 2023-02-15 |
+| 102        | Math     | 80    | 2023-01-15 |
+| 102        | Math     | 85    | 2023-02-15 |
+| 103        | Math     | 90    | 2023-01-15 |
+| 104        | Physics  | 75    | 2023-01-15 |
+| 104        | Physics  | 85    | 2023-02-15 |
++------------+----------+-------+------------+
+Output:
++------------+----------+-------------+--------------+
+| student_id | subject  | first_score | latest_score |
++------------+----------+-------------+--------------+
+| 101        | Math     | 70          | 85           |
+| 102        | Math     | 80          | 85           |
+| 104        | Physics  | 75          | 85           |
++------------+----------+-------------+--------------+
+Explanation:Student 101 in Math: Improved from 70 to 85Student 101 in Physics: No improvement (dropped from 65 to 60)Student 102 in Math: Improved from 80 to 85 Student 103 in Math: Only one exam, not eligible Student 104 in Physics: Improved from 75 to 85 Result table is ordered by student_id, subject.
+
+WITH ranked_score AS (
+    SELECT 
+        student_id,
+        subject,
+        score,
+        ROW_NUMBER() OVER (PARTITION BY student_id, subject ORDER BY exam_date) AS first,
+        ROW_NUMBER() OVER (PARTITION BY student_id, subject ORDER BY exam_date DESC) AS last
+    FROM Scores
+), 
+first_last AS (
+    SELECT 
+        student_id,
+        subject,
+        MAX(CASE WHEN first = 1 THEN score END) AS first_score,
+        MAX(CASE WHEN last = 1 THEN score END) AS latest_score
+    FROM ranked_score
+    GROUP BY student_id, subject
+)
+SELECT * 
+FROM first_last 
+WHERE first_score < latest_score;
+============================================================================================================================
+Table: Logins
++----------------+----------+
+| Column Name    | Type     |
++----------------+----------+
+| user_id        | int      |
+| time_stamp     | datetime |
++----------------+----------+
+(user_id, time_stamp) is the primary key (combination of columns with unique values) for this table.Each row contains information about the login time for the user with ID user_id.Write a solution to report the latest login for all users in the year 2020. Do not include the users who did not login in 2020.Return the result table in any order.The result format is in the following example.
+Example 1:Input: Logins table:
++---------+---------------------+
+| user_id | time_stamp          |
++---------+---------------------+
+| 6       | 2020-06-30 15:06:07 |
+| 6       | 2021-04-21 14:06:06 |
+| 6       | 2019-03-07 00:18:15 |
+| 8       | 2020-02-01 05:10:53 |
+| 8       | 2020-12-30 00:46:50 |
+| 2       | 2020-01-16 02:49:50 |
+| 2       | 2019-08-25 07:59:08 |
+| 14      | 2019-07-14 09:00:00 |
+| 14      | 2021-01-06 11:59:59 |
++---------+---------------------+
+Output: 
++---------+---------------------+
+| user_id | last_stamp          |
++---------+---------------------+
+| 6       | 2020-06-30 15:06:07 |
+| 8       | 2020-12-30 00:46:50 |
+| 2       | 2020-01-16 02:49:50 |
++---------+---------------------+
+Explanation: User 6 logged into their account 3 times but only once in 2020, so we include this login in the result table.User 8 logged into their account 2 times in 2020, once in February and once in December. We include only the latest one (December) in the result table.User 2 logged into their account 2 times but only once in 2020, so we include this login in the result table.User 14 did not login in 2020, so we do not include them in the result table.
+
+SELECT user_id,MAX(time_stamp) as last_stamp
+FROM Logins
+WHERE time_stamp >= '2020-01-01' AND time_stamp < '2021-01-01'
+GROUP BY user_id
+
+OR
+
+select user_id, max(time_stamp) 'last_stamp' from logins where time_stamp like '2020%' group by user_id ;
+==========================================================================================================================
+SELECT * FROM
+Users WHERE email regexp "^[a-zA-Z0-9]+@[a-zA-Z]+\\.com$" # Valid email address
+=============================================================================================================================
+Table: products
++--------------+------------+
+| Column Name  | Type       |
++--------------+------------+
+| product_id   | int        |
+| product_name | varchar    |
+| description  | varchar    |
++--------------+------------+
+(product_id) is the unique key for this tableEach row in the table represents a product with its unique ID, name, and description.Write a solution to find all products whose description contains a valid serial number pattern. A valid serial number follows these rules:It starts with the letters SN (case-sensitive).Followed by exactly 4 digits.It must have a hyphen (-) followed by exactly 4 digits.The serial number must be within the description (it may not necessarily start at the beginning).Return the result table ordered by product_id in ascending order.
+Example:Input:products table:
++------------+--------------+------------------------------------------------------+
+| product_id | product_name | description                                          |
++------------+--------------+------------------------------------------------------+
+| 1          | Widget A     | This is a sample product with SN1234-5678            |
+| 2          | Widget B     | A product with serial SN9876-1234 in the description |
+| 3          | Widget C     | Product SN1234-56789 is available now                |
+| 4          | Widget D     | No serial number here                                |
+| 5          | Widget E     | Check out SN4321-8765 in this description            |
++------------+--------------+------------------------------------------------------+
+Output:
++------------+--------------+------------------------------------------------------+
+| product_id | product_name | description                                          |
++------------+--------------+------------------------------------------------------+
+| 1          | Widget A     | This is a sample product with SN1234-5678            |
+| 2          | Widget B     | A product with serial SN9876-1234 in the description |
+| 5          | Widget E     | Check out SN4321-8765 in this description            |
++------------+--------------+------------------------------------------------------+
+Explanation:Product 1: Valid serial number SN1234-5678 Product 2: Valid serial number SN9876-1234 Product 3: Invalid serial number SN1234-56789 (contains 5 digits after the hyphen) Product 4: No serial number in the description Product 5: Valid serial number SN4321-8765The result table is ordered by product_id in ascending order.
+
+SELECT *
+FROM products
+WHERE description REGEXP '\\bSN[0-9]{4}-[0-9]{4}\\b'
+ORDER BY product_id;
+
+or
+
+SELECT *
+FROM products
+WHERE description REGEXP 'SN[0-9]{4}-[0-9]{4}([^0-9]|$)'
+ORDER BY product_id;
+==============================================================================================================================
+Table: Samples
++----------------+---------+
+| Column Name    | Type    | 
++----------------+---------+
+| sample_id      | int     |
+| dna_sequence   | varchar |
+| species        | varchar |
++----------------+---------+
+sample_id is the unique key for this table.Each row contains a DNA sequence represented as a string of characters (A, T, G, C) and the species it was collected from.
+Biologists are studying basic patterns in DNA sequences. Write a solution to identify sample_id with the following patterns:Sequences that start with ATG (a common start codon)Sequences that end with either TAA, TAG, or TGA (stop codons)Sequences containing the motif ATAT (a simple repeated pattern)Sequences that have at least 3 consecutive G (like GGG or GGGG)Return the result table ordered by sample_id in ascending order.The result format is in the following example.
+Example:Input:Samples table:
++-----------+------------------+-----------+
+| sample_id | dna_sequence     | species   |
++-----------+------------------+-----------+
+| 1         | ATGCTAGCTAGCTAA  | Human     |
+| 2         | GGGTCAATCATC     | Human     |
+| 3         | ATATATCGTAGCTA   | Human     |
+| 4         | ATGGGGTCATCATAA  | Mouse     |
+| 5         | TCAGTCAGTCAG     | Mouse     |
+| 6         | ATATCGCGCTAG     | Zebrafish |
+| 7         | CGTATGCGTCGTA    | Zebrafish |
++-----------+------------------+-----------+
+Output:
++-----------+------------------+-------------+-------------+------------+------------+------------+
+| sample_id | dna_sequence     | species     | has_start   | has_stop   | has_atat   | has_ggg    |
++-----------+------------------+-------------+-------------+------------+------------+------------+
+| 1         | ATGCTAGCTAGCTAA  | Human       | 1           | 1          | 0          | 0          |
+| 2         | GGGTCAATCATC     | Human       | 0           | 0          | 0          | 1          |
+| 3         | ATATATCGTAGCTA   | Human       | 0           | 0          | 1          | 0          |
+| 4         | ATGGGGTCATCATAA  | Mouse       | 1           | 1          | 0          | 1          |
+| 5         | TCAGTCAGTCAG     | Mouse       | 0           | 0          | 0          | 0          |
+| 6         | ATATCGCGCTAG     | Zebrafish   | 0           | 1          | 1          | 0          |
+| 7         | CGTATGCGTCGTA    | Zebrafish   | 0           | 0          | 0          | 0          |
++-----------+------------------+-------------+-------------+------------+------------+------------+
+
+SELECT 
+    sample_id, 
+    dna_sequence,
+    species,
+    CASE WHEN dna_sequence LIKE 'ATG%' THEN 1 ELSE 0 END AS has_start,
+    CASE 
+        WHEN dna_sequence LIKE '%TAA' 
+          OR dna_sequence LIKE '%TAG' 
+          OR dna_sequence LIKE '%TGA' 
+        THEN 1 ELSE 0 
+    END AS has_stop,
+    CASE WHEN dna_sequence LIKE '%ATAT%' THEN 1 ELSE 0 END AS has_atat,
+    CASE WHEN dna_sequence LIKE '%GGG%' THEN 1 ELSE 0 END AS has_ggg
+FROM Samples
+ORDER BY sample_id ASC;
+
+or
+
+SELECT 
+    *,
+    CASE WHEN dna_sequence REGEXP '^ATG' THEN 1 ELSE 0 END AS has_start,
+    CASE 
+        WHEN dna_sequence REGEXP '(TAA|TAG|TGA)$' THEN 1 ELSE 0 
+    END AS has_stop,
+    CASE WHEN dna_sequence REGEXP 'ATAT' THEN 1 ELSE 0 END AS has_atat,
+    CASE WHEN dna_sequence REGEXP 'G{3,}' THEN 1 ELSE 0 END AS has_ggg
+FROM Samples
+ORDER BY sample_id;
+===================================================================================================================================================
+In an EXISTS clause, the actual columns selected don't matter.You're not using the result of the subquery.The database engine only cares whether a row exists — not what values it contains.So you could just as well write:
+
+SELECT * FROM Employees E
+WHERE EXISTS ( SELECT 1 FROM Departments D WHERE D.Dept_ID = E.Dept_ID ); # SELECT 1 or SELECT "hello" anything doesn't matter
+======================================================================================================================================================
+Top K Products by Revenue Per Month
+SELECT *
+FROM (
+    SELECT product_id, MONTH(order_date) AS month,
+           SUM(price * quantity) AS revenue,
+           RANK() OVER (PARTITION BY MONTH(order_date) ORDER BY SUM(price * quantity) DESC) AS rnk
+    FROM sales
+    GROUP BY product_id, MONTH(order_date)
+) ranked
+WHERE rnk <= 3;
+===================================================================================================================
+Find the nth highest salary (without LIMIT or TOP)
+SELECT DISTINCT salary
+FROM employees e1
+WHERE N - 1 = (
+  SELECT COUNT(DISTINCT salary)
+  FROM employees e2
+  WHERE e2.salary > e1.salary
+);
+
+Running Total of Sales Per Day
+SELECT order_date, SUM(amount) OVER (ORDER BY order_date ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS running_total FROM orders;
+================================================================================================================================================
+Funcion to fetch last x days records
+DELIMITER $$
+
+CREATE FUNCTION getRecordsXDaysBefore(x INT)
+RETURNS TABLE
+BEGIN
+    RETURN
+    SELECT *
+    FROM your_table
+    WHERE your_date_column <= CURDATE() - INTERVAL x DAY;
+END $$
+
+DELIMITER ;
+
+SELECT * FROM getRecordsXDaysBefore(30);
+=========================================================================================================================================================
+Pivoting a table to convert rows into columns in SQL is commonly done using the PIVOT operator in databases that support it, like SQL Server, or by using CASE statements in databases that do not have built-in PIVOT support, like MySQL and PostgreSQL.
+SELECT *
+FROM (
+    SELECT year, product, sales
+    FROM sales_data
+)
+PIVOT (
+    SUM(sales)
+    FOR product IN ('A' AS Product_A_Sales, 'B' AS Product_B_Sales)
+);
+============================================================================================================================================================
+Percentage difference in sales compared to previous month
+SELECT 
+    sales_date, 
+    sales_amount, 
+    LAG(sales_amount) OVER (ORDER BY sales_date) AS previous_sales
+FROM sales_data;
+
+
+
+

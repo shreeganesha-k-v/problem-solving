@@ -1,0 +1,1593 @@
+A 3 x 3 magic square is a 3 x 3 grid filled with distinct numbers from 1 to 9 such that each row, column, and both diagonals all have the same sum.Given a row x col grid of integers, how many 3 x 3 contiguous magic square subgrids are there?
+Note: while a magic square can only contain numbers from 1 to 9, grid may contain numbers up to 15.
+
+Example 1:
+Input: grid = [[4,3,8,4],[9,5,1,9],[2,7,6,2]]
+Output: 1
+Explanation: 
+The following subgrid is a 3 x 3 magic square:
+while this one is not:
+In total, there is only one magic square inside the given grid.
+
+Example 2:
+Input: grid = [[8]]
+Output: 0
+ 
+class Solution {
+    public int numMagicSquaresInside(int[][] grid) {
+        int res=0;
+        int rows=grid.length;
+        int cols= grid[0].length;
+
+        for(int i=0;i<=rows-3;i++){
+            for(int j=0;j<=cols-3;j++){
+                if(isMagic(grid,i,j)){
+                    res++;
+                }
+            }
+        }
+        return res;
+    }
+
+    private boolean isMagic(int[][] grid,int row, int col){
+        boolean[] seen = new boolean[10];
+
+        for(int i=row;i<row+3;i++){
+            for(int j=col;j<col+3;j++){
+                int num = grid[i][j];
+                if (num < 1 || num > 9 || seen[num]) {
+                    return false;
+                }
+                seen[num]=true;
+            }
+        }
+
+        int sum = grid[row][col]+grid[row][col+1]+grid[row][col+2];
+
+        for(int i=row;i<row+3;i++){
+            if(grid[i][col]+grid[i][col+1]+grid[i][col+2]!=sum){
+                return false;
+            }
+        }
+
+        for(int j=col;j<col+3;j++){
+            if(grid[row][j]+grid[row+1][j]+grid[row+2][j]!=sum){
+                return false;
+            }
+        }
+
+        if(grid[row][col]+grid[row+1][col+1]+grid[row+2][col+2]!=sum){
+            return false;
+        }
+
+        if(grid[row][col+2]+grid[row+1][col+1]+grid[row+2][col]!=sum){
+            return false;
+        }
+        return true;
+    }
+}
+============================================================================================
+Given a collection of candidate numbers (candidates) and a target number (target), find all unique combinations in candidates where the candidate numbers sum to target.Each number in candidates may only be used once in the combination.Note: The solution set must not contain duplicate combinations.
+
+Example 1:
+Input: candidates = [10,1,2,7,6,1,5], target = 8
+Output: 
+[
+[1,1,6],
+[1,2,5],
+[1,7],
+[2,6]
+]
+Example 2:
+Input: candidates = [2,5,2,1,2], target = 5
+Output: 
+[
+[1,2,2],
+[5]
+]
+
+class Solution {
+    public List<List<Integer>> combinationSum2(int[] candidates, int target) {
+        Arrays.sort(candidates);
+        List<List<Integer>> res = new ArrayList<>();
+        backTrack(res,new ArrayList<>(),candidates,target,0);
+        return res;
+    }
+
+    private void backTrack(List<List<Integer>> res , List<Integer> temp, int[] arr,int rem, int start){
+
+        if(rem<0){
+            return;
+        }
+        else if(rem==0){
+            res.add(new ArrayList<>(temp));
+            
+        }else{
+            for(int i=start;i<arr.length;i++){
+                if(i>start && arr[i] == arr[i - 1] ){
+                    continue;
+                }
+                temp.add(arr[i]);
+                backTrack(res,temp,arr,rem-arr[i],i+1);
+                temp.remove(temp.size()-1);
+            }
+        }
+
+    }
+}
+========================================================================================================
+Given an integer array nums sorted in non-decreasing order, remove some duplicates in-place such that each unique element appears at most twice. The relative order of the elements should be kept the same.Since it is impossible to change the length of the array in some languages, you must instead have the result be placed in the first part of the array nums. More formally, if there are k elements after removing the duplicates, then the first k elements of nums should hold the final result. It does not matter what you leave beyond the first k elements.
+Return k after placing the final result in the first k slots of nums.
+Do not allocate extra space for another array. You must do this by modifying the input array in-place with O(1) extra memory.
+Custom Judge:
+The judge will test your solution with the following code:
+int[] nums = [...]; // Input array
+int[] expectedNums = [...]; // The expected answer with correct length
+int k = removeDuplicates(nums); // Calls your implementation
+assert k == expectedNums.length;
+for (int i = 0; i < k; i++) {
+    assert nums[i] == expectedNums[i];
+}
+If all assertions pass, then your solution will be accepted.
+
+Example 1:
+Input: nums = [1,1,1,2,2,3]
+Output: 5, nums = [1,1,2,2,3,_]
+Explanation: Your function should return k = 5, with the first five elements of nums being 1, 1, 2, 2 and 3 respectively.
+It does not matter what you leave beyond the returned k (hence they are underscores).
+Example 2:
+Input: nums = [0,0,1,1,1,1,2,3,3]
+Output: 7, nums = [0,0,1,1,2,3,3,_,_]
+Explanation: Your function should return k = 7, with the first seven elements of nums being 0, 0, 1, 1, 2, 3 and 3 respectively.
+It does not matter what you leave beyond the returned k (hence they are underscores).
+
+class Solution {
+    public int removeDuplicates(int[] nums) {
+        int n =  nums.length;
+        if(nums.length <=2){
+            return n;
+        }
+        int j=2;// counter to keep atmost 2 matching values
+        for(int i=2;i<n;i++){
+            if(nums[i]!=nums[j-2]){
+                nums[j]=nums[i];
+                j++;
+            }
+        }
+        return j;
+    }
+}
+==========================================================================================
+At a lemonade stand, each lemonade costs $5. Customers are standing in a queue to buy from you and order one at a time (in the order specified by bills). Each customer will only buy one lemonade and pay with either a $5, $10, or $20 bill. You must provide the correct change to each customer so that the net transaction is that the customer pays $5.
+Note that you do not have any change in hand at first.
+Given an integer array bills where bills[i] is the bill the ith customer pays, return true if you can provide every customer with the correct change, or false otherwise.
+
+Example 1:
+Input: bills = [5,5,5,10,20]
+Output: true
+Explanation: 
+From the first 3 customers, we collect three $5 bills in order.
+From the fourth customer, we collect a $10 bill and give back a $5.
+From the fifth customer, we give a $10 bill and a $5 bill.
+Since all customers got correct change, we output true.
+
+Example 2:
+Input: bills = [5,5,10,10,20]
+Output: false
+Explanation: 
+From the first two customers in order, we collect two $5 bills.
+For the next two customers in order, we collect a $10 bill and give back a $5 bill.
+For the last customer, we can not give the change of $15 back because we only have two $10 bills.
+Since not every customer received the correct change, the answer is false.
+ 
+class Solution {
+    public boolean lemonadeChange(int[] bills) {
+        int fiveBillCount = 0, tenBillCount = 0;
+
+        for (int bill : bills) {
+            if (bill == 5) {
+                fiveBillCount++;  // Case for $5
+            } else if (bill == 10) {
+                if (fiveBillCount >= 1) {
+                    tenBillCount++;  // Case for $10
+                    fiveBillCount--;
+                } else {
+                    return false;  // Not enough $5 bills for change
+                }
+            } else {  // Case for $20
+                if (tenBillCount >= 1 && fiveBillCount >= 1) {
+                    tenBillCount--;  // Use one $10 bill
+                    fiveBillCount--;  // Use one $5 bill
+                } else if (fiveBillCount >= 3) {
+                    fiveBillCount -= 3;  // Use three $5 bills
+                } else {
+                    return false;  // Not enough change
+                }
+            }
+        }
+        return true;  // Successfully provided change for all customers
+    }
+}
+====================================================================================================
+You are given m arrays, where each array is sorted in ascending order.
+You can pick up two integers from two different arrays (each array picks one) and calculate the distance. We define the distance between two integers a and b to be their absolute difference |a - b|.
+Return the maximum distance.
+
+Example 1:
+Input: arrays = [[1,2,3],[4,5],[1,2,3]]
+Output: 4
+Explanation: One way to reach the maximum distance 4 is to pick 1 in the first or third array and pick 5 in the second array.
+Example 2:
+Input: arrays = [[1],[1]]
+Output: 0
+Example 3:
+Input : arrays=[[-8,-7,-7,-5,1,1,3,4],[-2],[-10,-10,-7,0,1,3],[2]]
+output= 14
+ 
+class Solution {
+    public int maxDistance(List<List<Integer>> arrays) {
+        int res = Integer.MIN_VALUE;
+        int min = arrays.get(0).get(0);
+        int max = arrays.get(0).get(arrays.get(0).size()-1);
+
+        for(int i=1;i<arrays.size();i++){
+            res = Math.max(res,Math.abs(arrays.get(i).get(0)-max));
+            res = Math.max(res,Math.abs(arrays.get(i).get(arrays.get(i).size()-1)-min));
+            min = Math.min(min,arrays.get(i).get(0));
+            max= Math.max(max,arrays.get(i).get(arrays.get(i).size()-1));
+        }
+        return res;
+
+    }
+}
+==================================================================================================================================
+Given an integer n, return the minimum number of operations to get the character 'A' exactly n times on the screen.
+
+Example 1:
+Input: n = 3
+Output: 3
+Explanation: Initially, we have one character 'A'.
+In step 1, we use Copy All operation.
+In step 2, we use Paste operation to get 'AA'.
+In step 3, we use Paste operation to get 'AAA'.
+
+Example 2:
+Input: n = 1
+Output: 0
+ 
+class Solution {
+    public int minSteps(int n) {
+        if (n == 1) return 0;
+        int steps = 0;
+        int factor = 2;
+        while (n > 1) {
+            while (n % factor == 0) {
+                steps += factor;
+                n /= factor;
+            }
+            factor++;
+        }
+        return steps;
+    }
+}
+=======================================================================================
+Example 1:
+Input: num = 3749
+Output: "MMMDCCXLIX"
+Explanation:
+3000 = MMM as 1000 (M) + 1000 (M) + 1000 (M)
+ 700 = DCC as 500 (D) + 100 (C) + 100 (C)
+  40 = XL as 10 (X) less of 50 (L)
+   9 = IX as 1 (I) less of 10 (X)
+Note: 49 is not 1 (I) less of 50 (L) because the conversion is based on decimal places
+
+Example 2:
+Input: num = 58
+Output: "LVIII"
+Explanation:
+50 = L
+ 8 = VIII
+ 
+Example 3:
+Input: num = 1994
+Output: "MCMXCIV"
+Explanation:
+
+1000 = M
+ 900 = CM
+  90 = XC
+   4 = IV
+class Solution {
+    public String intToRoman(int num) {
+        int[] n = {1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1};
+        String[] s = {"M", "CM", "D", "CD", "C", "XC", "L", "XL", "X", "IX", "V", "IV", "I"};
+        StringBuilder res = new StringBuilder();
+        int i=0;
+        while(num>0){
+            if(num>=n[i]){
+                res.append(s[i]);
+                num -= n[i];
+            }else{
+                i++;
+            }
+        }
+        return res.toString();
+    }
+}
+===============================================================================================
+You are given an integer array nums. You are initially positioned at the array's first index, and each element in the array represents your maximum jump length at that position.Return true if you can reach the last index, or false otherwise.
+Example 1:
+Input: nums = [2,3,1,1,4]
+Output: true
+Explanation: Jump 1 step from index 0 to 1, then 3 steps to the last index.
+Example 2:
+Input: nums = [3,2,1,0,4]
+Output: false
+Explanation: You will always arrive at index 3 no matter what. Its maximum jump length is 0, which makes it impossible to reach the last index.
+
+class Solution {
+    public boolean canJump(int[] nums) {
+        int max=0;
+        for(int i=0;i<nums.length;i++){
+            if(i>max) return false;
+            max=Math.max(max,i+nums[i]);
+            if(max>=nums.length-1){
+                return true;
+            }
+        }
+        return false;
+    }
+}
+===========================================================================================
+You are given a 0-indexed array of integers nums of length n. You are initially positioned at nums[0].Each element nums[i] represents the maximum length of a forward jump from index i. 
+In other words, if you are at nums[i], you can jump to any nums[i + j] where:0 <= j <= nums[i] and i + j < n Return the minimum number of jumps to reach nums[n - 1]. 
+The test cases are generated such that you can reach nums[n - 1].
+
+Example 1:
+Input: nums = [2,3,1,1,4]
+Output: 2
+Explanation: The minimum number of jumps to reach the last index is 2. Jump 1 step from index 0 to 1, then 3 steps to the last index.
+Example 2:
+Input: nums = [2,3,0,1,4]
+Output: 2
+Example 2:
+Input: nums = [1,2]
+Output: 1
+ 
+int jumps = 0, currentEnd = 0, farthest = 0;
+        
+        for (int i = 0; i < nums.length - 1; i++) {
+            farthest = Math.max(farthest, i + nums[i]);
+            
+            // If we've reached the end of the current jump range
+            if (i == currentEnd) {
+                jumps++;
+                currentEnd = farthest;
+
+                // If the currentEnd has reached or exceeded the last index, we can return the jumps
+                if (currentEnd >= nums.length - 1) {
+                    break;
+                }
+            }
+        }
+        
+        return jumps;
+==============================================================================================================
+The complement of an integer is the integer you get when you flip all the 0's to 1's and all the 1's to 0's in its binary representation.
+For example, The integer 5 is "101" in binary and its complement is "010" which is the integer 2.
+Given an integer num, return its complement.
+
+Example 1:
+Input: num = 5
+Output: 2
+Explanation: The binary representation of 5 is 101 (no leading zero bits), and its complement is 010. So you need to output 2.
+Example 2:
+Input: num = 1
+Output: 0
+Explanation: The binary representation of 1 is 1 (no leading zero bits), and its complement is 0. So you need to output 0.
+ 
+class Solution {
+    public int findComplement(int num) {
+        String str = Integer.toBinaryString(num);
+        String res = "";
+        for(int i=0;i<str.length();i++){
+            if(str.charAt(i)=='0'){
+                res += '1';
+            }else{
+                res += '0';
+            }
+        }
+        return Integer.parseInt(res,2);
+
+    }
+    
+}
+===================================================================================================
+Given an integer array nums and an integer k, return true if there are two distinct indices i and j in the array such that nums[i] == nums[j] and abs(i - j) <= k.
+
+Example 1:
+Input: nums = [1,2,3,1], k = 3
+Output: true
+Example 2:
+Input: nums = [1,0,1,1], k = 1
+Output: true
+Example 3:
+Input: nums = [1,2,3,1,2,3], k = 2
+Output: false
+ 
+class Solution {
+    public boolean containsNearbyDuplicate(int[] nums, int k) {
+        HashMap<Integer,Integer> map = new HashMap<>();
+
+        for(int i=0;i<nums.length;i++){
+            if(map.containsKey(nums[i]) && (i-map.get(nums[i])<=k)){
+                return true;
+            }
+            map.put(nums[i],i);
+        }
+        return false;
+    }
+}
+======================================================================================
+Find all valid combinations of k numbers that sum up to n such that the following conditions are true:Only numbers 1 through 9 are used.
+Each number is used at most once.Return a list of all possible valid combinations. The list must not contain the same combination twice, and the combinations may be returned in any order.
+
+Example 1:
+Input: k = 3, n = 7
+Output: [[1,2,4]]
+Explanation:
+1 + 2 + 4 = 7
+There are no other valid combinations.
+Example 2:
+Input: k = 3, n = 9
+Output: [[1,2,6],[1,3,5],[2,3,4]]
+Explanation:
+1 + 2 + 6 = 9
+1 + 3 + 5 = 9
+2 + 3 + 4 = 9
+There are no other valid combinations.
+Example 3:
+Input: k = 4, n = 1
+Output: []
+Explanation: There are no valid combinations.
+Using 4 different numbers in the range [1,9], the smallest sum we can get is 1+2+3+4 = 10 and since 10 > 1, there are no valid combination.
+
+class Solution {
+    public List<List<Integer>> combinationSum3(int k, int n) {
+        int[] nums={1,2,3,4,5,6,7,8,9};
+        List<List<Integer>> res = new ArrayList<>();
+        backTrack(nums,k,n,0,new ArrayList<>(),res);
+        return res;
+
+    }
+
+    private void backTrack(int[] nums,int k,int n,int start, List<Integer> temp, List<List<Integer>> res){
+        if(temp.size()==k && n==0){
+            res.add(new ArrayList<>(temp));
+            
+        }else{
+            for(int i=start;i<nums.length;i++){
+                if(n<nums[i]) continue; // Skip if current number is greater than remaining sum
+                temp.add(nums[i]);
+                backTrack(nums,k,n-nums[i],i+1,temp,res);
+                temp.remove(temp.size()-1);// Remove last element to try the next candidate
+            }
+        }
+    }
+}
+=====================================================================================================
+You are given two m x n binary matrices grid1 and grid2 containing only 0's (representing water) and 1's (representing land). An island is a group of 1's connected 4-directionally (horizontal or vertical). Any cells outside of the grid are considered water cells.
+An island in grid2 is considered a sub-island if there is an island in grid1 that contains all the cells that make up this island in grid2.
+Return the number of islands in grid2 that are considered sub-islands.
+
+Example 1:
+Input: grid1 = [[1,1,1,0,0],[0,1,1,1,1],[0,0,0,0,0],[1,0,0,0,0],[1,1,0,1,1]], grid2 = [[1,1,1,0,0],[0,0,1,1,1],[0,1,0,0,0],[1,0,1,1,0],[0,1,0,1,0]]
+Output: 3
+Explanation: In the picture above, the grid on the left is grid1 and the grid on the right is grid2.
+The 1s colored red in grid2 are those considered to be part of a sub-island. There are three sub-islands.
+Example 2:
+Input: grid1 = [[1,0,1,0,1],[1,1,1,1,1],[0,0,0,0,0],[1,1,1,1,1],[1,0,1,0,1]], grid2 = [[0,0,0,0,0],[1,1,1,1,1],[0,1,0,1,0],[0,1,0,1,0],[1,0,0,0,1]]
+Output: 2 
+Explanation: In the picture above, the grid on the left is grid1 and the grid on the right is grid2.
+The 1s colored red in grid2 are those considered to be part of a sub-island. There are two sub-islands.
+ 
+class Solution {
+    private int m,n;
+    public int countSubIslands(int[][] grid1, int[][] grid2) {
+        m = grid1.length;
+        n = grid1[0].length;
+        int res =0;
+
+        for(int i=0;i<m;i++){
+            for(int j=0;j<n;j++){
+                if(grid2[i][j]==1){
+                    if(isSubIsland(grid1,grid2,i,j)){
+                        res++;
+                    }
+                }
+            }
+            
+        }
+        return res;
+    }
+
+    private boolean isSubIsland(int[][] g1,int[][] g2,int i,int j){
+        boolean[] isSubIsland = { true };
+        dfs(g1,g2,i,j,isSubIsland);
+        return isSubIsland[0];
+    }
+
+    private void dfs(int[][] g1,int[][] g2, int i,int j, boolean[] bool){
+            if(i<0 || i>=m || j<0 || j>=n || g2[i][j]==0) return;
+
+            if(g1[i][j]!=g2[i][j]) bool[0]=false;
+
+            g2[i][j]=0;
+            dfs(g1,g2,i+1,j,bool);
+            dfs(g1,g2,i-1,j,bool);
+            dfs(g1,g2,i,j+1,bool);
+            dfs(g1,g2,i,j-1,bool);
+    }
+}
+======================================================================================================
+Given a positive integer num, return true if num is a perfect square or false otherwise.A perfect square is an integer that is the square of an integer. In other words, it is the product of some integer with itself.You must not use any built-in library function, such as sqrt.
+
+Example 1:
+Input: num = 16
+Output: true
+Explanation: We return true because 4 * 4 = 16 and 4 is an integer.
+Example 2:
+Input: num = 14
+Output: false
+Explanation: We return false because 3.742 * 3.742 = 14 and 3.742 is not an integer.
+ 
+class Solution {
+    public boolean isPerfectSquare(int num) {
+        int count = 1;
+        while(count <= num/count){
+            if(count * count == num) return true;
+            count++;
+        }
+        return false;
+    }
+}
+====================================================================================================
+There is a robot on an m x n grid. The robot is initially located at the top-left corner (i.e., grid[0][0]). The robot tries to move to the bottom-right corner (i.e., grid[m - 1][n - 1]). The robot can only move either down or right at any point in time.
+Given the two integers m and n, return the number of possible unique paths that the robot can take to reach the bottom-right corner.
+The test cases are generated so that the answer will be less than or equal to 2 * 109.
+
+Example 1:
+Input: m = 3, n = 7
+Output: 28
+Example 2:
+Input: m = 3, n = 2
+Output: 3
+Explanation: From the top-left corner, there are a total of 3 ways to reach the bottom-right corner:
+1. Right -> Down -> Down
+2. Down -> Down -> Right
+3. Down -> Right -> Down
+ 
+class Solution {
+    public int uniquePaths(int m, int n) {
+        int[] aboveRows = new int[n];
+        Arrays.fill(aboveRows,1);//Initialize the aboveRow list with n elements, all set to 1. It's initialized with 1 because there's only one way to reach each cell in the top row, which is by moving horizontally.
+
+        for(int row=1;row<m;row++){//This loop iterates over each row below the top row. 
+            int[] currentRow = new int[n];
+            Arrays.fill(currentRow,1);// For each row below the top row, we create a new list to store the number of unique paths for each column in that row.
+            for(int col=1;col<n;col++){
+                currentRow[col]=currentRow[col-1]+aboveRows[col];
+// The number of unique paths to reach a cell in the current row is the sum of the number of paths to reach the cell immediately to the left (in the same row) and the number of paths to reach the cell above it (from the aboveRow).
+            }
+            aboveRows=currentRow;//We update the aboveRow to be the same as the currentRow because it becomes the reference for the next row
+        }
+        return aboveRows[n-1];
+    }
+}
+===================================================================================================================================
+You are given an m x n integer array grid. There is a robot initially located at the top-left corner (i.e., grid[0][0]). The robot tries to move to the bottom-right corner (i.e., grid[m - 1][n - 1]). The robot can only move either down or right at any point in time.
+An obstacle and space are marked as 1 or 0 respectively in grid. A path that the robot takes cannot include any square that is an obstacle.Return the number of possible unique paths that the robot can take to reach the bottom-right corner.
+The testcases are generated so that the answer will be less than or equal to 2 * 109.
+
+Example 1:
+Input: obstacleGrid = [[0,0,0],[0,1,0],[0,0,0]]
+Output: 2
+Explanation: There is one obstacle in the middle of the 3x3 grid above.
+There are two ways to reach the bottom-right corner:
+1. Right -> Right -> Down -> Down
+2. Down -> Down -> Right -> Right
+Example 2:
+Input: obstacleGrid = [[0,1],[0,0]]
+Output: 1
+
+public class UniquePathsWithObstacles {
+    public int uniquePathsWithObstacles(int[][] obstacleGrid) {
+        int m = obstacleGrid.length;
+        int n = obstacleGrid[0].length;
+
+        // If the starting or ending point is an obstacle, return 0.
+        if (obstacleGrid[0][0] == 1 || obstacleGrid[m - 1][n - 1] == 1) {
+            return 0;
+        }
+
+        // Initialize a 2D array for storing the number of ways to reach each cell.
+        int[][] dp = new int[m][n];
+
+        // Initialize the starting point.
+        dp[0][0] = 1;
+
+        // Fill the first column.
+        for (int i = 1; i < m; i++) {
+            dp[i][0] = (obstacleGrid[i][0] == 0 && dp[i - 1][0] == 1) ? 1 : 0;
+        }
+
+        // Fill the first row.
+        for (int j = 1; j < n; j++) {
+            dp[0][j] = (obstacleGrid[0][j] == 0 && dp[0][j - 1] == 1) ? 1 : 0;
+        }
+
+        // Fill the rest of the grid.
+        for (int i = 1; i < m; i++) {
+            for (int j = 1; j < n; j++) {
+                if (obstacleGrid[i][j] == 0) {
+                    dp[i][j] = dp[i - 1][j] + dp[i][j - 1];
+                } else {
+                    dp[i][j] = 0;  // Obstacle cell.
+                }
+            }
+        }
+
+        // The result is the value at the bottom-right corner.
+        return dp[m - 1][n - 1];
+    }
+}
+
+=====================================================================================
+Given an array of intervals where intervals[i] = [starti, endi], merge all overlapping intervals, and return an array of the non-overlapping intervals that cover all the intervals in the input.
+Example 1:
+Input: intervals = [[1,3],[2,6],[8,10],[15,18]]
+Output: [[1,6],[8,10],[15,18]]
+Explanation: Since intervals [1,3] and [2,6] overlap, merge them into [1,6].
+Example 2:
+Input: intervals = [[1,4],[4,5]]
+Output: [[1,5]]
+Explanation: Intervals [1,4] and [4,5] are considered overlapping.
+ 
+class Solution {
+    public int[][] merge(int[][] intervals) {
+        Arrays.sort(intervals,(a,b)->Integer.compare(a[0],b[0]));//[[1,3],[2,6],[8,10],[15,18]]
+        List<int[]> merged = new ArrayList<>();
+
+        int[] prev = intervals[0];
+
+        for(int i=1;i<intervals.length;i++){
+            int[] curr = intervals[i];
+            if(prev[1]>=curr[0]){
+                prev[1]= Math.max(prev[1],curr[1]);
+            }else{
+                merged.add(prev);
+                prev = curr;
+            }
+        }
+        merged.add(prev);
+
+        return merged.toArray(new int[merged.size()][]);
+    }
+}
+=========================================================================================================================================================
+Same above if inputs are arrayList
+
+public class Solution {
+	public static ArrayList<ArrayList<Integer>> mergeIntervals(ArrayList<ArrayList<Integer>> intervals) {
+		// Step 1: Sort intervals based on the start point
+		Collections.sort(intervals, (a, b) -> a.get(0) - b.get(0));
+
+		ArrayList<ArrayList<Integer>> res = new ArrayList<>();
+
+		if (intervals.size() == 0) return res;
+
+		// Step 2: Add the first interval to result
+		ArrayList<Integer> current = intervals.get(0);
+		res.add(new ArrayList<>(current));
+
+		// Step 3: Iterate over intervals and merge if needed
+		for (int i = 1; i < intervals.size(); i++) {
+			ArrayList<Integer> last = res.get(res.size() - 1);
+			ArrayList<Integer> next = intervals.get(i);
+
+			// Check for overlap
+			if (next.get(0) <= last.get(1)) {
+				// Merge intervals
+				last.set(1, Math.max(last.get(1), next.get(1)));
+			} else {
+				// No overlap
+				res.add(new ArrayList<>(next));
+			}
+		}
+
+		return res;
+	}
+}
+
+==========================================================================================================
+You are given an array of non-overlapping intervals intervals where intervals[i] = [starti, endi] represent the start and the end of the ith interval and intervals is sorted in ascending order by starti. You are also given an interval newInterval = [start, end] that represents the start and end of another interval.
+Insert newInterval into intervals such that intervals is still sorted in ascending order by starti and intervals still does not have any overlapping intervals (merge overlapping intervals if necessary).
+Return intervals after the insertion.
+Note that you don't need to modify intervals in-place. You can make a new array and return it.
+
+Example 1:
+Input: intervals = [[1,3],[6,9]], newInterval = [2,5]
+Output: [[1,5],[6,9]]
+Example 2:
+Input: intervals = [[1,2],[3,5],[6,7],[8,10],[12,16]], newInterval = [4,8]
+Output: [[1,2],[3,10],[12,16]]
+Explanation: Because the new interval [4,8] overlaps with [3,5],[6,7],[8,10].
+
+public class IntervalInsertion {
+    public static int[][] insertInterval(int[][] intervals, int[] newInterval) {
+        List<int[]> result = new ArrayList<>();
+        int i = 0;
+        int n = intervals.length;
+
+        // Add all intervals before the new interval
+        while (i < n && intervals[i][1] < newInterval[0]) {
+            result.add(intervals[i]);
+            i++;
+        }
+
+        // Merge overlapping intervals with the new interval
+        while (i < n && intervals[i][0] <= newInterval[1]) {
+            newInterval[0] = Math.min(newInterval[0], intervals[i][0]);
+            newInterval[1] = Math.max(newInterval[1], intervals[i][1]);
+            i++;
+        }
+        result.add(newInterval);
+
+        // Add remaining intervals after merging
+        while (i < n) {
+            result.add(intervals[i]);
+            i++;
+        }
+
+        // Convert List<int[]> to int[][]
+        return result.toArray(new int[result.size()][]);
+    }
+
+  
+}
+
+=====================================================================================================================
+You are given a 0-indexed 1-dimensional (1D) integer array original, and two integers, m and n. You are tasked with creating a 2-dimensional (2D) array with  m rows and n columns using all the elements from original.
+The elements from indices 0 to n - 1 (inclusive) of original should form the first row of the constructed 2D array, the elements from indices n to 2 * n - 1 (inclusive) should form the second row of the constructed 2D array, and so on.
+Return an m x n 2D array constructed according to the above procedure, or an empty 2D array if it is impossible.
+
+Example 1:
+Input: original = [1,2,3,4], m = 2, n = 2
+Output: [[1,2],[3,4]]
+Explanation: The constructed 2D array should contain 2 rows and 2 columns.
+The first group of n=2 elements in original, [1,2], becomes the first row in the constructed 2D array.
+The second group of n=2 elements in original, [3,4], becomes the second row in the constructed 2D array.
+Example 2:
+Input: original = [1,2,3], m = 1, n = 3
+Output: [[1,2,3]]
+Explanation: The constructed 2D array should contain 1 row and 3 columns.
+Put all three elements in original into the first row of the constructed 2D array.
+Example 3:
+Input: original = [1,2], m = 1, n = 1
+Output: []
+Explanation: There are 2 elements in original.
+It is impossible to fit 2 elements in a 1x1 2D array, so return an empty 2D array.
+ 
+class Solution {
+    public int[][] construct2DArray(int[] original, int m, int n) {
+        if(m*n!=original.length){
+            return new int[0][0];
+        }
+
+        int[][] res = new int[m][n];
+
+        for(int i =0;i<m;i++){
+            
+            res[i]= Arrays.copyOfRange(original,i*n,(i+1)*n);
+            
+        }
+        return res;
+    }
+}
+=========================================================================================
+There are n students in a class numbered from 0 to n - 1. The teacher will give each student a problem starting with the student number 0, then the student number 1, and so on until the teacher reaches the student number n - 1. After that, the teacher will restart the process, starting with the student number 0 again.
+You are given a 0-indexed integer array chalk and an integer k. There are initially k pieces of chalk. When the student number i is given a problem to solve, they will use chalk[i] pieces of chalk to solve that problem. However, if the current number of chalk pieces is strictly less than chalk[i], then the student number i will be asked to replace the chalk.
+Return the index of the student that will replace the chalk pieces.
+
+Example 1:
+Input: chalk = [5,1,5], k = 22
+Output: 0
+Explanation: The students go in turns as follows:
+- Student number 0 uses 5 chalk, so k = 17.
+- Student number 1 uses 1 chalk, so k = 16.
+- Student number 2 uses 5 chalk, so k = 11.
+- Student number 0 uses 5 chalk, so k = 6.
+- Student number 1 uses 1 chalk, so k = 5.
+- Student number 2 uses 5 chalk, so k = 0.
+Student number 0 does not have enough chalk, so they will have to replace it.
+Example 2:
+Input: chalk = [3,4,1,2], k = 25
+Output: 1
+Explanation: The students go in turns as follows:
+- Student number 0 uses 3 chalk so k = 22.
+- Student number 1 uses 4 chalk so k = 18.
+- Student number 2 uses 1 chalk so k = 17.
+- Student number 3 uses 2 chalk so k = 15.
+- Student number 0 uses 3 chalk so k = 12.
+- Student number 1 uses 4 chalk so k = 8.
+- Student number 2 uses 1 chalk so k = 7.
+- Student number 3 uses 2 chalk so k = 5.
+- Student number 0 uses 3 chalk so k = 2.
+Student number 1 does not have enough chalk, so they will have to replace it.
+
+class Solution {
+    public int chalkReplacer(int[] chalk, int k) {
+        long totalChalk=0;
+        for(int i=0;i<chalk.length;i++){
+            totalChalk += chalk[i];
+        }
+        long remainingChalk = k % totalChalk;
+
+        
+        for(int i=0;i<chalk.length;i++){
+            if(remainingChalk < chalk[i]){
+                return i;
+            }
+            remainingChalk -= chalk[i];
+        }
+        return -1;
+    }
+}
+===============================================================================
+You are given a string s consisting of lowercase English letters, and an integer k.
+First, convert s into an integer by replacing each letter with its position in the alphabet (i.e., replace 'a' with 1, 'b' with 2, ..., 'z' with 26). Then, transform the integer by replacing it with the sum of its digits. Repeat the transform operation k times in total.
+For example, if s = "zbax" and k = 2, then the resulting integer would be 8 by the following operations:
+Convert: "zbax" ➝ "(26)(2)(1)(24)" ➝ "262124" ➝ 262124
+Transform #1: 262124 ➝ 2 + 6 + 2 + 1 + 2 + 4 ➝ 17
+Transform #2: 17 ➝ 1 + 7 ➝ 8
+Return the resulting integer after performing the operations described above.
+
+Example 1:
+Input: s = "iiii", k = 1
+Output: 36
+Explanation: The operations are as follows:
+- Convert: "iiii" ➝ "(9)(9)(9)(9)" ➝ "9999" ➝ 9999
+- Transform #1: 9999 ➝ 9 + 9 + 9 + 9 ➝ 36
+Thus the resulting integer is 36.
+Example 2:
+Input: s = "leetcode", k = 2
+Output: 6
+Explanation: The operations are as follows:
+- Convert: "leetcode" ➝ "(12)(5)(5)(20)(3)(15)(4)(5)" ➝ "12552031545" ➝ 12552031545
+- Transform #1: 12552031545 ➝ 1 + 2 + 5 + 5 + 2 + 0 + 3 + 1 + 5 + 4 + 5 ➝ 33
+- Transform #2: 33 ➝ 3 + 3 ➝ 6
+Thus the resulting integer is 6.
+Example 3:
+Input: s = "zbax", k = 2
+Output: 8
+ 
+class Solution {
+    public int getLucky(String s, int k) {
+        StringBuilder sb = new StringBuilder();
+        
+        for(char c: s.toCharArray()){
+            sb.append(c-'a'+1);
+        }
+
+        while(k>0){
+            int temp=0;
+            for(char c: sb.toString().toCharArray()){
+                temp+= c-'0';
+            }
+            sb=new StringBuilder(String.valueOf(temp));
+            k--;
+        }
+        return Integer.parseInt(sb.toString());
+
+    }
+}
+===============================================================================================
+Given an integer array nums, find a subarray that has the largest product, and return the product.The test cases are generated so that the answer will fit in a 32-bit integer.
+Example 1:
+Input: nums = [2,3,-2,4]
+Output: 6
+Explanation: [2,3] has the largest product 6.
+Example 2:
+Input: nums = [-2,0,-1]
+Output: 0
+Explanation: The result cannot be 2, because [-2,-1] is not a subarray.
+
+class Solution {
+    public int maxProduct(int[] nums) {
+        if(nums.length==0){
+            return 0;
+        }
+        
+        int max=nums[0];
+        int currentMax=nums[0];
+        int currentMin=nums[0];
+
+        for(int i=1;i<nums.length;i++){
+            int temp = currentMax;
+            currentMax = Math.max(nums[i],Math.max(nums[i]*currentMax,nums[i]*currentMin));
+            currentMin = Math.min(nums[i],Math.min(nums[i]*temp,nums[i]*currentMin));
+
+            max = Math.max(max,currentMax);
+
+        }
+        return max;
+    }
+}
+=====================================================================================================================
+Minimum product sub array
+
+public static int minProduct(int[] nums) {
+        int minProduct = nums[0]; // Stores the minimum product found
+        int maxProduct = nums[0]; // Stores the maximum product (to handle negatives)
+        int result = nums[0]; // Global minimum product
+        
+        for (int i = 1; i < nums.length; i++) {
+            int temp = maxProduct; // Store maxProduct before modifying
+            
+            // If nums[i] is negative, swapping min and max helps
+            maxProduct = Math.max(nums[i], Math.max(nums[i] * maxProduct, nums[i] * minProduct));
+            minProduct = Math.min(nums[i], Math.min(nums[i] * temp, nums[i] * minProduct));
+
+            // Update result with the smallest product found
+            result = Math.min(result, minProduct);
+        }
+        
+        return result;
+    }
+=====================================================================================================================
+To find the minimum sum subarray, we can use Kadane’s Algorithm variation.
+
+public class MinSumSubarray {
+    public static int minSubarraySum(int[] nums) {
+        int minSum = nums[0]; // Stores the minimum sum found
+        int currentMinSum = nums[0]; // Stores sum of the current subarray
+
+        for (int i = 1; i < nums.length; i++) {
+            // Either extend the current subarray or start a new one
+            currentMinSum = Math.min(nums[i], currentMinSum + nums[i]);
+
+            // Update global minimum sum
+            minSum = Math.min(minSum, currentMinSum);
+        }
+
+        return minSum;
+    }
+====================================================================
+You have observations of n + m 6-sided dice rolls with each face numbered from 1 to 6. n of the observations went missing, and you only have the observations of m rolls. Fortunately, you have also calculated the average value of the n + m rolls.
+You are given an integer array rolls of length m where rolls[i] is the value of the ith observation. You are also given the two integers mean and n.
+Return an array of length n containing the missing observations such that the average value of the n + m rolls is exactly mean. If there are multiple valid answers, return any of them. If no such array exists, return an empty array.
+The average value of a set of k numbers is the sum of the numbers divided by k.
+Note that mean is an integer, so the sum of the n + m rolls should be divisible by n + m.
+
+Example 1:
+Input: rolls = [3,2,4,3], mean = 4, n = 2
+Output: [6,6]
+Explanation: The mean of all n + m rolls is (3 + 2 + 4 + 3 + 6 + 6) / 6 = 4.
+Example 2:
+Input: rolls = [1,5,6], mean = 3, n = 4
+Output: [2,3,2,2]
+Explanation: The mean of all n + m rolls is (1 + 5 + 6 + 2 + 3 + 2 + 2) / 7 = 3.
+Example 3:
+Input: rolls = [1,2,3,4], mean = 6, n = 4
+Output: []
+Explanation: It is impossible for the mean to be 6 no matter what the 4 missing rolls are.
+
+class Solution {
+    public int[] missingRolls(int[] rolls, int mean, int n) {
+        int m = rolls.length;
+        int observedSum = Arrays.stream(rolls).sum();
+        int total = mean * (n+m);
+        int remain = total-observedSum;
+
+        if(remain < n || remain > 6*n){
+            return new int[0];
+        }
+
+        int part = remain / n;
+        int rem = remain %n;
+        int[] res = new int[n];
+        Arrays.fill(res,part);
+
+        for(int i=0;i<rem;i++){
+            res[i]++;
+        }
+        return res;
+    }
+}
+==========================================================================================
+class Solution {
+    public int minBitFlips(int start, int goal) {
+        int count = 0; 
+        int xor = start ^ goal; // XOR will give 1 where the bits differ
+
+        while(xor!=0){
+            count += xor & 1; // Increment count if the last bit is 1
+            xor >>=1; // Right-shift to check the next bit
+        }
+        return count;
+    }
+}
+or
+String num1 = toBinary(start);
+        String num2 = toBinary(goal);
+
+        int l1 = num1.length();
+        int l2 = num2.length();
+        int res =0;
+         for(int i=0;i<(l1<l2?l1:l2);i++){
+            if(num1.charAt(i)!=num2.charAt(i)){
+                res++;
+            }
+         }
+         res += Math.abs(l1-l2);
+
+         return res;
+    }
+
+    private String toBinary(int num){
+        StringBuilder sb = new StringBuilder();
+
+        while(num>0){
+            sb.append(num%2);
+            num = num/2;
+        }
+        return sb.reverse().toString();
+
+    }
+====================================================================================================
+You are given a string allowed consisting of distinct characters and an array of strings words. A string is consistent if all characters in the string appear in the string allowed.Return the number of consistent strings in the array words.
+Example 1:
+Input: allowed = "ab", words = ["ad","bd","aaab","baa","badab"]
+Output: 2
+Explanation: Strings "aaab" and "baa" are consistent since they only contain characters 'a' and 'b'.
+Example 2:
+Input: allowed = "abc", words = ["a","b","c","ab","ac","bc","abc"]
+Output: 7
+Explanation: All strings are consistent.
+Example 3:
+Input: allowed = "cad", words = ["cc","acd","b","ba","bac","bad","ac","d"]
+Output: 4
+Explanation: Strings "cc", "acd", "ac", and "d" are consistent.
+ 
+class Solution {
+    public int countConsistentStrings(String allowed, String[] words) {
+        Set<Character> allow = new HashSet<>();
+
+        for(char c : allowed.toCharArray()){
+            allow.add(c);
+        }
+        int res=0;
+
+        for(String s : words){
+            boolean bool = true;
+            for(char c: s.toCharArray()){
+                if(!allow.contains(c)){
+                    bool = false;
+                    break;
+                }
+            }
+            if(bool) res++;
+
+        }
+        return res;
+    }
+}
+==============================================================================================
+You are given an array arr of positive integers. You are also given the array queries where queries[i] = [lefti, righti].
+For each query i compute the XOR of elements from lefti to righti (that is, arr[lefti] XOR arr[lefti + 1] XOR ... XOR arr[righti] ).
+Return an array answer where answer[i] is the answer to the ith query.
+
+Example 1:
+Input: arr = [1,3,4,8], queries = [[0,1],[1,2],[0,3],[3,3]]
+Output: [2,7,14,8] 
+Explanation: 
+The binary representation of the elements in the array are:
+1 = 0001 
+3 = 0011 
+4 = 0100 
+8 = 1000 
+The XOR values for queries are:
+[0,1] = 1 xor 3 = 2 
+[1,2] = 3 xor 4 = 7 
+[0,3] = 1 xor 3 xor 4 xor 8 = 14 
+[3,3] = 8
+Example 2:
+Input: arr = [4,8,2,10], queries = [[2,3],[1,3],[0,0],[0,3]]
+Output: [8,0,4,4]
+ 
+class Solution {
+    public int[] xorQueries(int[] arr, int[][] queries) {
+        int[] res = new int[queries.length];
+
+        for(int i=0;i<queries.length;i++){
+            int[] temp = queries[i];
+            int xor=arr[temp[0]];
+            for(int j=temp[0]+1;j<=temp[1];j++){
+                xor ^=arr[j];
+            }
+            res[i]=xor;
+        }
+        return res;
+    }
+}
+or
+class Solution {
+    public int[] xorQueries(int[] arr, int[][] queries) {
+        int n=arr.length;
+        int[] pre=new int[n];
+        pre[0]=arr[0];
+        for(int i=1;i<n;i++) {
+            pre[i]=pre[i-1]^arr[i];
+        }
+        int[] res=new int[queries.length];
+        for(int k=0;k<queries.length;k++) {
+            int i=queries[k][0];
+            int j=queries[k][1];
+            if(i==0) {
+                res[k]=pre[j];
+            } else {
+                res[k]=pre[j]^pre[i-1];
+            }
+        }
+        return res;
+    }
+}
+=========================================================================================
+You are given an integer array nums of size n.Consider a non-empty subarray from nums that has the maximum possible bitwise AND.
+In other words, let k be the maximum value of the bitwise AND of any subarray of nums. Then, only subarrays with a bitwise AND equal to k should be considered.Return the length of the longest such subarray.
+The bitwise AND of an array is the bitwise AND of all the numbers in it.
+A subarray is a contiguous sequence of elements within an array.
+
+Example 1:
+Input: nums = [1,2,3,3,2,2]
+Output: 2
+Explanation:
+The maximum possible bitwise AND of a subarray is 3.
+The longest subarray with that value is [3,3], so we return 2.
+Example 2:
+Input: nums = [1,2,3,4]
+Output: 1
+Explanation:
+The maximum possible bitwise AND of a subarray is 4.
+The longest subarray with that value is [4], so we return 1.
+ 
+class Solution {
+    public int longestSubarray(int[] nums) {
+        int andValue = Integer.MIN_VALUE;
+
+        for(int num:nums){
+            andValue = Math.max(andValue,num);
+        }//it simply returns maximum value in an array;
+
+        int i=0;
+        int count=0;
+        int res=0;
+
+        while(i<nums.length){
+            if(nums[i]==andValue){
+                count++;
+            }else{
+                count=0;
+            }
+            res=Math.max(res,count);
+            i++;
+            }
+            return res;
+
+
+    }
+}
+=====================================================================================================
+Given a list of 24-hour clock time points in "HH:MM" format, return the minimum minutes difference between any two time-points in the list.
+Example 1:
+Input: timePoints = ["23:59","00:00"]
+Output: 1
+Example 2:
+Input: timePoints = ["00:00","23:59","00:00"]
+Output: 0
+ 
+class Solution {
+    public int findMinDifference(List<String> timePoints) {
+        int res = Integer.MAX_VALUE;
+        int[] times = new int[timePoints.size()];
+
+        for(int i=0;i<timePoints.size();i++){
+           String[] timeArray = timePoints.get(i).split(":");
+           times[i]=Integer.parseInt(timeArray[0])*60+Integer.parseInt(timeArray[1]);
+        }
+
+        Arrays.sort(times);
+
+        for(int i=1;i<times.length;i++){
+            res= Math.min(times[i]-times[i-1],res);
+        }
+
+        int wrapTime = Math.abs(times[times.length-1]-(times[0]+1440));// handle during mid night scenario a day has 1440 minutes
+        return Math.min(wrapTime,res);
+    }
+}
+===========================================================================================================
+A sentence is a string of single-space separated words where each word consists only of lowercase letters.A word is uncommon if it appears exactly once in one of the sentences, and does not appear in the other sentence.Given two sentences s1 and s2, return a list of all the uncommon words. You may return the answer in any order.
+Example 1:
+Input: s1 = "this apple is sweet", s2 = "this apple is sour"
+Output: ["sweet","sour"]
+Explanation:
+The word "sweet" appears only in s1, while the word "sour" appears only in s2.
+Example 2:
+Input: s1 = "apple apple", s2 = "banana"
+Output: ["banana"]
+
+class Solution {
+    public String[] uncommonFromSentences(String s1, String s2) {
+        Map<String,Integer> countMap = new HashMap<>();
+        convertToMap(countMap,s1);
+        convertToMap(countMap,s2);
+        List<String> res = new ArrayList<>();
+
+        for(String key: countMap.keySet()){
+            if(countMap.get(key)==1){
+                res.add(key);
+            }
+        }
+        return res.toArray(new String[0]);
+    }
+
+    private void convertToMap(Map<String,Integer> map,String word){
+        String[] words = word.split(" ");
+
+        Arrays.stream(words)
+        .forEach(s-> map.put(s,map.getOrDefault(s,0)+1));
+    }
+}
+==============================================================================================================================
+Given a list of non-negative integers nums, arrange them such that they form the largest number and return it.Since the result may be very large, so you need to return a string instead of an integer.
+Example 1:
+Input: nums = [10,2]
+Output: "210"
+Example 2:
+Input: nums = [3,30,34,5,9]
+Output: "9534330"
+Example 3:
+Input: nums = [0,0]
+Output: "0"
+
+class Solution {
+    public String largestNumber(int[] nums) {
+        String[] strNums = new String[nums.length];
+
+        for(int i=0;i<nums.length;i++){
+            strNums[i]=String.valueOf(nums[i]);
+        }
+
+        Arrays.sort(strNums,(a,b)->(b+a).compareTo(a+b)); // for ["10","2"] it compares like if "2"+"10">"10"+"2"
+
+        if(strNums[0].equals("0")){
+            return "0";
+        }
+
+        StringBuilder sb = new StringBuilder();
+
+        for(String s:strNums){
+            sb.append(s);
+        }
+
+        return sb.toString();
+    }
+}
+=====================================================================================================
+Given a string expression of numbers and operators, return all possible results from computing all the different possible ways to group numbers and operators. You may return the answer in any order.The test cases are generated such that the output values fit in a 32-bit integer and the number of different results does not exceed 104.
+Example 1:
+Input: expession = "2-1-1"
+Output: [0,2]
+Explanation:
+((2-1)-1) = 0 
+(2-(1-1)) = 2
+Example 2:
+Input: expression = "2*3-4*5"
+Output: [-34,-14,-10,-10,10]
+Explanation:
+(2*(3-(4*5))) = -34 
+((2*3)-(4*5)) = -14 
+((2*(3-4))*5) = -10 
+(2*((3-4)*5)) = -10 
+(((2*3)-4)*5) = 10
+
+public class Solution {
+    static Map<String, List<Integer>> map = new HashMap<>();
+
+    public static int[] diffWaysToCompute(String s) {
+        map.clear(); // Optional: Clear memoization map for fresh runs
+        List<Integer> res = compute(s);
+        return res.stream().mapToInt(Integer::intValue).toArray();
+    }
+
+    private static List<Integer> compute(String s) {
+        if (map.containsKey(s)) return map.get(s);
+        List<Integer> res = new ArrayList<>();
+
+        for (int i = 0; i < s.length(); i++) {
+            char c = s.charAt(i);
+            if (c == '+' || c == '-' || c == '*') {
+                List<Integer> left = compute(s.substring(0, i));
+                List<Integer> right = compute(s.substring(i + 1));
+
+                for (int l : left) {
+                    for (int r : right) {
+                        if (c == '+') res.add(l + r);
+                        else if (c == '-') res.add(l - r);
+                        else res.add(l * r);
+                    }
+                }
+            }
+        }
+
+        if (res.isEmpty()) res.add(Integer.parseInt(s));
+        map.put(s, res);
+        return res;
+    }
+}
+
+================================================================================================
+Given a m x n grid filled with non-negative numbers, find a path from top left to bottom right, which minimizes the sum of all numbers along its path.Note: You can only move either down or right at any point in time.
+
+Example 1:
+Input: grid = [[1,3,1],[1,5,1],[4,2,1]]
+Output: 7
+Explanation: Because the path 1 → 3 → 1 → 1 → 1 minimizes the sum.
+Example 2:
+Input: grid = [[1,2,3],[4,5,6]]
+Output: 12
+
+public class MinPathSum {
+    public int minPathSum(int[][] grid) {
+        int rows = grid.length;
+        int cols = grid[0].length;
+
+        // Create a DP table to store the minimum sum for each cell
+        int[][] dp = new int[rows][cols];
+
+        // Initialize the top-left cell
+        dp[0][0] = grid[0][0];
+
+        // Fill the first row (only can come from the left)
+        for (int j = 1; j < cols; j++) {
+            dp[0][j] = dp[0][j - 1] + grid[0][j];
+        }
+
+        // Fill the first column (only can come from above)
+        for (int i = 1; i < rows; i++) {
+            dp[i][0] = dp[i - 1][0] + grid[i][0];
+        }
+
+        // Fill the rest of the dp table
+        for (int i = 1; i < rows; i++) {
+            for (int j = 1; j < cols; j++) {
+                dp[i][j] = Math.min(dp[i - 1][j], dp[i][j - 1]) + grid[i][j];
+            }
+        }
+
+        // The bottom-right cell contains the minimum sum
+        return dp[rows - 1][cols - 1];
+    }
+}
+==========================================================================================================
+Given an integer n, return all the numbers in the range [1, n] sorted in lexicographical order.You must write an algorithm that runs in O(n) time and uses O(1) extra space. 
+
+Example 1:
+Input: n = 13
+Output: [1,10,11,12,13,2,3,4,5,6,7,8,9]
+Example 2:
+Input: n = 2
+Output: [1,2]
+ 
+class Solution {
+    public List<Integer> lexicalOrder(int n) {
+        return IntStream.rangeClosed(1,n)
+                                .boxed()
+                                .sorted((a,b)-> String.valueOf(a).compareTo(String.valueOf(b)))
+                                .collect(Collectors.toList());
+    }
+}
+==========================================================================================================
+You are given two arrays with positive integers arr1 and arr2.A prefix of a positive integer is an integer formed by one or more of its digits, starting from its leftmost digit. For example, 123 is a prefix of the integer 12345, while 234 is not.
+A common prefix of two integers a and b is an integer c, such that c is a prefix of both a and b. For example, 5655359 and 56554 have a common prefix 565 while 1223 and 43456 do not have a common prefix.You need to find the length of the longest common prefix between all pairs of integers (x, y) such that x belongs to arr1 and y belongs to arr2.
+Return the length of the longest common prefix among all pairs. If no common prefix exists among them, return 0.
+Example 1:
+Input: arr1 = [1,10,100], arr2 = [1000]
+Output: 3
+Explanation: There are 3 pairs (arr1[i], arr2[j]):
+- The longest common prefix of (1, 1000) is 1.
+- The longest common prefix of (10, 1000) is 10.
+- The longest common prefix of (100, 1000) is 100.
+The longest common prefix is 100 with a length of 3.
+Example 2:
+Input: arr1 = [1,2,3], arr2 = [4,4,4]
+Output: 0
+Explanation: There exists no common prefix for any pair (arr1[i], arr2[j]), hence we return 0.
+Note that common prefixes between elements of the same array do not count.
+class Solution {
+    public int longestCommonPrefix(int[] arr1, int[] arr2) {
+        
+        String res="";
+        for(int i=0;i<arr1.length;i++){
+            for(int j=0;j<arr2.length;j++){
+                String prefix = longestCommonPrefix(String.valueOf(arr1[i]),String.valueOf(arr2[j]));
+                if(prefix.length()>res.length()){
+                    res=prefix;
+                }
+            }
+        }
+        return res.length();
+    }
+
+    public String longestCommonPrefix(String s1, String s2) {
+        int len = Math.min(s1.length(), s2.length());
+        int i = 0;
+        while (i < len && s1.charAt(i) == s2.charAt(i)) {
+            i++;
+        }
+        return s1.substring(0, i);
+    }
+}
+========================================================================================
+You are implementing a program to use as your calendar. We can add a new event if adding the event will not cause a double booking.A double booking happens when two events have some non-empty intersection (i.e., some moment is common to both events.).The event can be represented as a pair of integers start and end that represents a booking on the half-open interval [start, end), the range of real numbers x such that start <= x < end.
+Implement the MyCalendar class:MyCalendar() Initializes the calendar object.
+boolean book(int start, int end) Returns true if the event can be added to the calendar successfully without causing a double booking. Otherwise, return false and do not add the event to the calendar.
+
+Example 1:
+Input
+["MyCalendar", "book", "book", "book"]
+[[], [10, 20], [15, 25], [20, 30]]
+Output
+[null, true, false, true]
+Explanation
+MyCalendar myCalendar = new MyCalendar();
+myCalendar.book(10, 20); // return True
+myCalendar.book(15, 25); // return False, It can not be booked because time 15 is already booked by another event.
+myCalendar.book(20, 30); // return True, The event can be booked, as the first event takes every time less than 20, but not including 20.
+
+class MyCalendar {
+    List<int[]> bookings = new ArrayList<>();
+    public MyCalendar() {
+        bookings = new ArrayList<>();
+    }
+    
+    public boolean book(int start, int end) {
+        for(int[] event: bookings){
+            int bookedStart= event[0];
+            int bookedEnd = event[1];
+
+            if(start<bookedEnd && end > bookedStart){
+                return false;
+            }
+        }
+        bookings.add(new int[]{start,end});
+        return true;
+    }
+}
+ ======================================================================================================================
+ You are implementing a program to use as your calendar. We can add a new event if adding the event will not cause a triple booking.A triple booking happens when three events have some non-empty intersection (i.e., some moment is common to all the three events.).The event can be represented as a pair of integers start and end that represents a booking on the half-open interval [start, end), the range of real numbers x such that start <= x < end.Implement the MyCalendarTwo class:MyCalendarTwo() Initializes the calendar object.
+boolean book(int start, int end) Returns true if the event can be added to the calendar successfully without causing a triple booking. Otherwise, return false and do not add the event to the calendar.
+Example 1:
+Input
+["MyCalendarTwo", "book", "book", "book", "book", "book", "book"]
+[[], [10, 20], [50, 60], [10, 40], [5, 15], [5, 10], [25, 55]]
+Output
+[null, true, true, true, false, true, true]
+
+Explanation
+MyCalendarTwo myCalendarTwo = new MyCalendarTwo();
+myCalendarTwo.book(10, 20); // return True, The event can be booked. 
+myCalendarTwo.book(50, 60); // return True, The event can be booked. 
+myCalendarTwo.book(10, 40); // return True, The event can be double booked. 
+myCalendarTwo.book(5, 15);  // return False, The event cannot be booked, because it would result in a triple booking.
+myCalendarTwo.book(5, 10); // return True, The event can be booked, as it does not use time 10 which is already double booked.
+myCalendarTwo.book(25, 55); // return True, The event can be booked, as the time in [25, 40) will be double booked with the third event, the time [40, 50) will be single booked, and the time [50, 55) will be double booked with the second event.
+ 
+ class MyCalendarTwo {
+    private List<int[]> events;        // List to store all events
+    private List<int[]> doubleBookings; // List to store double bookings
+
+    public MyCalendarTwo() {
+        events = new ArrayList<>();        // Initialize list to store events
+        doubleBookings = new ArrayList<>(); // Initialize list to store double bookings
+    }
+
+    public boolean book(int start, int end) {
+        // Check if the current event would cause a triple booking
+        for (int[] db : doubleBookings) {
+            if (start < db[1] && end > db[0]) {
+                // Triple booking detected, reject this event
+                return false;
+            }
+        }
+
+        // Check for overlaps with existing events to see if a double booking occurs
+        for (int[] event : events) {
+            if (start < event[1] && end > event[0]) {
+                // There is an overlap, add the overlapping part to doubleBookings
+                doubleBookings.add(new int[]{Math.max(start, event[0]), Math.min(end, event[1])});
+            }
+        }
+
+        // Add the new event to the events list
+        events.add(new int[]{start, end});
+        return true;
+    }
+}
+====================================================================================================================
+Given a string word, compress it using the following algorithm:Begin with an empty string comp. While word is not empty, use the following operation:Remove a maximum length prefix of word made of a single character c repeating at most 9 times.Append the length of the prefix followed by c to comp.Return the string comp.
+Example 1:
+Input: word = "abcde"                        Output: "1a1b1c1d1e"
+Explanation:
+Initially, comp = "". Apply the operation 5 times, choosing "a", "b", "c", "d", and "e" as the prefix in each operation.
+For each prefix, append "1" followed by the character to comp.
+Example 2:
+Input: word = "aaaaaaaaaaaaaabb"               Output: "9a5a2b"
+Explanation:
+Initially, comp = "". Apply the operation 3 times, choosing "aaaaaaaaa", "aaaaa", and "bb" as the prefix in each operation.
+
+class Solution {
+    public String compressedString(String word) {
+        StringBuilder comp = new StringBuilder();
+        int cnt = 1, n = word.length();
+        char ch = word.charAt(0);
+        for (int i = 1; i < n; i++) {
+            if (word.charAt(i) == ch && cnt < 9) {
+                cnt++;
+            } else {
+                comp.append(cnt).append(ch);
+                ch = word.charAt(i);
+                cnt = 1;
+            }
+        }
+        comp.append(cnt).append(ch);
+        return comp.toString();
+    }
+}
+====================================================================================================================================
+You are given two jugs with capacities x liters and y liters. You have an infinite water supply. Return whether the total amount of water in both jugs may reach target using the following operations:Fill either jug completely with water.Completely empty either jug.
+Pour water from one jug into another until the receiving jug is full, or the transferring jug is empty.
+Example 1:Input: x = 3, y = 5, target = 4			Output: true
+
+Explanation:Follow these steps to reach a total of 4 liters:
+Fill the 5-liter jug (0, 5).Pour from the 5-liter jug into the 3-liter jug, leaving 2 liters (3, 2).Empty the 3-liter jug (0, 2).Transfer the 2 liters from the 5-liter jug to the 3-liter jug (2, 0).Fill the 5-liter jug again (2, 5).Pour from the 5-liter jug intothe 3-liter jug until the 3-liter jug is full. This leaves 4 liters in the 5-liter jug (3, 4).
+Empty the 3-liter jug. Now, you have exactly 4 liters in the 5-liter jug (0, 4).
+
+public class WaterJugProblem {
+
+    public static boolean canMeasureWater(int x, int y, int target) {
+        // Base case: If target is greater than the sum of both jug capacities, it's not possible
+        if (target > x + y) {
+            return false;
+        }
+        
+        // If target is zero or equal to one of the capacities, it's possible
+        if (target == 0 || target == x || target == y || target == x + y) {
+            return true;
+        }
+        
+        // Use the GCD condition to determine if the target can be measured
+        return target % gcd(x, y) == 0;
+    }
+    
+    // Helper method to calculate GCD using Euclid's algorithm
+    private static int gcd(int a, int b) {
+        while (b != 0) {
+            int temp = b;
+            b = a % b;
+            a = temp;
+        }
+        return a;
+    }
+}

@@ -1,0 +1,1718 @@
+Given an array of integers arr of even length n and an integer k.We want to divide the array into exactly n / 2 pairs such that the sum of each pair is divisible by k.Return true If you can find a way to do that or false otherwise.
+
+Example 1:
+Input: arr = [1,2,3,4,5,10,6,7,8,9], k = 5
+Output: true
+Explanation: Pairs are (1,9),(2,8),(3,7),(4,6) and (5,10).
+Example 2:
+Input: arr = [1,2,3,4,5,6], k = 7
+Output: true
+Explanation: Pairs are (1,6),(2,5) and(3,4).
+Example 3:
+Input: arr = [1,2,3,4,5,6], k = 10
+Output: false
+Explanation: You can try all possible pairs to see that there is no way to divide arr into 3 pairs each with sum divisible by 10
+class Solution {
+    public boolean canArrange(int[] arr, int k) {
+        Map<Integer, Integer> map = new HashMap<>();
+
+        // Step 1: Populate the frequency map based on the remainder
+        for (int num : arr) {
+            int rem = (num % k + k) % k;  // Ensures non-negative remainder
+            map.put(rem, map.getOrDefault(rem, 0) + 1);
+        }
+
+        // Step 2: Check if valid pairs can be formed
+        for (int rem : map.keySet()) {
+            int count = map.get(rem);
+
+            // Case 1: For remainder 0, the count must be even
+            if (rem == 0) {
+                if (count % 2 != 0) return false;
+            } else {
+                // Case 2: For remainder rem, there must be an equal number of (k - rem)
+                int complement = k - rem;
+                if (map.getOrDefault(complement, 0) != count) {
+                    return false;  // If counts don't match, return false
+                }
+            }
+        }
+
+        return true;
+    }
+}
+==========================================================================================================================================
+You are given a string s consisting only of uppercase English letters.You can apply some operations to this string where, in one operation, you can remove any occurrence of one of the substrings "AB" or "CD" from s.Return the minimum possible length of the resulting string that you can obtain.Note that the string concatenates after removing the substring and could produce new "AB" or "CD" substrings.
+
+Example 1:
+Input: s = "ABFCACDB"
+Output: 2
+Explanation: We can do the following operations:
+- Remove the substring "ABFCACDB", so s = "FCACDB".
+- Remove the substring "FCACDB", so s = "FCAB".
+- Remove the substring "FCAB", so s = "FC".
+So the resulting length of the string is 2.
+It can be shown that it is the minimum length that we can obtain.
+Example 2:
+Input: s = "ACBBD"
+Output: 5
+Explanation: We cannot do any operations on the string so the length remains the same.
+ 
+class Solution {
+    public int minLength(String s) {
+        String prev;
+        do{
+             prev = s;
+            s=s.replace("AB","")
+                .replace("CD","");
+        }while(!s.equals(prev));
+
+        return s.length();
+    }
+}
+===============================================================================================================
+Given a string s, partition s such that every substring of the partition is a palindrome. Return all possible palindrome partitioning of s.
+Example 1:
+Input: s = "aab"
+Output: [["a","a","b"],["aa","b"]]
+Example 2:
+Input: s = "a"
+Output: [["a"]]
+
+public List<List<String>> partition(String s) {
+        List<List<String>> result = new ArrayList<>();
+        backtrack(s, 0, new ArrayList<>(), result);
+        return result;
+    }
+
+private void backtrack(String s, int start, List<String> currentPartition, List<List<String>> result) {
+    // If we reach the end of the string, add the current partition to the result
+    if (start == s.length()) {
+        result.add(new ArrayList<>(currentPartition));  // Add partition to result
+        return;  // Return to backtrack
+    }
+
+    // Explore all substrings starting from the current position
+    for (int end = start; end < s.length(); end++) {
+        if (isPalindrome(s, start, end)) {
+            // Add the palindrome to the current partition
+            currentPartition.add(s.substring(start, end + 1));
+            
+            // Recurse for the remaining string
+            backtrack(s, end + 1, currentPartition, result);
+            
+            // **Backtrack**: Remove the last added element to explore other possibilities
+            currentPartition.remove(currentPartition.size() - 1);
+        }
+    }
+}
+==================================================================================================================
+There are n balls on a table, each ball has a color black or white.You are given a 0-indexed binary string s of length n, where 1 and 0 represent black and white balls, respectively.In each step, you can choose two adjacent balls and swap them.
+Return the minimum number of steps to group all the black balls to the right and all the white balls to the left.
+
+Example 1:
+Input: s = "101"
+Output: 1
+Explanation: We can group all the black balls to the right in the following way:
+- Swap s[0] and s[1], s = "011".
+Initially, 1s are not grouped together, requiring at least 1 step to group them to the right.
+Example 2:
+Input: s = "100"
+Output: 2
+Explanation: We can group all the black balls to the right in the following way:
+- Swap s[0] and s[1], s = "010".
+- Swap s[1] and s[2], s = "001".
+It can be proven that the minimum number of steps needed is 2.
+Example 3:
+Input: s = "0111"
+Output: 0
+Explanation: All the black balls are already grouped to the right.
+ 
+class Solution {
+    public long minimumSteps(String s) {
+        long swap = 0;
+        int black = 0;
+        for(int i=0;i<s.length();i++){
+            if(s.charAt(i)=='0') swap+=(long)black;
+            else black++;
+        }
+        return swap;
+    }
+}
+=====================================================================================================
+Swap only once to get maximum value
+input: 2745 output : 7245
+input : 3129 output: 9123
+input : 9976 output: 9976
+
+class Solution {
+    public int maximumSwap(int num) {
+        char[] digits = Integer.toString(num).toCharArray();
+        int n = digits.length;
+
+        // Store the last occurrence of each digit (0 to 9)
+        int[] last = new int[10];
+        for (int i = 0; i < n; i++) {
+            last[digits[i] - '0'] = i;//last[2]=0,last[7]=1,last[4]=3,last[5]=3
+        }
+
+        // Find the first digit that can be swapped with a larger digit later
+        for (int i = 0; i < n; i++) {
+            // Check from 9 to (current digit + 1) for a larger digit
+            for (int d = 9; d > digits[i] - '0'; d--) {
+                if (last[d] > i) {
+                    // Swap the current digit with the largest possible one
+                    char temp = digits[i];
+                    digits[i] = digits[last[d]];
+                    digits[last[d]] = temp;
+
+                    // Return the result after the first swap
+                    return Integer.parseInt(new String(digits));
+                }
+            }
+        }
+
+        // Return the original number if no swap is possible
+        return num;
+    }
+}
+========================================================================================
+Given an integer n, return true if it is a power of four. Otherwise, return false.An integer n is a power of four, if there exists an integer x such that n == 4x.
+Example 1:Input: n = 16 Output: true
+Example 2:Input: n = 5 Output: false
+Example 3:Input: n = 1 Output: true
+ 
+class Solution {
+    public boolean isPowerOfFour(int n) {
+        int max = (int)Math.sqrt(n);
+        int i=0;
+        while(i<=max){
+            if(Math.pow(4,i)==n) return true;
+            i++;
+        }
+        return false;
+    }
+}
+========================================================================================================
+Given a string s, reverse only all the vowels in the string and return it.The vowels are 'a', 'e', 'i', 'o', and 'u', and they can appear in both lower and upper cases, more than once.
+ 
+Example 1:
+Input: s = "IceCreAm"
+Output: "AceCreIm"
+Explanation:
+The vowels in s are ['I', 'e', 'e', 'A']. On reversing the vowels, s becomes "AceCreIm".
+Example 2:
+Input: s = "leetcode"
+Output: "leotcede"
+
+class Solution {
+    public String reverseVowels(String s) {
+        
+        int left = 0;
+        int right = s.length()-1;
+        char[] chars = s.toCharArray();
+
+        while(left<right){
+            while(left < right && !isVowel(chars[left])){
+                left++;
+            }
+            while(left < right && !isVowel(chars[right])){
+                right--;
+            }
+
+            char temp = chars[left];
+            chars[left]=chars[right];
+            chars[right]=temp;
+
+            left++;
+            right--;
+        }
+        return new String(chars);
+
+       
+    }
+    private boolean isVowel(char c){
+         c = Character.toLowerCase(c);// or u can do like "aeiou".indexOf(c)!=-1;
+
+        List<Character> vowels = new ArrayList<>();
+        vowels.add('a');
+        vowels.add('e');
+        vowels.add('i');
+        vowels.add('o');
+        vowels.add('u');
+        return vowels.contains(c);
+
+    }
+}
+======================================================================================
+Given a string s, return the maximum number of unique substrings that the given string can be split into.You can split string s into any list of non-empty substrings, where the concatenation of the substrings forms the original string. However, you must split the substrings such that all of them are unique.A substring is a contiguous sequence of characters within a string.
+Eample 1:
+Input: s = "ababccc"
+Output: 5
+Explanation: One way to split maximally is ['a', 'b', 'ab', 'c', 'cc']. Splitting like ['a', 'b', 'a', 'b', 'c', 'cc'] is not valid as you have 'a' and 'b' multiple times.
+Example 2:
+Input: s = "aba"
+Output: 2
+Explanation: One way to split maximally is ['a', 'ba'].
+Example 3:
+Input: s = "aa"
+Output: 1
+Explanation: It is impossible to split the string any further.
+ 
+class Solution {
+    public int maxUniqueSplit(String s) {
+        return backTrack(s,new HashSet<>(),0);
+
+    }
+    private int backTrack(String s,HashSet<String> seen, int start){
+        if(s.length()==start){
+            return 0;
+        }
+        int maxSplits = 0;
+
+        for(int end = start+1;end<=s.length();end++){
+            String sub = s.substring(start,end);
+            if(!seen.contains(sub)){
+                seen.add(sub);
+                maxSplits = Math.max(maxSplits,1+backTrack(s,seen,end));
+                seen.remove(sub);
+
+            }
+        }
+        return maxSplits;
+    }
+}
+=======================================================================================================
+Given an integer n, return the least number of perfect square numbers that sum to n.A perfect square is an integer that is the square of an integer; in other words, it is the product of some integer with itself. For example, 1, 4, 9, and 16 are perfect squares while 3 and 11 are not.
+Example 1:
+Input: n = 12
+Output: 3
+Explanation: 12 = 4 + 4 + 4.
+Example 2:
+Input: n = 13
+Output: 2
+Explanation: 13 = 4 + 9.
+public class PerfectSquares {
+
+    public int numSquares(int n) {
+        // Create a DP array to store the minimum number of perfect squares for each value from 0 to n.
+        int[] dp = new int[n + 1];
+        
+        // Initialize the array with a large value, representing an impossible count initially.
+        Arrays.fill(dp, Integer.MAX_VALUE);
+        
+        // Base case: 0 can be represented by 0 numbers (sum is 0).
+        dp[0] = 0;
+
+        // Iterate through all numbers from 1 to n.
+        for (int i = 1; i <= n; i++) {
+            // Check all perfect squares less than or equal to i.
+            for (int j = 1; j * j <= i; j++) {
+                // Update the DP value by comparing with the minimum of the current value 
+                // and the value if we include the current square number.
+                dp[i] = Math.min(dp[i], dp[i - j * j] + 1);
+            }
+        }
+        
+        // The result for n will be stored in dp[n].
+        return dp[n];
+    }
+}
+============================================================================================================================================
+Given an array of distinct integers nums and a target integer target, return the number of possible combinations that add up to target.The test cases are generated so that the answer can fit in a 32-bit integer.
+Example 1:Input: nums = [1,2,3], target = 4				Output: 7
+Explanation:
+The possible combination ways are:(1, 1, 1, 1)(1, 1, 2)(1, 2, 1)(1, 3)(2, 1, 1)(2, 2)(3, 1)
+Note that different sequences are counted as different combinations.
+Example 2:Input: nums = [9], target = 3					Output: 0
+
+class Solution {
+
+    public int combinationSum4(int[] nums, int target) {
+        
+        int[] dp = new int[target+1];
+        dp[0]=1;
+
+        for(int i=0;i<=target;i++){
+
+            for(int num:nums){
+                if(i-num>=0)
+                dp[i]+=dp[i-num];
+
+            }
+
+        }
+        return dp[target];
+
+    }
+}
+
+==================================================================================
+Given a list of folders folder, return the folders after removing all sub-folders in those folders. You may return the answer in any order.If a folder[i] is located within another folder[j], it is called a sub-folder of it. A sub-folder of folder[j] must start with folder[j], followed by a "/". For example, "/a/b" is a sub-folder of "/a", but "/b" is not a sub-folder of "/a/b/c".The format of a path is one or more concatenated strings of the form: '/' followed by one or more lowercase English letters.For example, "/leetcode" and "/leetcode/problems" are valid paths while an empty string and "/" are not.
+Example 1:
+Input: folder = ["/a","/a/b","/c/d","/c/d/e","/c/f"]
+Output: ["/a","/c/d","/c/f"]
+Explanation: Folders "/a/b" is a subfolder of "/a" and "/c/d/e" is inside of folder "/c/d" in our filesystem.
+Example 2:
+Input: folder = ["/a","/a/b/c","/a/b/d"]
+Output: ["/a"]
+Explanation: Folders "/a/b/c" and "/a/b/d" will be removed because they are subfolders of "/a".
+Example 3:
+Input: folder = ["/a/b/c","/a/b/ca","/a/b/d"]
+Output: ["/a/b/c","/a/b/ca","/a/b/d"]
+ 
+class Solution {
+    public List<String> removeSubfolders(String[] folder) {
+        Arrays.sort(folder);
+
+        String prev = folder[0];
+        List<String> res = new ArrayList<>();
+        res.add(prev);
+
+        for(int i=1;i<folder.length;i++){
+            if(!folder[i].startsWith(prev+"/")){
+                res.add(folder[i]);
+                prev = folder[i];
+            }
+            
+        }
+        return res;
+    }
+}
+=================================================================================================
+Suppose an array of length n sorted in ascending order is rotated between 1 and n times. For example, the array nums = [0,1,4,4,5,6,7] might become:[4,5,6,7,0,1,4] if it was rotated 4 times.[0,1,4,4,5,6,7] if it was rotated 7 times.Notice that rotating an array [a[0], a[1], a[2], ..., a[n-1]] 1 time results in the array [a[n-1], a[0], a[1], a[2], ..., a[n-2]].Given the sorted rotated array nums that may contain duplicates, return the minimum element of this array.You must decrease the overall operation steps as much as possible.
+Example 1:
+Input: nums = [1,3,5]
+Output: 1
+Example 2:
+Input: nums = [2,2,2,0,1]
+Output: 0
+ 
+public class FindMinimumInRotatedArray {
+    public static int findMin(int[] nums) {
+        int left = 0, right = nums.length - 1;
+
+        while (left < right) {
+            int mid = left + (right - left) / 2;
+
+            // If mid element is greater than the right element, the minimum must be in the right half
+            if (nums[mid] > nums[right]) {
+                left = mid + 1;
+            }
+            // If mid element is smaller than the right element, the minimum must be in the left half (or could be mid)
+            else if (nums[mid] < nums[right]) {
+                right = mid;
+            }
+            // If nums[mid] == nums[right], we can't decide which side has the minimum, so reduce right by 1
+            else {
+                right--;
+            }
+        }
+
+        // When left == right, we've found the minimum element
+        return nums[left];
+    }
+}
+=====================================================================================================================
+Given a m * n matrix of ones and zeros, return how many square submatrices have all ones.
+Example 1:
+Input: matrix =
+[
+  [0,1,1,1],
+  [1,1,1,1],
+  [0,1,1,1]
+]
+Output: 15
+Explanation: 
+There are 10 squares of side 1.
+There are 4 squares of side 2.
+There is  1 square of side 3.
+Total number of squares = 10 + 4 + 1 = 15.
+Example 2:
+Input: matrix = 
+[
+  [1,0,1],
+  [1,1,0],
+  [1,1,0]
+]
+Output: 7
+Explanation: 
+There are 6 squares of side 1.  
+There is 1 square of side 2. 
+Total number of squares = 6 + 1 = 7.
+
+class Solution {
+    public int countSquares(int[][] matrix) {
+        int row = matrix.length;
+        int col = matrix[0].length;
+        int[][] dp = new int[row][col];
+        int res = 0;
+
+        for (int i = 0; i < row; i++) {
+            for (int j = 0; j < col; j++) {
+                if (matrix[i][j] == 1) {
+                    if (i == 0 || j == 0) {
+                        // Base case: If it's the first row or column, just take the matrix value.
+                        dp[i][j] = 1;
+                    } else {
+                        // Calculate the size of the largest square ending at (i, j)
+                        dp[i][j] = Math.min(Math.min(dp[i - 1][j], dp[i - 1][j - 1]), dp[i][j - 1]) + 1;
+                    }
+                    res += dp[i][j]; // Accumulate the count of squares
+                }
+            }
+        }
+        return res;
+    }
+}
+==============================================================================================================================
+You are given an integer array nums. A subsequence of nums is called a square streak if:The length of the subsequence is at least 2, and after sorting the subsequence, each element 
+(except the first element) is the square of the previous number.Return the length of the longest square streak in nums, or return -1 if there is no square streak.
+A subsequence is an array that can be derived from another array by deleting some or no elements without changing the order of the remaining elements.
+
+Example 1:
+Input: nums = [4,3,6,16,8,2]
+Output: 3
+Explanation: Choose the subsequence [4,16,2]. After sorting it, it becomes [2,4,16].
+- 4 = 2 * 2.
+- 16 = 4 * 4.
+Therefore, [4,16,2] is a square streak.
+It can be shown that every subsequence of length 4 is not a square streak.
+Example 2:
+Input: nums = [2,3,5,6,7]
+Output: -1
+Explanation: There is no square streak in nums so return -1.
+ 
+class Solution {
+    public int longestSquareStreak(int[] nums) {
+        
+        Map<Integer,Integer> map = new HashMap<>();
+        Arrays.sort(nums);
+        int res = -1;
+
+        for(int num:nums){
+            int sqrt = (int)Math.sqrt(num);
+
+            if(map.containsKey(sqrt) && num==sqrt*sqrt){
+                map.put(num,map.get(sqrt)+1);
+                res = Math.max(res,map.get(num));
+            }else{
+                map.put(num,1);
+            }
+        }
+        return res;
+    }
+}
+or
+
+class Solution {
+    public int longestSquareStreak(int[] nums) {
+        // Use a HashSet to store elements for O(1) lookup
+        HashSet<Integer> set = new HashSet<>();
+        for (int num : nums) {
+            set.add(num);
+        }
+
+        int count = -1;
+
+        // Check each number as a potential starting point
+        for (int num : nums) {
+            if (!set.contains(num)) {
+                // Skip if this number was already used in a previous streak
+                continue;
+            }
+
+            int curr = num;
+            int len = 1;
+
+            // Build the streak by finding successive squares
+            while (set.contains(curr * curr)) {
+                curr = curr * curr;
+                len++;
+                // Remove the element to avoid redundant checks
+                set.remove(curr);
+            }
+
+            // Update the maximum streak length if it's at least 2
+            if (len >= 2) {
+                count = Math.max(count, len);
+            }
+        }
+
+        return count;
+    }
+}
+===============================================================================================================
+Given a 1-indexed array of integers numbers that is already sorted in non-decreasing order, find two numbers such that they add up to a specific target number. Let these two numbers be numbers[index1] and numbers[index2] where 1 <= index1 < index2 <= numbers.length.Return the indices of the two numbers, index1 and index2, added by one as an integer array [index1, index2] of length 2.The tests are generated such that there is exactly one solution. You may not use the same element twice.Your solution must use only constant extra space.
+
+Example 1:
+Input: numbers = [2,7,11,15], target = 9
+Output: [1,2]
+Explanation: The sum of 2 and 7 is 9. Therefore, index1 = 1, index2 = 2. We return [1, 2].
+Example 2:
+Input: numbers = [2,3,4], target = 6
+Output: [1,3]
+Explanation: The sum of 2 and 4 is 6. Therefore index1 = 1, index2 = 3. We return [1, 3].
+Example 3:
+Input: numbers = [-1,0], target = -1
+Output: [1,2]
+Explanation: The sum of -1 and 0 is -1. Therefore index1 = 1, index2 = 2. We return [1, 2].
+ 
+class Solution {
+    public int[] twoSum(int[] numbers, int target) {
+        int left=0;
+        int right=numbers.length-1;
+        int curr;
+        while(left<right)
+        {
+            curr=numbers[left]+numbers[right];
+            if(curr==target){
+                return new int[]{left+1,right+1};
+            }
+            if(curr>target)
+            {
+                right--;
+            }
+            else{
+                left++;
+            }
+        }
+        return new int[]{left,right};
+    }
+}
+========================================================================================================================
+Given a positive integer n, write a function that returns the number of set bitsin its binary representation (also known as the Hamming weight).
+Example 1:
+Input: n = 11
+Output: 3
+Explanation:The input binary string 1011 has a total of three set bits.
+Example 2:
+Input: n = 128
+Output: 1
+Explanation:The input binary string 10000000 has a total of one set bit.
+Example 3:
+Input: n = 2147483645
+Output: 30
+Explanation:The input binary string 1111111111111111111111111111101 has a total of thirty set bits.
+class Solution {
+    public int hammingWeight(int n) {
+        String s = bin(n);
+
+        int originalLen = s.length();
+        int newLen = s.replace("1","").length();
+        
+        return originalLen-newLen;
+    }
+
+    private String bin(int n){
+        StringBuilder sb = new StringBuilder();
+
+        while(n>0){
+            int res = n % 2;
+            sb.append(res);
+            n /= 2;
+        }
+        return sb.reverse().toString();
+    }
+
+}
+or
+class Solution {
+    public int hammingWeight(int n) {
+        int count=0;
+        while(n!=0){
+            if((n&1)==1)
+                count++;
+            n=n>>1;
+        }
+        return count;
+    }
+}
+==================================================================================================
+A fancy string is a string where no three consecutive characters are equal.Given a string s, delete the minimum possible number of characters from s to make it fancy.Return the final string after the deletion. It can be shown that the answer will always be unique.
+Example 1:
+Input: s = "leeetcode"
+Output: "leetcode"
+Explanation:
+Remove an 'e' from the first group of 'e's to create "leetcode".
+No three consecutive characters are equal, so return "leetcode".
+Example 2:
+Input: s = "aaabaaaa"
+Output: "aabaa"
+Explanation:
+Remove an 'a' from the first group of 'a's to create "aabaaaa".
+Remove two 'a's from the second group of 'a's to create "aabaa".
+No three consecutive characters are equal, so return "aabaa".
+Example 3:
+Input: s = "aab"
+Output: "aab"
+Explanation: No three consecutive characters are equal, so return "aab".
+
+public class FancyString {
+    public static String makeFancyString(String s) {
+        if (s.length() < 3) {
+            return s; // If the string has less than 3 characters, it's already fancy
+        }
+
+        StringBuilder result = new StringBuilder();
+        result.append(s.charAt(0)); // Start with the first character
+        result.append(s.charAt(1)); // Add the second character
+        
+        for (int i = 2; i < s.length(); i++) {
+            // Only compare last two characters in result with the current character in s
+            if (!(result.charAt(result.length() - 1) == s.charAt(i) && result.charAt(result.length() - 2) == s.charAt(i))) {
+                result.append(s.charAt(i)); // Append if it doesn't create three consecutive characters
+            }
+        }
+        
+        return result.toString();
+    }
+}
+==========================================================================================================================
+A sentence is a list of words that are separated by a single space with no leading or trailing spaces.For example, "Hello World", "HELLO", "hello world hello world" are all sentences.Words consist of only uppercase and lowercase English letters. Uppercase and lowercase English letters are considered different.A sentence is circular if:
+The last character of a word is equal to the first character of the next word.
+The last character of the last word is equal to the first character of the first word.
+For example, "leetcode exercises sound delightful", "eetcode", "leetcode eats soul" are all circular sentences. However, "Leetcode is cool", "happy Leetcode", "Leetcode" and "I like Leetcode" are not circular sentences.Given a string sentence, return true if it is circular. Otherwise, return false.
+Example 1:
+Input: sentence = "leetcode exercises sound delightful"
+Output: true
+Explanation: The words in sentence are ["leetcode", "exercises", "sound", "delightful"].
+- leetcode's last character is equal to exercises's first character.
+- exercises's last character is equal to sound's first character.
+- sound's last character is equal to delightful's first character.
+- delightful's last character is equal to leetcode's first character.
+The sentence is circular.
+Example 2:
+Input: sentence = "eetcode"
+Output: true
+Explanation: The words in sentence are ["eetcode"].
+- eetcode's last character is equal to eetcode's first character.
+The sentence is circular.
+Example 3:
+Input: sentence = "Leetcode is cool"
+Output: false
+Explanation: The words in sentence are ["Leetcode", "is", "cool"].
+- Leetcode's last character is not equal to is's first character.
+The sentence is not circular
+
+class Solution {
+    public boolean isCircularSentence(String sentence) {
+        String[] arr = sentence.split(" ");
+        int n = arr.length;
+        if(n == 1) return arr[0].charAt(0)==arr[0].charAt(sentence.length()-1);
+
+        char c = arr[0].charAt(arr[0].length()-1);
+        
+
+        for(int i=1;i<n;i++){
+            if (c != arr[i].charAt(0)){
+                    return false;
+                }
+                c= arr[i].charAt(arr[i].length()-1);
+
+
+        } 
+        return arr[0].charAt(0)==arr[n-1].charAt(arr[n-1].length()-1);
+    }
+}
+
+or
+
+public class CircularSentenceChecker {
+    public static boolean isCircularSentence(String sentence) {
+        // Split the sentence into words
+        String[] words = sentence.split(" ");
+        
+        // Check each pair of consecutive words
+        for (int i = 0; i < words.length; i++) {
+            String currentWord = words[i];
+            String nextWord = words[(i + 1) % words.length];
+            
+            // Check if the last character of the current word matches the first character of the next word
+            if (currentWord.charAt(currentWord.length() - 1) != nextWord.charAt(0)) {
+                return false;
+            }
+        }
+        
+        // If all checks pass, the sentence is circular
+        return true;
+    }
+}
+=============================================================================================================================
+You are given a 0-indexed binary string s having an even length.A string is beautiful if it's possible to partition it into one or more substrings such that:Each substring has an even length.Each substring contains only 1's or only 0's.You can change any character in s to 0 or 1.Return the minimum number of changes required to make the string s beautiful.
+
+Example 1:
+Input: s = "1001" Output: 2
+Explanation: We change s[1] to 1 and s[3] to 0 to get string "1100".
+It can be seen that the string "1100" is beautiful because we can partition it into "11|00".
+It can be proven that 2 is the minimum number of changes needed to make the string beautiful.
+Example 2:
+Input: s = "10" Output: 1
+Explanation: We change s[1] to 1 to get string "11".
+It can be seen that the string "11" is beautiful because we can partition it into "11".
+It can be proven that 1 is the minimum number of changes needed to make the string beautiful.
+Example 3:
+Input: s = "0000" Output: 0
+Explanation: We don't need to make any changes as the string "0000" is beautiful already.
+Example 4:
+Input: s = "11000111" Output: 1
+ 
+class Solution {
+//we iterate through the string in pairs and ensure each pair contains identical characters. If we find a mismatch, it means we need to make a change. 
+    public int minChanges(String s) {
+        int res = 0;
+        
+        for(int i=0;i<s.length();i+=2){
+
+            if(s.charAt(i)!=s.charAt(i+1)) res++;
+        }
+        return res;
+    }
+}
+======================================================================================================================
+Given an integer array nums of unique elements, return all possible subsets(the power set).The solution set must not contain duplicate subsets. Return the solution in any order.
+Example 1:
+Input: nums = [1,2,3]
+Output: [[],[1],[2],[1,2],[3],[1,3],[2,3],[1,2,3]]
+Example 2:
+Input: nums = [0]
+Output: [[],[0]]
+
+class Solution {
+    public List<List<Integer>> subsets(int[] nums) {
+        List<List<Integer>> res = new ArrayList<>();
+        backtrack(res, new ArrayList<>(), nums, 0);
+        return res;
+    }
+
+    private void backtrack(List<List<Integer>> res, List<Integer> temp, int[] nums, int start) {
+        // Add a copy of the current subset to the result list
+        res.add(new ArrayList<>(temp));
+
+        // Iterate through the remaining elements
+        for (int i = start; i < nums.length; i++) {
+            // Include nums[i] in the current subset
+            temp.add(nums[i]);
+            // Recurse to build further subsets including nums[i]
+            backtrack(res, temp, nums, i + 1);
+            // Backtrack by removing the last added element
+            temp.remove(temp.size() - 1);
+        }
+    }
+}
+==========================================================================================================================
+You are a professional robber planning to rob houses along a street. Each house has a certain amount of money stashed, the only constraint stopping you from robbing each of them is that adjacent houses have security systems connected and it will automatically contact the police if two adjacent houses were broken into on the same night.Given an integer array nums representing the amount of money of each house, return the maximum amount of money you can rob tonight without alerting the police.
+
+Example 1:
+Input: nums = [1,2,3,1]
+Output: 4
+Explanation: Rob house 1 (money = 1) and then rob house 3 (money = 3).
+Total amount you can rob = 1 + 3 = 4.
+Example 2:
+Input: nums = [2,7,9,3,1]
+Output: 12
+Explanation: Rob house 1 (money = 2), rob house 3 (money = 9) and rob house 5 (money = 1).
+Total amount you can rob = 2 + 9 + 1 = 12.
+ 
+class Solution {
+    public int rob(int[] nums) {
+        if (nums == null || nums.length == 0) return 0;
+        if (nums.length == 1) return nums[0];
+        
+        int rob1 = 0, rob2 = 0;
+        
+        for (int num : nums) {
+            int newRob = Math.max(rob1 + num, rob2);
+            rob1 = rob2;
+            rob2 = newRob;
+        }
+        
+        return rob2;
+    }
+}
+==========================================================================================================================
+You are a professional robber planning to rob houses along a street. Each house has a certain amount of money stashed. All houses at this place are arranged in a circle. That means the first house is the neighbor of the last one. Meanwhile, adjacent houses have a security system connected, and it will automatically contact the police if two adjacent houses were broken into on the same night.Given an integer array nums representing the amount of money of each house, return the maximum amount of money you can rob tonight without alerting the police.
+Example 1:Input: nums = [2,3,2]					Output: 3
+Explanation: You cannot rob house 1 (money = 2) and then rob house 3 (money = 2), because they are adjacent houses.
+Example 2:Input: nums = [1,2,3,1]				Output: 4
+Explanation: Rob house 1 (money = 1) and then rob house 3 (money = 3).
+Total amount you can rob = 1 + 3 = 4.
+Example 3:Input: nums = [1,2,3]					Output: 3
+
+public class HouseRobberII {
+    public static int rob(int[] nums) {
+        if (nums == null || nums.length == 0) return 0;
+        if (nums.length == 1) return nums[0];
+        
+        // Compare two cases: exclude first house OR exclude last house
+        return Math.max(robRange(nums, 0, nums.length - 2), robRange(nums, 1, nums.length - 1));
+    }
+    
+    // Helper function to calculate max robbery for a linear range
+    private static int robRange(int[] nums, int start, int end) {
+        int prev2 = 0; // Money robbed two houses ago
+        int prev1 = 0; // Money robbed from the previous house
+        
+        for (int i = start; i <= end; i++) {
+            int curr = Math.max(prev1, prev2 + nums[i]);
+            prev2 = prev1; // Shift prev2 to prev1
+            prev1 = curr;  // Update prev1 to the current maximum
+        }
+        
+        return prev1;
+    }
+}
+
+==========================================================================================================================
+Given an integer array nums, rotate the array to the right by k steps, where k is non-negative.
+Example 1:
+Input: nums = [1,2,3,4,5,6,7], k = 3
+Output: [5,6,7,1,2,3,4]
+Explanation:
+rotate 1 steps to the right: [7,1,2,3,4,5,6]
+rotate 2 steps to the right: [6,7,1,2,3,4,5]
+rotate 3 steps to the right: [5,6,7,1,2,3,4]
+Example 2:
+Input: nums = [-1,-100,3,99], k = 2
+Output: [3,99,-1,-100]
+Explanation: 
+rotate 1 steps to the right: [99,-1,-100,3]
+rotate 2 steps to the right: [3,99,-1,-100]
+
+class Solution {
+    public void rotate(int[] nums, int k) {
+        int n = nums.length;
+        k = k%n;
+
+        int[] rotated = new int[n];
+
+        for(int i=0;i<n;i++){
+            rotated[(i+k)%n]=nums[i];
+        }
+
+        for (int i = 0; i < n; i++) {
+            nums[i] = rotated[i];
+        }  
+    }
+}
+==========================================================================================================================
+public class MergeSort{
+	
+	private void sort(int[] arr,int[] temp,int low,int high){
+		if (low >= high) {
+            return;
+        }
+		int mid = low+(high-low)/2;
+		
+		sort(arr,temp,low,mid);
+		sort(arr,temp,mid+1,high);
+		merge(arr,temp,low,high,mid);
+	}
+	
+	private void merge(int[] arr,int[] temp,int low,int high,int mid){
+		
+		for(int i=low;i<=high;i++){
+			temp[i]=arr[i];
+		}
+		
+		int i=low,j=mid+1,k=low;
+		
+		while(i<=mid && j<=high){
+			if(temp[i]<=temp[j]){
+				arr[k++]=temp[i++];
+			}else{
+				arr[k++]=temp[j++];
+			}
+		}
+		
+		while(i<=mid){
+			arr[k++]=temp[i++];
+		}
+		
+	}
+=================================================================================================================
+class QuickSort{
+	private void sort(int[] arr,int low,int high){
+		if(low<high){
+			int p = partition(arr,low,high);
+			sort(arr,low,p-1);
+			sort(arr,p+1,high);
+		}
+	}
+	
+	private int partition(int[] arr,int low,int high){
+		int pivot = arr[high];
+		
+		int j=low, i=low;
+		
+		while(i<=high){
+			if(arr[i]<=pivot){
+				int temp = arr[i];
+				arr[i]=arr[j];
+				arr[j]=temp;
+				j++;			
+			}
+			i++;
+		}
+		
+		return j-1;
+	}
+	
+	public static void main(String args[]){
+		QuickSort qc=new QuickSort();
+		Scanner sc = new Scanner(System.in);
+		System.out.print("Enter number of elements in array");
+		int n = sc.nextInt();
+		int[] arr = new int[n];
+		for(int i=0;i<n;i++){
+			System.out.println(String.format("Enter %dth element",i+1));
+			arr[i]= sc.nextInt();
+		}
+		
+		System.out.print("Entered elements:");
+		System.out.println(Arrays.toString(arr));
+		qc.sort(arr,0,n-1);
+		System.out.print("Afer sort elements:");
+		System.out.println(Arrays.toString(arr));
+		
+		sc.close();
+		
+	}
+============================================================================================================
+The string "PAYPALISHIRING" is written in a zigzag pattern on a given number of rows like this: (you may want to display this pattern in a fixed font for better legibility)
+P   A   H   N
+A P L S I I G
+Y   I   R
+And then read line by line: "PAHNAPLSIIGYIR"Write the code that will take a string and make this conversion given a number of rows:
+string convert(string s, int numRows);
+Example 1:
+Input: s = "PAYPALISHIRING", numRows = 3
+Output: "PAHNAPLSIIGYIR"
+Example 2:
+Input: s = "PAYPALISHIRING", numRows = 4
+Output: "PINALSIGYAHRPI"
+Explanation:
+P     I    N
+A   L S  I G
+Y A   H R
+P     I
+Example 3:
+Input: s = "A", numRows = 1
+Output: "A"
+ 
+public class Solution {
+    public String convert(String s, int numRows) {
+        if (numRows == 1) return s;
+
+        // Create an array of StringBuilders for each row
+        StringBuilder[] rows = new StringBuilder[numRows];
+        for (int i = 0; i < numRows; i++) {
+            rows[i] = new StringBuilder();
+        }
+
+        int currentRow = 0;
+        boolean goingDown = false;
+
+        // Traverse each character in the string
+        for (char c : s.toCharArray()) {
+            rows[currentRow].append(c);
+
+            // Change direction if we hit the top or bottom row
+            if (currentRow == 0 || currentRow == numRows - 1) {
+                goingDown = !goingDown;
+            }
+
+            // Move up or down based on the direction
+            currentRow += goingDown ? 1 : -1;
+        }
+
+        // Combine all rows to form the final result
+        StringBuilder result = new StringBuilder();
+        for (StringBuilder row : rows) {
+            result.append(row);
+        }
+
+        return result.toString();
+    }
+}
+===============================================================================================================
+You are given an integer n indicating there are n specialty retail stores. There are m product types of varying amounts, which are given as a 0-indexed integer array quantities, where quantities[i] represents the number of products of the ith product type.
+You need to distribute all products to the retail stores following these rules:A store can only be given at most one product type but can be given any amount of it.After distribution, each store will have been given some number of products (possibly 0). Let x represent the maximum number of products given to any store. You want x to be as small as possible, i.e., you want to minimize the maximum number of products that are given to any store.Return the minimum possible x.
+
+Example 1:
+Input: n = 6, quantities = [11,6]
+Output: 3
+Explanation: One optimal way is:
+- The 11 products of type 0 are distributed to the first four stores in these amounts: 2, 3, 3, 3
+- The 6 products of type 1 are distributed to the other two stores in these amounts: 3, 3
+The maximum number of products given to any store is max(2, 3, 3, 3, 3, 3) = 3.
+Example 2:
+Input: n = 7, quantities = [15,10,10]
+Output: 5
+Explanation: One optimal way is:
+- The 15 products of type 0 are distributed to the first three stores in these amounts: 5, 5, 5
+- The 10 products of type 1 are distributed to the next two stores in these amounts: 5, 5
+- The 10 products of type 2 are distributed to the last two stores in these amounts: 5, 5
+The maximum number of products given to any store is max(5, 5, 5, 5, 5, 5, 5) = 5.
+Example 3:
+Input: n = 1, quantities = [100000]
+Output: 100000
+Explanation: The only optimal way is:
+- The 100000 products of type 0 are distributed to the only store.
+The maximum number of products given to any store is max(100000) = 100000.
+
+public class Solution {
+    public int minimizedMaximum(int n, int[] quantities) {
+        int left = 1;
+        int right = Arrays.stream(quantities).max().getAsInt();
+        int result = right;
+
+        while (left <= right) {
+            int mid = left + (right - left) / 2;
+            if (canDistribute(quantities, n, mid)) {
+                result = mid;
+                right = mid - 1;  // Try for a smaller maximum
+            } else {
+                left = mid + 1;  // Increase the maximum load per store
+            }
+        }
+        return result;
+    }
+
+    private boolean canDistribute(int[] quantities, int n, int maxProductsPerStore) {
+        int storesNeeded = 0;
+        for (int quantity : quantities) {
+            storesNeeded += (quantity + maxProductsPerStore - 1) / maxProductsPerStore;  // Ceiling division
+            if (storesNeeded > n) {
+                return false;  // More stores are needed than available
+            }
+        }
+        return true;  // Feasible within the given number of stores
+    }
+}
+======================================================================================================
+Given an integer array of size n, find all elements that appear more than ⌊ n/3 ⌋ times.
+Example 1:
+Input: nums = [3,2,3]
+Output: [3]
+Example 2:
+Input: nums = [1]
+Output: [1]
+Example 3:
+Input: nums = [1,2]
+Output: [1,2]
+ 
+class Solution {
+    public List<Integer> majorityElement(int[] nums) {
+        int n = nums.length;
+        List<Integer> res = new ArrayList<>();
+        Map<Integer,Integer> map = new HashMap<>();
+        for(int num:nums){
+            map.put(num,map.getOrDefault(num,0)+1);
+        }
+
+        for(int num:map.keySet()){
+            int count = map.get(num);
+            if(count > n/3) res.add(num);
+        }
+
+        return res;
+    }
+}
+====================================================================================================================================
+Given two strings word1 and word2, return the minimum number of operations required to convert word1 to word2.You have the following three operations permitted on a word:
+Insert a character
+Delete a character
+Replace a character
+Example 1:
+Input: word1 = "horse", word2 = "ros"
+Output: 3
+Explanation: 
+horse -> rorse (replace 'h' with 'r')
+rorse -> rose (remove 'r')
+rose -> ros (remove 'e')
+Example 2:
+Input: word1 = "intention", word2 = "execution"
+Output: 5
+Explanation: 
+intention -> inention (remove 't')
+inention -> enention (replace 'i' with 'e')
+enention -> exention (replace 'n' with 'x')
+exention -> exection (replace 'n' with 'c')
+exection -> execution (insert 'u')
+ 
+public class EditDistance {
+    public static int minDistance(String word1, String word2) {
+        int m = word1.length();
+        int n = word2.length();
+        // Create a DP table
+        int[][] dp = new int[m + 1][n + 1];
+        // Initialize the table
+        for (int i = 0; i <= m; i++) {
+            for (int j = 0; j <= n; j++) {
+                if (i == 0) {
+                    dp[i][j] = j; // If word1 is empty, insert all characters of word2
+                } else if (j == 0) {
+                    dp[i][j] = i; // If word2 is empty, remove all characters of word1
+                } else if (word1.charAt(i - 1) == word2.charAt(j - 1)) {
+                    dp[i][j] = dp[i - 1][j - 1]; // Characters are the same, no operation needed
+                } else {
+                    dp[i][j] = 1 + Math.min(
+                        dp[i - 1][j - 1], // Replace
+                        Math.min(dp[i - 1][j], // Remove
+                                 dp[i][j - 1]) // Insert
+                    );
+                }
+            }
+        }
+
+        return dp[m][n]; // The answer is in the last cell
+    }
+}
+============================================================================================================
+Search in rotated sorted array
+Example 1:
+Input: nums = [2,5,6,0,0,1,2], target = 0                          Output: true
+Example 2:
+Input: nums = [2,5,6,0,0,1,2], target = 3                          Output: false
+Example 2:
+Input: nums = [1,0,1,1,1,1,1], target = 0                          Output: true
+
+class Solution {
+    public boolean search(int[] nums, int target) {
+        int left = 0;
+        int right = nums.length - 1;
+
+        while (left <= right) {
+            int mid = left + (right - left) / 2;
+
+            if (nums[mid] == target) return true;
+
+            // Handle duplicates
+            if (nums[left] == nums[mid] && nums[mid] == nums[right]) {
+                left++;
+                right--;
+            } else if (nums[left] <= nums[mid]) {
+                // Left part is sorted
+                if (target >= nums[left] && target < nums[mid]) {
+                    right = mid - 1;
+                } else {
+                    left = mid + 1;
+                }
+            } else {
+                // Right part is sorted
+                if (target > nums[mid] && target <= nums[right]) {
+                    left = mid + 1;
+                } else {
+                    right = mid - 1;
+                }
+            }
+        }
+
+        return false; // Target not found
+    }
+}
+===========================================================================================================
+You have a bomb to defuse, and your time is running out! Your informer will provide you with a circular array code of length of n and a key k.To decrypt the code, you must replace every number. All the numbers are replaced simultaneously.
+If k > 0, replace the ith number with the sum of the next k numbers.
+If k < 0, replace the ith number with the sum of the previous k numbers.
+If k == 0, replace the ith number with 0.
+As code is circular, the next element of code[n-1] is code[0], and the previous element of code[0] is code[n-1].
+Given the circular array code and an integer key k, return the decrypted code to defuse the bomb!
+Example 1:
+Input: code = [5,7,1,4], k = 3
+Output: [12,10,16,13]
+Explanation: Each number is replaced by the sum of the next 3 numbers. The decrypted code is [7+1+4, 1+4+5, 4+5+7, 5+7+1]. Notice that the numbers wrap around.
+Example 2:
+Input: code = [1,2,3,4], k = 0
+Output: [0,0,0,0]
+Explanation: When k is zero, the numbers are replaced by 0. 
+Example 3:
+Input: code = [2,4,9,3], k = -2
+Output: [12,5,6,13]
+Explanation: The decrypted code is [3+9, 2+3, 4+2, 9+4]. Notice that the numbers wrap around again. If k is negative, the sum is of the previous numbers.
+ 
+public class CircularSum {
+    public static int[] decrypt(int[] code, int k) {
+        int n = code.length;
+        int[] result = new int[n];
+
+        // Iterate over each element in the array
+        for (int i = 0; i < n; i++) {
+            int sum = 0;
+
+            if (k > 0) { // For positive k, sum the next k elements
+                for (int j = 1; j <= k; j++) {
+                    sum += code[(i + j) % n]; // Wrap around using modulo
+                }
+            } else if (k < 0) { // For negative k, sum the previous |k| elements
+                for (int j = 1; j <= -k; j++) {
+                    sum += code[(i - j + n) % n]; // Wrap around using modulo
+                }
+            }
+
+            result[i] = sum;
+        }
+
+        return result;
+    }
+}
+================================================================================================
+You are given an integer array nums and an integer k. Find the maximum subarray sum of all the subarrays of nums that meet the following conditions:The length of the subarray is k, andAll the elements of the subarray are distinct.Return the maximum subarray sum of all the subarrays that meet the conditions. If no subarray meets the conditions, return 0.A subarray is a contiguous non-empty sequence of elements within an array.
+
+Example 1:
+Input: nums = [1,5,4,2,9,9,9], k = 3
+Output: 15
+Explanation: The subarrays of nums with length 3 are:
+- [1,5,4] which meets the requirements and has a sum of 10.
+- [5,4,2] which meets the requirements and has a sum of 11.
+- [4,2,9] which meets the requirements and has a sum of 15.
+- [2,9,9] which does not meet the requirements because the element 9 is repeated.
+- [9,9,9] which does not meet the requirements because the element 9 is repeated.
+We return 15 because it is the maximum subarray sum of all the subarrays that meet the conditions
+Example 2:
+Input: nums = [4,4,4], k = 3
+Output: 0
+Explanation: The subarrays of nums with length 3 are:
+- [4,4,4] which does not meet the requirements because the element 4 is repeated.
+We return 0 because no subarrays meet the conditions.
+
+public class MaxSubarraySum {
+    public static int maximumSubarraySum(int[] nums, int k) {
+        int maxSum = 0;
+        int currentSum = 0;
+        HashSet<Integer> set = new HashSet<>();
+
+        int start = 0;
+
+        for (int end = 0; end < nums.length; end++) {
+            // If we encounter a duplicate, shrink the window
+            while (set.contains(nums[end])) {
+                set.remove(nums[start]);
+                currentSum -= nums[start];
+                start++;
+            }
+
+            // Add the current element to the window
+            set.add(nums[end]);
+            currentSum += nums[end];
+
+            // If the window size equals k, check the sum
+            if (end - start + 1 == k) {
+                maxSum = Math.max(maxSum, currentSum);
+
+                // Remove the start of the window to slide forward
+                set.remove(nums[start]);
+                currentSum -= nums[start];
+                start++;
+            }
+        }
+
+        return maxSum;
+    }
+}
+============================================================================================================
+Given a string s and a dictionary of strings wordDict, return true if s can be segmented into a space-separated sequence of one or more dictionary words.Note that the same word in the dictionary may be reused multiple times in the segmentation.
+
+Example 1:
+Input: s = "leetcode", wordDict = ["leet","code"]
+Output: true
+Explanation: Return true because "leetcode" can be segmented as "leet code".
+Example 2:
+Input: s = "applepenapple", wordDict = ["apple","pen"]
+Output: true
+Explanation: Return true because "applepenapple" can be segmented as "apple pen apple".
+Note that you are allowed to reuse a dictionary word.
+Example 3:
+Input: s = "catsandog", wordDict = ["cats","dog","sand","and","cat"]   
+Output: false
+
+public class WordBreak {
+    public static boolean wordBreak(String s, List<String> wordDict) {
+        Set<String> wordSet = new HashSet<>(wordDict); // Convert to set for O(1) lookups
+        boolean[] dp = new boolean[s.length() + 1];
+        dp[0] = true; // Base case: empty string can always be segmented
+
+        for (int i = 1; i <= s.length(); i++) {
+            for (int j = 0; j < i; j++) {
+                if (dp[j] && wordSet.contains(s.substring(j, i))) {
+                    dp[i] = true;
+                    break;
+                }
+            }
+        }
+        
+        return dp[s.length()];
+    }
+}
+========================================================================================================================
+Given a string s which represents an expression, evaluate this expression and return its value. The integer division should truncate toward zero.You may assume that the given expression is always valid. All intermediate results will be in the range of [-231, 231 - 1].
+Note: You are not allowed to use any built-in function which evaluates strings as mathematical expressions, such as eval().
+
+Example 1:
+Input: s = "3+2*2"
+Output: 7
+Example 2:
+Input: s = " 3/2 "
+Output: 1
+Example 3:
+Input: s = " 3+5 / 2 "
+Output: 5
+ 
+class Solution {
+    public int calculate(String s) {
+        Stack<Integer> stack = new Stack<>();
+        char operator = '+'; // Default operator
+        int num = 0;
+
+        for (int i = 0; i < s.length(); i++) {
+            char c = s.charAt(i);
+
+            // Build the current number
+            if (Character.isDigit(c)) {
+                num = num * 10 + (c - '0');
+            }
+
+            // If we encounter an operator or the end of the string, process the number
+            if ((!Character.isDigit(c) && c != ' ') || i == s.length() - 1) {
+                if (operator == '+') {
+                    stack.push(num);
+                } else if (operator == '-') {
+                    stack.push(-num);
+                } else if (operator == '*') {
+                    stack.push(stack.pop() * num);
+                } else if (operator == '/') {
+                    stack.push(stack.pop() / num);
+                }
+                // Update the operator and reset the number (inside the operator-handling block)
+                operator = c;
+                num = 0;
+            }
+        }
+
+        // Sum up the values in the stack
+        int res = 0;
+        for (int i : stack) {
+            res += i;
+        }
+        return res;
+    }
+}
+====================================================================================================================================
+Given an array of integers citations where citations[i] is the number of citations a researcher received for their ith paper, return the researcher's h-index.According to the definition of h-index on Wikipedia: The h-index is defined as the maximum value of h such that the given researcher has published at least h papers that have each been cited at least h times.
+
+Example 1:
+Input: citations = [3,0,6,1,5]
+Output: 3
+Explanation: [3,0,6,1,5] means the researcher has 5 papers in total and each of them had received 3, 0, 6, 1, 5 citations respectively.
+Since the researcher has 3 papers with at least 3 citations each and the remaining two with no more than 3 citations each, their h-index is 3.
+Example 2:
+Input: citations = [1,3,1]
+Output: 1
+ 
+public class HIndex {
+    public static int hIndex(int[] citations) {
+        // Step 1: Sort the citations array in descending order
+        Arrays.sort(citations);
+        int n = citations.length;
+
+        // Step 2: Iterate through the sorted array
+        for (int i = 0; i < n; i++) {
+            int h = n - i; // Number of papers with at least h citations
+            if (citations[i] >= h) {
+                return h;
+            }
+        }
+
+        // If no valid h-index is found, return 0
+        return 0;
+    }
+}
+================================================================================
+Given an array of integers citations where citations[i] is the number of citations a researcher received for their ith paper and citations is sorted in ascending order, return the researcher's h-index.According to the definition of h-index on Wikipedia: The h-index is defined as the maximum value of h such that the given researcher has published at least h papers that have each been cited at least h times.You must write an algorithm that runs in logarithmic time.
+Example 1:Input: citations = [0,1,3,5,6]			Output: 3
+Explanation: [0,1,3,5,6] means the researcher has 5 papers in total and each of them had received 0, 1, 3, 5, 6 citations respectively.
+Since the researcher has 3 papers with at least 3 citations each and the remaining two with no more than 3 citations each, their h-index is 3.
+Example 2:Input: citations = [1,2,100]				Output: 2
+
+class Solution {
+    public int hIndex(int[] citations) {
+        
+        int n = citations.length;
+        for(int i=0;i<n;i++){
+            int h = n-i;
+
+            if(citations[i]>=h){
+                return h;
+            }
+        }
+        return 0;
+    }
+}
+===============================================================================================================================
+Given two integers left and right that represent the range [left, right], return the bitwise AND of all numbers in this range, inclusive.
+Example 1:
+Input: left = 5, right = 7                         Output: 4
+Example 2:
+Input: left = 0, right = 0                         Output: 0
+Example 3:
+Input: left = 1, right = 2147483647                Output: 0
+Example 3:
+Input: left = 1, right = 2                         Output: 0
+ 
+public class BitwiseAndOfRange {
+    public static int rangeBitwiseAnd(int left, int right) {
+        while (left < right) {
+            // Remove the rightmost 1-bit from 'right'
+            right = right & (right - 1);
+        }
+        return left & right;
+    }
+}
+===============================================================================================================
+Given an integer n, return the number of prime numbers that are strictly less than n.
+
+Example 1:
+Input: n = 10
+Output: 4
+Explanation: There are 4 prime numbers less than 10, they are 2, 3, 5, 7.
+Example 2:
+Input: n = 0
+Output: 0
+Example 3:
+Input: n = 1
+Output: 0
+ 
+public class PrimeCounter {
+    public static int countPrimes(int n) {
+        if (n <= 1) return 0;
+        boolean[] isPrime = new boolean[n];
+        for (int i = 2; i < n; i++) {
+            isPrime[i] = true;
+        }
+        for (int i = 2; i * i < n; i++) {
+            if (isPrime[i]) {
+                for (int j = i * i; j < n; j += i) {
+                    isPrime[j] = false;
+                }
+            }
+        }
+
+        int count = 0;
+        for (boolean prime : isPrime) {
+            if (prime) count++;
+        }
+
+        return count;
+    }
+}
+=========================================================================================================
+Given a sentence that consists of some words separated by a single space, and a searchWord, check if searchWord is a prefix of any word in sentence.Return the index of the word in sentence (1-indexed) where searchWord is a prefix of this word. If searchWord is a prefix of more than one word, return the index of the first word (minimum index). If there is no such word return -1.
+A prefix of a string s is any leading contiguous substring of s.
+
+Example 1:
+Input: sentence = "i love eating burger", searchWord = "burg"
+Output: 4
+Explanation: "burg" is prefix of "burger" which is the 4th word in the sentence.
+Eample 2:
+Input: sentence = "this problem is an easy problem", searchWord = "pro"
+Output: 2
+Explanation: "pro" is prefix of "problem" which is the 2nd and the 6th word in the sentence, but we return 2 as it's the minimal index.
+Example 3:
+Input: sentence = "i am tired", searchWord = "you"
+Output: -1
+Explanation: "you" is not a prefix of any word in the sentence.
+
+class Solution {
+    public int isPrefixOfWord(String sentence, String searchWord) {
+        String[] arr = sentence.split("\\s+");
+
+        for(int i=0;i<arr.length;i++){
+            if(arr[i].startsWith(searchWord)){
+                return i+1;
+            }
+        }
+        return -1;
+    }
+}
+========================================================================================================================
+You are given a 0-indexed string s and a 0-indexed integer array spaces that describes the indices in the original string where spaces will be added. Each space should be inserted before the character at the given index.For example, given s = "EnjoyYourCoffee" and spaces = [5, 9], we place spaces before 'Y' and 'C', which are at indices 5 and 9 respectively. Thus, we obtain "Enjoy Your Coffee".Return the modified string after the spaces have been added.
+
+Example 1:
+Input: s = "LeetcodeHelpsMeLearn", spaces = [8,13,15]
+Output: "Leetcode Helps Me Learn"
+Explanation: 
+The indices 8, 13, and 15 correspond to the underlined characters in "LeetcodeHelpsMeLearn".
+We then place spaces before those characters.
+Example 2:
+Input: s = "icodeinpython", spaces = [1,5,7,9]
+Output: "i code in py thon"
+Explanation:
+The indices 1, 5, 7, and 9 correspond to the underlined characters in "icodeinpython".
+We then place spaces before those characters.
+Example 3:
+Input: s = "spacing", spaces = [0,1,2,3,4,5,6]
+Output: " s p a c i n g"
+Explanation:
+We are also able to place spaces before the first character of the string.
+
+public class AddSpacesToString {
+    public static String addSpaces(String s, int[] spaces) {
+        StringBuilder result = new StringBuilder();
+        int spaceIndex = 0;
+
+        for (int i = 0; i < s.length(); i++) {
+            // Check if the current index matches the space position
+            if (spaceIndex < spaces.length && i == spaces[spaceIndex]) {
+                result.append(" "); // Add a space
+                spaceIndex++;       // Move to the next space position
+            }
+            result.append(s.charAt(i)); // Append the current character
+        }
+
+        return result.toString();
+    }
+}
+========================================================================================================
+You are given two 0-indexed strings str1 and str2.In an operation, you select a set of indices in str1, and for each index i in the set, increment str1[i] to the next character cyclically. That is 'a' becomes 'b', 'b' becomes 'c', and so on, and 'z' becomes 'a'.
+Return true if it is possible to make str2 a subsequence of str1 by performing the operation at most once, and false otherwise.
+Note: A subsequence of a string is a new string that is formed from the original string by deleting some (possibly none) of the characters without disturbing the relative positions of the remaining characters.
+
+Example 1:
+Input: str1 = "abc", str2 = "ad"
+Output: true
+Explanation: Select index 2 in str1.
+Increment str1[2] to become 'd'. 
+Hence, str1 becomes "abd" and str2 is now a subsequence. Therefore, true is returned.
+Example 2:
+Input: str1 = "zc", str2 = "ad"
+Output: true
+Explanation: Select indices 0 and 1 in str1. 
+Increment str1[0] to become 'a'. 
+Increment str1[1] to become 'd'. 
+Hence, str1 becomes "ad" and str2 is now a subsequence. Therefore, true is returned.
+Example 3:
+Input: str1 = "ab", str2 = "d"
+Output: false
+Explanation: In this example, it can be shown that it is impossible to make str2 a subsequence of str1 using the operation at most once. 
+Therefore, false is returned.
+
+class Solution {
+    public boolean canMakeSubsequence(String str1, String str2) {
+        int i = 0, j = 0;
+
+        while (i < str1.length() && j < str2.length()) {
+            char ch1 = str1.charAt(i);
+            char ch2 = str2.charAt(j);
+
+            // Check if the characters match or can match by incrementing
+            if (ch1 == ch2 || (ch1 + 1 - 'a') % 26 + 'a' == ch2) {
+                j++; // Move to the next character in str2
+            }
+            i++; // Always move to the next character in str1
+        }
+
+        // If all characters in str2 are matched, return true
+        return j == str2.length();
+    }
+}
+====================================================================================================
+public class GuessGame {
+    
+    public int guessNumber(int n) {
+        int low = 1;
+        int high = n;
+
+        while (low <= high) {
+            int mid = low + (high - low) / 2; // Prevent overflow
+
+            int result = guess(mid);
+            if (result == 0) {
+                return mid; // Correct guess
+            } else if (result == -1) {
+                high = mid - 1; // Guess is too high
+            } else {
+                low = mid + 1; // Guess is too low
+            }
+        }
+
+        return -1; // Should never reach here if the input is valid
+    }
+}
+=====================================================================================
+There are n bulbs that are initially off. You first turn on all the bulbs, then you turn off every second bulb.On the third round, you toggle every third bulb (turning on if it's off or turning off if it's on). For the ith round, you toggle every i bulb. For the nth round, you only toggle the last bulb.Return the number of bulbs that are on after n rounds.
+Example 1:Input: n = 3									Output: 1
+Explanation: At first, the three bulbs are [off, off, off].
+After the first round, the three bulbs are [on, on, on].
+After the second round, the three bulbs are [on, off, on].
+After the third round, the three bulbs are [on, off, off]. 
+So you should return 1 because there is only one bulb is on.
+Example 2:Input: n = 0											Output: 0
+Example 3:Input: n = 1											Output: 1
+
+ class Solution {
+    public int bulbSwitch(int n) {
+        return (int) Math.sqrt(n);
+    }
+}
+=================================================================================================================================
+Given a string s of zeros and ones, return the maximum score after splitting the string into two non-empty substrings (i.e. left substring and right substring).The score after splitting a string is the number of zeros in the left substring plus the number of ones in the right substring.
+Example 1:Input: s = "011101"							Output: 5 
+Explanation: 
+All possible ways of splitting s into two non-empty substrings are:
+left = "0" and right = "11101", score = 1 + 4 = 5 
+left = "01" and right = "1101", score = 1 + 3 = 4 
+left = "011" and right = "101", score = 1 + 2 = 3 
+left = "0111" and right = "01", score = 1 + 1 = 2 
+left = "01110" and right = "1", score = 2 + 1 = 3
+Example 2:Input: s = "00111"							Output: 5
+Explanation: When left = "00" and right = "111", we get the maximum score = 2 + 3 = 5
+
+    public static int maxScore(String s) {
+        int totalOnes = 0;
+
+        // Count the total number of ones in the string
+        for (char c : s.toCharArray()) {
+            if (c == '1') {
+                totalOnes++;
+            }
+        }
+
+        int leftZeros = 0;  // Zeros in the left substring
+        int rightOnes = totalOnes; // Ones in the right substring
+        int maxScore = 0;
+
+        // Iterate over the string up to `s.length() - 1` to ensure two non-empty substrings
+        for (int i = 0; i < s.length() - 1; i++) {
+            if (s.charAt(i) == '0') {
+                leftZeros++;
+            } else {
+                rightOnes--;
+            }
+
+            // Calculate the score for the current split
+            int currentScore = leftZeros + rightOnes;
+            maxScore = Math.max(maxScore, currentScore);
+        }
+
+        return maxScore;
+    }
+}
+=====================================================================================================================
+An array is considered special if every pair of its adjacent elements contains two numbers with different parity.You are given an array of integers nums. Return true if nums is a special array, otherwise, return false.
+Example 1:Input: nums = [1]			Output: true
+Explanation:There is only one element. So the answer is true.
+Example 2:Input: nums = [2,1,4]			Output: true
+Explanation:There is only two pairs: (2,1) and (1,4), and both of them contain numbers with different parity. So the answer is true.
+class Solution {
+    public boolean isArraySpecial(int[] nums) {
+        
+        for(int i=0;i<nums.length-1;i++){
+            if(nums[i]%2==nums[i+1]%2){
+                return false;
+            }
+        }
+        return true;
+    }
+}
+========================================================================================================================

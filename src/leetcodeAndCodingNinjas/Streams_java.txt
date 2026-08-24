@@ -1,0 +1,371 @@
+How to find the first non-repeating character in a string using Streams?
+
+String input = "swiss";
+Optional<Character> firstNonRepeating = input.chars()
+    .mapToObj(c -> (char) c)
+    .collect(Collectors.groupingBy(Function.identity(), LinkedHashMap::new, Collectors.counting()))
+    .entrySet().stream()
+    .filter(e -> e.getValue() == 1)
+    .map(Map.Entry::getKey)
+    .findFirst();
+===========================================================================================================================================
+How to implement a custom collector in Java Streams?
+Collector<String, StringJoiner, String> customCollector = Collector.of(
+    () -> new StringJoiner(", "), 
+    StringJoiner::add, 
+    StringJoiner::merge, 
+    StringJoiner::toString
+);
+String result = Stream.of("A", "B", "C").collect(customCollector);
+
+public static <T> Collector<T, LinkedList<T>, LinkedList<T>> toLinkedList() {
+    return Collector.of(
+            LinkedList::new,    // Supplier
+            LinkedList::add,    // Accumulator
+            (left, right) -> {  // Combiner
+                left.addAll(right);
+                return left;
+            },
+            Collector.Characteristics.IDENTITY_FINISH  // Finisher: No conversion needed, identity
+    );
+}
+
+// Custom Collector to collect sum, count, and average
+    public static Collector<Integer, ?, Summary> summarize() {
+        return Collector.of(
+                Summary::new,  // Supplier: Create a new Summary object
+                Summary::add,  // Accumulator: Update sum, count, and average
+                Summary::merge, // Combiner: Merge two Summary objects (used in parallel streams)
+                Collector.Characteristics.IDENTITY_FINISH // Finisher: No conversion needed, identity
+        );
+    }
+=========================================================================================
+Stream<Integer> infiniteStream = Stream.iterate(0, n -> n + 2);// generate infinite stream
+
+//find duplicate
+Set<Integer> seen = new HashSet<>();
+Set<Integer> duplicates = list.stream().filter(n -> !seen.add(n)).collect(Collectors.toSet());
+=======================================================================================================
+List<Integer> numbers = Arrays.asList(1, 2, 3, 4, 5);
+Optional<Integer> sum = numbers.stream().reduce((a, b) -> a + b);
+
+int sum = numbers.stream().reduce(0, (a, b) -> a + b);
+System.out.println(sum); // Output: 15
+
+
+public class StreamToArray {
+    public static void main(String[] args) {
+        List<String> names = Arrays.asList("Java", "Python", "C++");
+
+        String[] array = names.stream().toArray(String[]::new);
+    }
+}
+
+double avgSalary = employees.stream().collect(Collectors.averagingInt(e -> e.salary));
+
+Optional<Employee> highestPaid = employees.stream().collect(Collectors.reducing((e1, e2) -> e1.salary > e2.salary ? e1 : e2));
+//highest salary use this or .sorted()
+
+int totalSalary = employees.stream().collect(Collectors.reducing(0, e -> e.salary, Integer::sum));
+
+String names = employees.stream()
+                .map(e -> e.name)
+                .collect(Collectors.reducing("", (a, b) -> a + ", " + b));
+
+Map<String, Integer> highestSalaryByDept = employees.stream()
+                .collect(Collectors.groupingBy(
+                        e -> e.department, 
+                        Collectors.reducing(0, e -> e.salary, Integer::max)
+                ));
+				
+// Group employees by department and find the highest salary in each department
+        Map<String, Optional<Employee>> highestSalaryByDept = employees.stream()
+                .collect(Collectors.groupingBy(
+                        e -> e.department, 
+                        Collectors.maxBy(Comparator.comparingInt(emp -> emp.salary)) // Find max salary employee
+                ));
+				
+		Map<String, Employee> highestSalaryByDept = employees.stream().collect(Collectors.groupingBy(Employee::dept,
+		Collectors.collectingAndThen(Collectors.maxBy(Comparator.comparingInt(Employee::salary))
+		,Optional::get)));//Doesnt return Optional Object
+
+Map<String, Double> avgSalaryByDept = employees.stream()
+                .collect(Collectors.groupingBy(
+                        e -> e.department, 
+                        Collectors.averagingInt(e -> e.salary)
+                ));
+
+Map<String, Double> avgSalary = employees.stream()
+    .collect(Collectors.groupingBy(Employee::getDepartment, 
+             Collectors.collectingAndThen(Collectors.summarizingDouble(Employee::getSalary), 
+             stats -> stats.getAverage())));// without using averaging int
+
+
+
+public class GroupEmployees {
+    public static void main(String[] args) {
+        List<Employee> employees = List.of(
+            new Employee("Alice", "HR"),
+            new Employee("Bob", "IT"),
+            new Employee("Charlie", "HR"),
+            new Employee("David", "IT"),
+            new Employee("Eve", "Finance")
+        );
+
+        Map<String, List<Employee>> groupedAndSorted = employees.stream()
+            .collect(Collectors.groupingBy(
+                Employee::getDepartment,
+                Collectors.collectingAndThen(
+                    Collectors.toList(),
+                    list -> list.stream()
+                                .sorted(Comparator.comparing(Employee::getName))
+                                .collect(Collectors.toList())
+                )
+            ));
+    }
+}
+or
+Map<String, List<Employee>> result = employees.stream()
+    .filter(e -> e.getAge() > 25)
+    .collect(Collectors.toMap(
+        Employee::getDepartment, // key = department
+        e -> new ArrayList<>(List.of(e)), // value = a new list with one employee
+        (list1, list2) -> {              // merge function to combine lists on duplicate key
+            list1.addAll(list2);
+            return list1;
+        },
+        LinkedHashMap::new // optional: preserves insertion order
+    ));
+
+// Sort each list of employees by name
+result.replaceAll((k, v) -> v.stream()
+    .sorted(Comparator.comparing(Employee::getName))
+    .collect(Collectors.toList())
+);
+
+// Print the result
+result.forEach((k, v) -> System.out.println("Key: " + k + " Values: " + v));
+
+Map<String, List<Employee>> grouped = employees.stream()
+    .collect(Collectors.groupingBy(
+        Employee::getDepartment,
+        LinkedHashMap::new,                      // preserve insertion order of departments
+        Collectors.toList()
+    ));
+--------------------------------------------------------------------------------------------------
+Map<K, V> map = list.stream()
+    .collect(Collectors.toMap(
+        keyMapper,
+        valueMapper,
+        mergeFunction,       // handles duplicate keys
+        mapSupplier          // optional: e.g., LinkedHashMap::new
+    ));
+Map<String, String> deptToNameMap = employees.stream()
+    .collect(Collectors.toMap(
+        Employee::getDepartment,
+        Employee::getName,
+        (name1, name2) -> name1 + ", " + name2,  // merge
+        LinkedHashMap::new                       // ordered map
+    ));
+	
+Map<String, List<Employee>> map = employees.stream()
+    .collect(Collectors.groupingBy(Employee::dept))
+    .entrySet()
+    .stream()
+    .collect(Collectors.toMap(
+        Map.Entry::getKey,
+        e -> {
+            List<Employee> emps = new ArrayList<>(e.getValue());
+            emps.sort(Comparator.comparing(Employee::name)); // fix comparator
+            return emps;
+        }
+    ));
+
+--------------------------------------------------------------------------------------------------
+ Map<Integer, Long> freqMap = Arrays.stream(nums)
+            .boxed()
+            .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
+
+    return freqMap.entrySet().stream()
+            .filter(e -> e.getValue() == 2)
+            .map(Map.Entry::getKey)
+            .sorted()
+            .collect(Collectors.toList());
+----------------------------------------------------------------------------------------------------
+Map<String, List<Employee>> result = employees.stream()
+    .collect(Collectors.partitioningBy(
+        e -> e.getAge() % 2 == 0
+    ))
+    .entrySet()
+    .stream()
+    .collect(Collectors.toMap(
+        entry -> entry.getKey() ? "Even" : "Odd",
+        Map.Entry::getValue
+    ));
+-----------------------------------------------------------------------------------------------------------
+input = "3a2b" output : aaabb
+public class Main {
+    public static void main(String[] args) {
+        String s = "3a2b";
+
+        String result = IntStream.range(0, s.length())
+            .filter(i -> Character.isDigit(s.charAt(i)))
+            .mapToObj(i -> {
+                int count = s.charAt(i) - '0';
+                char ch = s.charAt(i + 1);
+                return String.valueOf(ch).repeat(count);
+            })
+            .collect(Collectors.joining());
+
+        System.out.println(result);  // Output: aaabb
+    }
+}
+inverse logic hiven aaabb ouput is 3a2b
+String f = s.chars()
+                .mapToObj(c->(char)c)
+                .collect(Collectors.groupingBy(c->c,Collectors.counting()))
+                .entrySet()
+                .stream()
+                .collect(Collectors.reducing("",e->e.getKey()+""+e.getValue(),(s1,s2)->s1+s2));
+--------------------------------------------------------------------------------------------------------------------------------------------
+List<Integer> list = List.of(1, 2, 3, 4, 5, 3, 2, 1, 1);
+
+Optional<Integer> val = list.stream()
+    .collect(Collectors.groupingBy(a -> a, Collectors.counting()))
+    .entrySet()
+    .stream() // ✅ convert Set to Stream
+    .sorted((a, b) -> Long.compare(b.getValue(), a.getValue())) // sort by frequency descending
+    .skip(1) // skip the most frequent
+    .map(Map.Entry::getKey)
+    .findFirst();
+
+System.out.println(val.orElse(null)); // use orElse to handle empty case
+--------------------------------------------------------------------------------------------------------------------------------------
+List<Integer> input = List.of(1, 2, 3, 4, 5);
+int target = 6;
+
+List<int[]> pairs = input.stream()
+    .flatMap(i -> input.stream()
+        .filter(j -> i < j && i + j == target)
+        .map(j -> new int[]{i, j})
+    )
+    .collect(Collectors.toList());
+--------------------------------------------------------------------------------------------------------------------------------------------
+Partition Primes and Non-Primes
+Map<Boolean, List<Integer>> primes = IntStream.rangeClosed(2, 30)
+    .boxed()
+    .collect(Collectors.partitioningBy(num ->
+        IntStream.rangeClosed(2, (int) Math.sqrt(num))
+                 .allMatch(div -> num % div != 0)
+    ));
+--------------------------------------------------------------------------------------------------------------------------------------------
+Consecutive sequence longest
+
+public class LongestConsecutiveGroup {
+    public static void main(String[] args) {
+        List<Integer> nums = Arrays.asList(100, 4, 200, 1, 3, 2);
+
+        List<Integer> longest = findLongestConsecutive(nums);
+        System.out.println(longest);//[1,2,3,4]
+    }
+
+    public static List<Integer> findLongestConsecutive(List<Integer> nums) {
+        Set<Integer> set = new HashSet<>(nums);
+
+        return nums.stream()
+                .filter(n -> !set.contains(n - 1))  // only start from sequence heads
+                .map(n -> {
+                    int c = n;
+                    List<Integer> curr = new ArrayList<>();
+                    while (set.contains(c)) {
+                        curr.add(c++);
+                    }
+                    return curr;
+                })
+                .max(Comparator.comparingInt(List::size))  // return the longest sequence
+                .orElse(Collections.emptyList());          // handle Optional properly
+    }
+}
+--------------------------------------------------------------------------------------------------------------------------------------------
+public class LongestConsecutiveGroup {
+    public static void main(String[] args) {
+        List<String> words = Arrays.asList("apple", "banana", "apple", "orange", "banana", "apple");
+        System.out.println(kMostFrequent(2, words));  // Output: [apple, banana]
+    }
+
+    private static List<String> kMostFrequent(int k, List<String> input) {
+        return input.stream()
+            .collect(Collectors.groupingBy(w -> w, Collectors.counting()))  // <-- fix here
+            .entrySet()
+            .stream()
+            .sorted(Comparator
+                .<Map.Entry<String, Long>>comparingLong(Map.Entry::getValue)
+                .reversed()
+                .thenComparing(Map.Entry::getKey))
+            .limit(k)
+            .map(Map.Entry::getKey)
+            .collect(Collectors.toList());
+    }
+}
+--------------------------------------------------------------------------------------------------------------------------------------------
+Count anagrams
+List<String> input = List.of("eat", "tea", "tan", "ate", "nat", "bat");
+System.out.println(countMap(input));
+
+private static Map<String, Long> countMap(List<String> list) {
+    return list.stream()
+        .collect(Collectors.groupingBy(
+            s -> s.chars()
+                  .mapToObj(c -> String.valueOf((char) c))
+                  .sorted()
+                  .collect(Collectors.joining()),
+            Collectors.counting()
+        ));
+}
+--------------------------------------------------------------------------------------------------------------------------------------------
+public class SomeDummy {
+    public static void main(String... args) {
+        List<Employee> emps = List.of(
+            new Employee("AAA", "HR", 300),
+            new Employee("SDA", "HR", 400),
+            new Employee("ERER", "HR", 250),
+            new Employee("John", "IT", 300),
+            new Employee("AAA", "IT", 258),
+            new Employee("fgfgf", "IT", 255),
+            new Employee("aa", "SU", 234)
+        );
+
+        Map<String, SummaryStats> statsMap = summaryStats(emps);
+
+        statsMap.entrySet().stream()
+            .sorted((e1, e2) -> Double.compare(e2.getValue().avg(), e1.getValue().avg())) // descending by avg
+            .forEach(entry -> System.out.println(
+                "Dept : " + entry.getKey() + " Stats : [ " + entry.getValue().avg() + " , " + entry.getValue().count() + " ]"
+            ));
+    }
+
+    public static Map<String, SummaryStats> summaryStats(List<Employee> employees) {
+        return employees.stream()
+            .collect(Collectors.groupingBy(Employee::dept,
+                Collectors.collectingAndThen(
+                    Collectors.summarizingInt(Employee::salary),
+                    stats -> new SummaryStats(stats.getAverage(), (int) stats.getCount())
+                )));
+    }
+
+    record Employee(String name, String dept, int salary) {}
+    record SummaryStats(Double avg, int count) {}
+}
+--------------------------------------------------------------------------------------------------------------------------------------------
+Most frequent word in a list
+List<String> list = List.of("apple", "banana", "Apple", "orange", "banana", "apple");
+
+        String most = list.stream()
+            .map(String::toLowerCase) // normalize to lowercase
+            .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()))
+            .entrySet()
+            .stream()
+            .max(Map.Entry.comparingByValue()) // get the highest frequency
+            .map(Map.Entry::getKey)
+            .orElse(null);
+--------------------------------------------------------------------------------------------------------------------------------------------

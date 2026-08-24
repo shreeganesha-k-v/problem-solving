@@ -1,0 +1,1429 @@
+Given a positive integer N, you can do the following operation at most once a) Swap two digits of the integer N.You need to determine the largest integer you can get by performing the above operation at most once.
+Sample Input 1:		4589			99538
+Sample Output 1:	9584			99835
+Explanation Of Sample Input 1:For the first test case, swap the first digit with the last digit, So, return 9584.
+For the second test case, swap the third digit with the last digit. So, return 99835.
+Sample Input 2:		4321   	18
+Sample Output 2:	4321	81
+Explanation Of Sample Input 2:
+For the first test case, the number given is biggest among all possible answers, So, return 4321.For the second test case, swap the first digit with the last digit. So, return 81.
+
+public class MaxNumberAfterOneSwap {
+
+    public static int getMaximum(int n) {
+        char[] digits = String.valueOf(n).toCharArray();
+        int len = digits.length;
+
+        // Array to store index of max digit to the right
+        int[] maxIndexRight = new int[len];
+        int maxIdx = len - 1;
+        maxIndexRight[len - 1] = maxIdx;
+
+        // Build maxIndexRight from right to left
+        for (int i = len - 2; i >= 0; i--) {
+            if (digits[i] > digits[maxIdx]) {
+                maxIdx = i;
+            }
+            maxIndexRight[i] = maxIdx;
+        }
+
+        // Try to find the first beneficial swap
+        for (int i = 0; i < len; i++) {
+            if (digits[i] < digits[maxIndexRight[i]]) {
+                // Swap
+                char temp = digits[i];
+                digits[i] = digits[maxIndexRight[i]];
+                digits[maxIndexRight[i]] = temp;
+                break;
+            }
+        }
+
+        return Integer.parseInt(new String(digits));
+    }
+
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        int T = sc.nextInt();
+
+        while (T-- > 0) {
+            int N = sc.nextInt();
+            System.out.println(getMaximum(N));
+        }
+        sc.close();
+    }
+}
+=========================================================================================================================================================================================================================================================
+You are given an array of characters letters that is sorted in non-decreasing order, and a character target. There are at least two different characters in letters.Return the smallest character in letters that is lexicographically greater than target. If such a character does not exist, return the first character in letters.
+Example 1:Input: letters = ["c","f","j"], target = "a"			Output: "c"
+Explanation: The smallest character that is lexicographically greater than 'a' in letters is 'c'.
+Example 2:Input: letters = ["c","f","j"], target = "c"			Output: "f"
+Explanation: The smallest character that is lexicographically greater than 'c' in letters is 'f'.
+Example 3:Input: letters = ["x","x","y","y"], target = "z"		Output: "x"
+Explanation: There are no characters in letters that is lexicographically greater than 'z' so we return letters[0].
+
+class Solution {
+    public char nextGreatestLetter(char[] letters, char target) {
+        int n = letters.length;
+        int low = 0;
+        int high = n - 1;
+
+        while (low <= high) {
+            int mid = low + (high - low) / 2;
+
+            if (letters[mid] <= target) {
+                // Move right to find a larger character
+                low = mid + 1;
+            } else {
+                // Move left to find the SMALLEST larger character
+                high = mid - 1;
+            }
+        }
+
+        // Using modulo handles the "wrap-around" case 
+        // If low == n, it returns letters[0]
+        return letters[low % n];
+    }
+}
+===========================================================================================================================================================================================================================================================
+You are given an array of integers nums of length n.The cost of an array is the value of its first element. For example, the cost of [1,2,3] is 1 while the cost of [3,4,1] is 3.You need to divide nums into 3 disjoint contiguous subarrays.Return the minimum possible sum of the cost of these subarrays.
+Example 1:Input: nums = [1,2,3,12]			Output: 6
+Explanation: The best possible way to form 3 subarrays is: [1], [2], and [3,12] at a total cost of 1 + 2 + 3 = 6.
+The other possible ways to form 3 subarrays are:
+- [1], [2,3], and [12] at a total cost of 1 + 2 + 12 = 15.
+- [1,2], [3], and [12] at a total cost of 1 + 3 + 12 = 16.
+Example 2:Input: nums = [5,4,3]				Output: 12
+Explanation: The best possible way to form 3 subarrays is: [5], [4], and [3] at a total cost of 5 + 4 + 3 = 12.
+It can be shown that 12 is the minimum cost achievable.
+Example 3:Input: nums = [10,3,1,1]			Output: 12
+Explanation: The best possible way to form 3 subarrays is: [10,3], [1], and [1] at a total cost of 10 + 1 + 1 = 12.
+It can be shown that 12 is the minimum cost achievable.
+
+class Solution {
+    public int minimumCost(int[] nums) {
+        int n = nums.length;
+
+        // minimum nums[i] for i in [1 .. j-1]
+        int minLeft = nums[1];
+        int best = Integer.MAX_VALUE;
+
+        for (int j = 2; j < n; j++) {
+            best = Math.min(best, minLeft + nums[j]);
+            minLeft = Math.min(minLeft, nums[j]);
+        }
+
+        return nums[0] + best;
+    }
+}
+=====================================================================================================================================================================================================================================================
+You are given an integer array nums of length n.An array is trionic if there exist indices 0 < p < q < n − 1 such that:
+nums[0...p] is strictly increasing,nums[p...q] is strictly decreasing,nums[q...n − 1] is strictly increasing.Return true if nums is trionic, otherwise return false.
+Example 1:Input: nums = [1,3,5,4,2,6]						Output: true
+Explanation:Pick p = 2, q = 4:nums[0...2] = [1, 3, 5] is strictly increasing (1 < 3 < 5).nums[2...4] = [5, 4, 2] is strictly decreasing (5 > 4 > 2).nums[4...5] = [2, 6] is strictly increasing (2 < 6).
+Example 2:Input: nums = [2,1,3]								Output: false
+Explanation:There is no way to pick p and q to form the required three segments.
+
+class Solution {
+    public boolean isTrionic(int[] nums) {
+        int n = nums.length;
+        if (n < 4) return false;
+
+        int i = 0;
+
+        // increasing
+        while (i + 1 < n && nums[i] < nums[i + 1]) i++;
+        int p = i;
+        if (p == 0) return false;
+
+        // decreasing
+        while (i + 1 < n && nums[i] > nums[i + 1]) i++;
+        int q = i;
+        if (q == p) return false;
+
+        // increasing again
+        int startThird = i;
+        while (i + 1 < n && nums[i] < nums[i + 1]) i++;
+
+        // must move at least once in third segment
+        if (startThird == i) return false;
+
+        return i == n - 1;
+    }
+}
+========================================================================================================================================================================================================================================================
+You are provided with the two strings named X and Y respectively. Y has its own specific order and has no repeating characters. Your task is to arrange the characters of the first string i.e. X in such a way that the order of characters in X is exactly the same as in Y, which means if ‘d’ occurs after ‘c’ in Y then it should also occur after ‘c’ in X ( obviously if X has ‘d’ and ‘c’ as characters in it ). All you have to do is, convert string X in the specific order with respect to string Y.
+Sample Input 1:acabd	abc
+Sample Output 1:aabcd
+Explanation of Sample Input 1:String Y has ‘a’ first then ‘b’ and then ‘c’ and therefore string X must be ordered as ‘aabcd’ to keep the respective order of characters same as in string Y.
+Other possible answers are: ‘daabc’ , ‘adabc’ , ‘aadbc’, ‘aabdc’.
+Sample Input 2:	dfhfgk	h				aabbb	gd					abababab	ab					cag	abcdef
+Sample Output 2:hdffgk					aabbb						aaaabbbb						acg
+
+import java.util.*;
+
+public class Solution {
+
+    public static String customSort(String X, String Y) {
+
+        // frequency of characters in X
+        int[] freq = new int[26];
+        for (char c : X.toCharArray()) {
+            freq[c - 'a']++;
+        }
+
+        StringBuilder result = new StringBuilder();
+
+        // place characters according to order in Y
+        for (char c : Y.toCharArray()) {
+            while (freq[c - 'a'] > 0) {
+                result.append(c);
+                freq[c - 'a']--;
+            }
+        }
+
+        // append remaining characters
+        for (int i = 0; i < 26; i++) {
+            while (freq[i] > 0) {
+                result.append((char) (i + 'a'));
+                freq[i]--;
+            }
+        }
+
+        return result.toString();
+    }
+}
+===================================================================================================================================================================================================================================================================
+You are given an array ‘A’ of length ‘N’ consisting only of positive integers. Your task is to make the given array a palindrome by using a minimum number of operations. In one operation, you can select two adjacent indexes and merge them by adding their values. After every operation, the length of the array decreases by one.
+Sample Input-1 : 1 2 1				1 2 3 4 1
+Sample Output-1  0					2
+Explanation for Sample Input 1:
+For test case 1:
+    The given array is already a palindrome. Hence the answer is 0.
+For test case 2:
+    We select indexes 3 and 4 to merge. The array will look like [1, 2, 7, 1].
+    We select indexes 2 and 3 to merge. The array will look like [1, 9, 1].
+    Now the array is a palindrome. Hence the answer will be 2.
+Sample Input -2 :  8					1 3 3
+Sample Output -2 : 0					2
+
+public class Solution {
+
+    public static int minOperations(int[] A) {
+        int i = 0;
+        int j = A.length - 1;
+
+        long left = A[i];
+        long right = A[j];
+        int ops = 0;
+
+        while (i < j) {
+            if (left == right) {
+                i++;
+                j--;
+
+                if (i < j) {
+                    left = A[i];
+                    right = A[j];
+                }
+            } 
+            else if (left < right) {
+                i++;
+                left += A[i];
+                ops++;
+            } 
+            else {
+                j--;
+                right += A[j];
+                ops++;
+            }
+        }
+
+        return ops;
+    }
+}
+===================================================================================================================================================================================================================================================================
+The Look-And-Say sequence is a sequence of positive integers. The sequence is as follows:1, 11, 21, 1211, 111221, 312211, 13112221,... This sequence is constructed in the following way:The first number is 1.This is read as “One 1”. Hence, the second number will be 11.The second number is read as “Two 1s”. Hence, the third number will be 21. The third number is read as “One 2, One 1”. Hence, the fourth number will be 1211. And so on.The fourth term is read as “One 1, One 2, Two 1s”.Hence, the fifth term will be 111221. And so on.Given an integer N, find the Nth term of the sequence.
+
+Sample Input 1:	1				2				3
+Sample Output 1:1				11				21
+Explanation for Sample 1:
+The first term is 1.The second term is 11.The third term is 21.
+Sample Input 2:  6
+Sample Output 2: 312211
+
+public class Solution {
+
+    public static String lookAndSay(int n) {
+        String result = "1";
+
+        for (int i = 2; i <= n; i++) {
+            StringBuilder next = new StringBuilder();
+            int count = 1;
+
+            for (int j = 1; j < result.length(); j++) {
+                if (result.charAt(j) == result.charAt(j - 1)) {
+                    count++;
+                } else {
+                    next.append(count);
+                    next.append(result.charAt(j - 1));
+                    count = 1;
+                }
+            }
+
+            // append last group
+            next.append(count);
+            next.append(result.charAt(result.length() - 1));
+
+            result = next.toString();
+        }
+
+        return result;
+    }
+}
+===================================================================================================================================================================================================================================================================
+You are given an array 'ARR' that consists of ‘N’ numbers. Your task is to split the array into two non-empty subarrays such that the absolute difference between their sum is minimum. For example,
+If the given array is [6,7,1,8,5]. We can split the array into [6,7,1] and [8,5].
+Hence the answer will be |14-13| = 1 which is minimum.
+
+Sample Input 1:	6 7 1 8 5				6 6 6    
+Sample Output 1: 1						6
+Explanation of sample input 1:For the first test case, We can split the array into [6,7] and [1,8,5]. The absolute difference is  |13-14| =1.Hence,  the answer is 1.For the second test case,We can split the array into [6] and [6,6]. The absolute difference is |6-12| =6.Hence, the answer is 6.    
+Sample Input 2:	4 1 20 9 9					7 9 8 10
+Sample Output 2: 7							2
+
+import java.io.*;
+import java.util.*;
+
+public class Main {
+
+    public static long minDifference(int[] arr, int n) {
+        long total = 0;
+
+        // total sum
+        for (int x : arr) total += x;
+
+        long prefix = 0;
+        long ans = Long.MAX_VALUE;
+
+        // try all valid split points (0 to n-2)
+        for (int i = 0; i < n - 1; i++) {
+            prefix += arr[i];
+
+            long diff = Math.abs(total - 2 * prefix);
+            ans = Math.min(ans, diff);
+        }
+
+        return ans;
+    }
+}
+===================================================================================================================================================================================================================================================================
+We stack glasses in a pyramid, where the first row has 1 glass, the second row has 2 glasses, and so on until the 100th row.  Each glass holds one cup of champagne.Then, some champagne is poured into the first glass at the top.  When the topmost glass is full, any excess liquid poured will fall equally to the glass immediately to the left and right of it.  When those glasses become full, any excess champagne will fall equally to the left and right of those glasses, and so on.  (A glass at the bottom row has its excess champagne fall on the floor.)
+For example, after one cup of champagne is poured, the top most glass is full.  After two cups of champagne are poured, the two glasses on the second row are half full.  After three cups of champagne are poured, those two cups become full - there are 3 full glasses total now.  After four cups of champagne are poured, the third row has the middle glass half full, and the two outside glasses are a quarter full, as pictured below.Now after pouring some non-negative integer cups of champagne, return how full the jth glass in the ith row is (both i and j are 0-indexed.)
+Example 1:Input: poured = 1, query_row = 1, query_glass = 1											Output: 0.00000
+Explanation: We poured 1 cup of champange to the top glass of the tower (which is indexed as (0, 0)). There will be no excess liquid so all the glasses under the top glass will remain empty.
+Example 2:Input: poured = 2, query_row = 1, query_glass = 1											Output: 0.50000
+Explanation: We poured 2 cups of champange to the top glass of the tower (which is indexed as (0, 0)). There is one cup of excess liquid. The glass indexed as (1, 0) and the glass indexed as (1, 1) will share the excess liquid equally, and each will get half cup of champange.
+Example 3:Input: poured = 100000009, query_row = 33, query_glass = 17								Output: 1.00000
+
+class Solution {
+    public double champagneTower(int poured, int query_row, int query_glass) {
+
+        double[][] dp = new double[101][101];
+        dp[0][0] = poured;
+
+        for (int i = 0; i < query_row; i++) {
+            for (int j = 0; j <= i; j++) {
+
+                if (dp[i][j] > 1) {
+                    double overflow = (dp[i][j] - 1) / 2.0; // If glass is poured extra each glass below would get half of excess poured , -1 because that stays in current glass
+
+                    dp[i + 1][j] += overflow;
+                    dp[i + 1][j + 1] += overflow;
+
+                    dp[i][j] = 1; // cap at full
+                }
+            }
+        }
+
+        return Math.min(1.0, dp[query_row][query_glass]);
+    }
+}
+===================================================================================================================================================================================================================================================================
+Given an integer n, return the decimal value of the binary string formed by concatenating the binary representations of 1 to n in order, modulo 109 + 7.
+Example 1:Input: n = 1			Output: 1
+Explanation: "1" in binary corresponds to the decimal value 1. 
+Example 2:Input: n = 3			Output: 27
+Explanation: In binary, 1, 2, and 3 corresponds to "1", "10", and "11".
+After concatenating them, we have "11011", which corresponds to the decimal value 27.
+Example 3:Input: n = 12			Output: 505379714
+Explanation: The concatenation results in "1101110010111011110001001101010111100".
+The decimal value of that is 118505380540.
+After modulo 109 + 7, the result is 505379714.
+
+ class Solution {
+
+    public int concatenatedBinary(int n) {
+
+        long mod = 1_000_000_007;
+        long result = 0;
+
+        int bitLength = 0;
+
+        for (int i = 1; i <= n; i++) {
+
+            // check if power of 2
+            // whenever power of 2 occurs,
+            // binary length increases
+            if ((i & (i - 1)) == 0) {
+                bitLength++;
+            }
+
+            // left shift and add number
+            result = ((result << bitLength) + i) % mod;
+        }
+
+        return (int) result;
+    }
+}
+===================================================================================================================================================================================================================================================================
+You have been given three distinct integers ‘X’, ‘Y’ and ‘Z’. You need to find the number with a value in the middle.
+For example :X = 4, Y = 6, Z = 2,Here the element with value in the middle is 4, because 2 < 4 < 6.
+Sample Input 1 : 2 3 1				6 8 9   
+Sample Output 1 : 2 				8
+Explanation of sample input 1 :In the first test case, the three numbers are 2, 3 and 1. The middle element is 2, as 1 < 2 < 3. In the second test case, the three numbers are 6, 8 and 9. The middle element is 8, as 6 < 8 < 9
+Sample Input 2 : 15 2 3 			2 3 4
+Sample Output 2 : 3					3
+Explanation for sample input 2 :In the first test case, the three numbers are 15, 2 and 3. The middle element is 3, as 2 < 3 < 15. In the second test case, the three numbers are 2, 3 and 4. The middle element is 3, as 2 < 3 < 4
+
+static int middleOfThree(int x, int y, int z) {
+
+    int max = Math.max(x, Math.max(y, z));
+    int min = Math.min(x, Math.min(y, z));
+
+    return x + y + z - max - min;
+}
+or
+
+public class Main {
+
+    public static int middleOfThree(int x, int y, int z) {
+
+        if ((x > y && x < z) || (x < y && x > z))
+            return x;
+
+        if ((y > x && y < z) || (y < x && y > z))
+            return y;
+
+        return z;
+    }
+}
+===================================================================================================================================================================================================================================================================
+A decimal number is called deci-binary if each of its digits is either 0 or 1 without any leading zeros. For example, 101 and 1100 are deci-binary, while 112 and 3001 are not.Given a string n that represents a positive decimal integer, return the minimum number of positive deci-binary numbers needed so that they sum up to n.
+Example 1: Input: n = "32"							Output: 3
+Explanation: 10 + 11 + 11 = 32
+Example 2: Input: n = "82734"						Output: 8
+Example 3: Input: n = "27346209830709182346"  		Output: 9
+ 
+class Solution {
+
+    public int minPartitions(String n) {
+
+        int maxDigit = 0;
+
+        for (char ch : n.toCharArray()) {
+            maxDigit = Math.max(maxDigit, ch - '0');
+
+            // optimization (cannot exceed 9)
+            if (maxDigit == 9)
+                return 9;
+        }
+
+        return maxDigit;
+    }
+}
+===================================================================================================================================================================================================================================================================
+Given a positive integer ‘n’, your task is to find the next smallest integer and the previous largest integer having the exact number of ‘1’ bits set in their binary representation as ‘n’.
+Example: ‘n = 6’ The binary representation of 6 = ‘0110’, which has two ‘1’ bits set. Next smallest integer = 9 = ‘1001’, the smallest integer greater than 6 having two ‘1’ bits set. Previous largest integer = 5 = ‘0101’, largest integer smaller than 6 having two ‘1’ bits set.
+Therefore, the answer is {9, 5}.
+Note:1. ‘n’ is a positive integer greater than one. 2. For any given integer ‘n’, there is always a positive integer smaller than ‘n’ having the exact number of ‘1’ bits set. 3. Don’t print anything. Just implement the function and return the answer. 4. ‘n’ can have a max of ‘30’ bits.
+Sample input 1:	 6				9
+Sample output 1: 9 5    		10 6
+Explanation of sample input 1:Test Case 1:The binary representation of {5 = 0101, 6 = 0110, 7 = 0111, 8 = 1000, 9 = 1001}, here ‘9’ is the smallest integer greater than ‘6’ and ‘5’ is the largest integer smaller than ‘6’ having the exact number of ‘1’ bits set (i.e., two set bits) as that of ‘6’, so the answer is {9, 5}.
+Test Case 2:The binary representation of {6 = 0110, 7 = 0111, 8 = 1000, 9 = 1001, 10 = 1010}, here ‘10’ is the smallest integer greater than ‘9’ and ‘6’ is the largest integer smaller than ‘9’ having the exact number of ‘1’ bits set (i.e., two set bits) as that of ‘9’, so the answer is {10, 6}.
+Sample input 2: 	4		5
+Sample output 2:    8 2		6 3
+
+public class Solution {
+
+    public static int[] nextSmallerAndPreviousLarger(int n) {
+
+        int setBits = Integer.bitCount(n);
+
+        int next = n + 1;
+        while (Integer.bitCount(next) != setBits) {
+            next++;
+        }
+
+        int prev = n - 1;
+        while (Integer.bitCount(prev) != setBits) {
+            prev--;
+        }
+
+        return new int[]{next, prev};
+    }
+}
+===================================================================================================================================================================================================================================================================
+You are given a string ‘STR’ consisting of English lowercase letters. You are also provided another string ‘ABBR’ consisting of lowercase letters and digits.We say ‘ABBR’ matches ‘STR’ if it fulfils the following condition:
+1) While matching, if we encounter a number ‘X’ in ‘ABBR’, then we have to skip ‘X’ characters in ‘STR’ and keep on matching.For example: For ‘STR’ = “abc”, all valid matching ‘ABBR’ are: [“abc”, “1bc”, “1b1”, “2c”, “3”, “a1c”, “a2”, “ab1”].Your task is to check whether ‘STR’ matches with the given ‘ABBR’ or not. Return TRUE if ‘STR’ matches with ‘ABBR’ else return FALSE.
+For example :
+If ‘STR’ = “hello” and ‘ABBR’= “1e2o”.
+1. As ‘STR[0]’=’h’ but ‘ABBR[0]’=1 which means we can skip 1 character from ‘STR’ so continue matching.
+2. ‘STR[1]’=’e’ and ‘ABBR[1]’=’e’ (matches) so continue matching.
+3.‘STR[2]’=’l’ and ‘ABBR[2]’=2 which means we can skip 2 characters from ‘STR’ so continue matching.
+4. We will not match the 3rd index as skipped in the earlier step.   
+4.‘STR[4]’=’o’ and ‘ABBR[4]’=’o’ (matches). 
+So we can say ‘STR’ matches with ‘ABBR’ and return TRUE.
+Detailed explanation ( Input/output format, Notes, Images )
+Sample input 1 :abbreviations a11s
+Sample output 1 :YES
+Explanation for sample output 1 :
+For the given ‘STR’ = “abbreviations” and ‘ABBR’ = “a11s”, the character at the 0th index of both the strings matches, so we can continue matching for next indices.
+For the next step, we encounter a number 11 in ‘ABBR’, which means we have to skip 11 characters from ‘STR’ and continue matching.
+After skipping 11 indices, we move to the 12th index of ‘STR’. Now,  both ‘STR[12]’ = ‘s’ and ‘ABBR[3]’ = ‘s’ and match.
+Finally, we reach the end of both strings. So we print YES as an answer.
+Sample input 2 :	xyzzy 4					ninja 8inja
+Sample output 2 :   NO						NO
+Explanation for sample output 2 :
+(i) For the first test case, ‘ABBR’ has only one digit that is 4 which means we have to skip 4 characters in ‘STR’ from the starting. And after skipping 4 characters, we are still left with one character in ‘STR’ and zero characters in ‘ABBR’. So, we can say that ‘STR’ does not match with ‘ABBR’.(ii) For the second test case,the 0th index of ‘ABBR’ has a digit that is 8 which means we have to skip 8 characters in ‘STR’ from the starting. But the length of ‘STR’ is less than 8 which means we can not skip 8 characters. So, we can say that ‘STR’ does not match with ‘ABBR’.
+
+public class Solution 
+{
+    public static boolean validAbbreviation(String p, String s) 
+    {
+        int i = 0, j = 0;
+        int n = p.length(), m = s.length();
+
+        while (i < n && j < m) {
+
+            if (Character.isDigit(s.charAt(j))) {
+
+                // Leading zero invalid
+                if (s.charAt(j) == '0') return false;
+
+                int num = 0;
+
+                while (j < m && Character.isDigit(s.charAt(j))) {
+                    num = num * 10 + (s.charAt(j) - '0');
+                    j++;
+                }
+
+                i += num;
+
+                if (i > n) return false;
+
+            } else {
+
+                if (p.charAt(i) != s.charAt(j)) {
+                    return false;
+                }
+
+                i++;
+                j++;
+            }
+        }
+
+        return i == n && j == m;
+    }
+}
+====================================================================================================================================================================================================================================================
+Given two positive integers n and k, the binary string Sn is formed as follows:S1 = "0"			Si = Si - 1 + "1" + reverse(invert(Si - 1)) for i > 1. Where + denotes the concatenation operation, reverse(x) returns the reversed string x, and invert(x) inverts all the bits in x (0 changes to 1 and 1 changes to 0).For example, the first four strings in the above sequence are:
+S1 = "0"
+S2 = "011"
+S3 = "0111001"
+S4 = "011100110110001"
+Return the kth bit in Sn. It is guaranteed that k is valid for the given n.
+Example 1:	Input: n = 3, k = 1			Output: "0"
+Explanation: S3 is "0111001". The 1st bit is "0".
+Example 2: Input: n = 4, k = 11			Output: "1"
+Explanation: S4 is "011100110110001". The 11th bit is "1".
+
+class Solution {
+
+    public char findKthBit(int n, int k) {
+        
+        // Base case
+        if (n == 1) return '0';
+        
+        int length = (1 << n) - 1;      // 2^n - 1
+        int mid = (length / 2) + 1;     // 2^(n-1)
+
+        if (k == mid) {
+            return '1';
+        }
+        
+        if (k < mid) {
+            return findKthBit(n - 1, k);
+        } 
+        else {
+            // mirror position
+            int mirror = length - k + 1;
+            char bit = findKthBit(n - 1, mirror);
+            
+            // invert result
+            return bit == '0' ? '1' : '0';
+        }
+    }
+}
+====================================================================================================================================================================================================================================================
+Given an m x n binary matrix mat, return the number of special positions in mat.A position (i, j) is called special if mat[i][j] == 1 and all other elements in row i and column j are 0 (rows and columns are 0-indexed).
+Example 1: Input: mat = [[1,0,0],[0,0,1],[1,0,0]]				Output: 1
+Explanation: (1, 2) is a special position because mat[1][2] == 1 and all other elements in row 1 and column 2 are 0.
+Example 2: Input: mat = [[1,0,0],[0,1,0],[0,0,1]]				Output: 3
+Explanation: (0, 0), (1, 1) and (2, 2) are special positions.
+
+class Solution {
+    public int numSpecial(int[][] mat) {
+        int m = mat.length;
+        int n = mat[0].length;
+
+        int[] rowCount = new int[m];
+        int[] colCount = new int[n];
+
+        // Count 1s in rows and columns
+        for(int i = 0; i < m; i++){
+            for(int j = 0; j < n; j++){
+                if(mat[i][j] == 1){
+                    rowCount[i]++;
+                    colCount[j]++;
+                }
+            }
+        }
+
+        int special = 0;
+
+        // Check special positions
+        for(int i = 0; i < m; i++){
+            for(int j = 0; j < n; j++){
+                if(mat[i][j] == 1 && rowCount[i] == 1 && colCount[j] == 1){
+                    special++;
+                }
+            }
+        }
+
+        return special;
+    }
+}
+====================================================================================================================================================================================================================================================
+You are given a string s consisting only of the characters '0' and '1'. In one operation, you can change any '0' to '1' or vice versa.The string is called alternating if no two adjacent characters are equal. For example, the string "010" is alternating, while the string "0100" is not.Return the minimum number of operations needed to make s alternating.
+Example 1:	Input: s = "0100"		Output: 1
+Explanation: If you change the last character to '1', s will be "0101", which is alternating.
+Example 2:	Input: s = "10"			Output: 0
+Explanation: s is already alternating.
+Example 3:	Input: s = "1111"		Output: 2
+Explanation: You need two operations to reach "0101" or "1010".
+ 
+class Solution {
+    public int minOperations(String s) {
+        int mismatchStart0 = 0; // pattern: 010101...
+        int mismatchStart1 = 0; // pattern: 101010...
+        
+        for (int i = 0; i < s.length(); i++) {
+            char expected0 = (i % 2 == 0) ? '0' : '1';
+            char expected1 = (i % 2 == 0) ? '1' : '0';
+            
+            if (s.charAt(i) != expected0) mismatchStart0++;
+            if (s.charAt(i) != expected1) mismatchStart1++;
+        }
+        
+        return Math.min(mismatchStart0, mismatchStart1);
+    }
+}
+====================================================================================================================================================================================================================================================
+You are given an array ‘A’ of length ‘N’ consisting only of positive integers. Your task is to make the given array a palindrome by using a minimum number of operations. In one operation, you can select two adjacent indexes and merge them by adding their values. After every operation, the length of the array decreases by one.
+Sample Input-1 : 1 2 1				1 2 3 4 1
+Sample Output-1  0					2
+Explanation for Sample Input 1:
+For test case 1:The given array is already a palindrome. Hence the answer is 0.
+For test case 2:We select indexes 3 and 4 to merge. The array will look like [1, 2, 7, 1].We select indexes 2 and 3 to merge. The array will look like [1, 9, 1].Now the array is a palindrome. Hence the answer will be 2.
+Sample Input -2  : 8				1 3 3
+Sample Output -2:  0				2
+
+public class Solution {
+
+    public static int minOperations(long[] arr, int n) {
+        int left = 0;
+        int right = n - 1;
+        int operations = 0;
+
+        while (left < right) {
+
+            if (arr[left] == arr[right]) {
+                left++;
+                right--;
+            } 
+            else if (arr[left] < arr[right]) {
+                arr[left + 1] += arr[left];
+                left++;
+                operations++;
+            } 
+            else {
+                arr[right - 1] += arr[right];
+                right--;
+                operations++;
+            }
+        }
+
+        return operations;
+    }
+}
+====================================================================================================================================================================================================================================================
+Given a binary string s ​​​​​without leading zeros, return true​​​ if s contains at most one contiguous segment of ones. Otherwise, return false.
+Example 1:Input: s = "1001"				Output: false
+Explanation: The ones do not form a contiguous segment.
+Example 2:Input: s = "110"				Output: true
+
+class Solution {
+    public boolean checkOnesSegment(String s) {
+        return !s.contains("01"); // After first zero one should not appear
+    }
+}
+or
+class Solution {
+    public boolean checkOnesSegment(String s) {
+
+        boolean zeroSeen = false;
+
+        for(char c : s.toCharArray()) {
+
+            if(c == '0') {
+                zeroSeen = true;
+            }
+
+            if(c == '1' && zeroSeen) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+}
+====================================================================================================================================================================================================================================================
+Ninja is given an array of integers that contain numbers in random order. He needs to write a program to find and return the number which occurs the maximum times in the given input. He needs your help to solve this problem.If two or more elements contend for the maximum frequency, return the element which occurs in the array first i.e. whose index is lowest.
+For example,For 'arr' = [ 1, 2, 3, 1, 2]. you need to return 1.
+Sample Input 1: 2 12 2 11 -12 2 -1 2 2 11 12 2 -6 		Sample Output 1: 2
+Explanation of Sample Input 1:Test case 1:For the first test case of sample output 1, as we start traveling the array, ‘2’ has the highest frequency, hence our answer is ‘2’.
+Sample Input 2: 4 -5 1					1 -2 1 -2
+Sample Output 2: 4						-2
+Explanation of Sample Input 2:Test case 1:For the first test case of sample output 2, as all the elements have only occurred once, so we will take the first element that has occurred once. Therefore our output will be ‘4’.
+Test case 2: -2 has the highest frequency.
+
+public class Solution {
+
+    public static int maxFrequencyElement(int[] arr) {
+
+        Map<Integer, Integer> freq = new HashMap<>();
+        Map<Integer, Integer> firstIndex = new HashMap<>();
+
+        int maxFreq = 0;
+        int result = arr[0];
+
+        for (int i = 0; i < arr.length; i++) {
+
+            int num = arr[i];
+
+            freq.put(num, freq.getOrDefault(num, 0) + 1);
+
+            firstIndex.putIfAbsent(num, i);
+
+            int f = freq.get(num);
+
+            if (f > maxFreq || 
+               (f == maxFreq && firstIndex.get(num) < firstIndex.get(result))) {
+
+                maxFreq = f;
+                result = num;
+            }
+        }
+
+        return result;
+    }
+}
+====================================================================================================================================================================================================================================================
+The complement of an integer is the integer you get when you flip all the 0's to 1's and all the 1's to 0's in its binary representation.For example, The integer 5 is "101" in binary and its complement is "010" which is the integer 2.Given an integer n, return its complement.
+Example 1:	Input: n = 5				Output: 2
+Explanation: 5 is "101" in binary, with complement "010" in binary, which is 2 in base-10.
+Example 2:	Input: n = 7				Output: 0
+Explanation: 7 is "111" in binary, with complement "000" in binary, which is 0 in base-10.
+Example 3:	Input: n = 10				Output: 5
+Explanation: 10 is "1010" in binary, with complement "0101" in binary, which is 5 in base-10.
+
+class Solution {
+    public int findComplement(int n) {
+        if (n == 0) return 1;
+
+        int mask = (Integer.highestOneBit(n) << 1) - 1; // create a mask which has all 1 , like if n = 5(101) then mask would be 7 (111)
+        return n ^ mask;
+    }
+}
+
+or
+
+class Solution {
+    public int findComplement(int n) {
+
+        if (n == 0) return 1;
+
+        int mask = 1;
+
+        while (mask <= n) {
+            mask <<= 1;
+        }
+
+        mask -= 1;
+
+        return n ^ mask;
+    }
+}
+====================================================================================================================================================================================================================================================
+For a given two-dimensional integer array/list ‘ARR’ of size (N x M), print the ‘ARR’ in a sine wave order, i.e., print the first column top to bottom, next column bottom to top, and so on.
+The sine wave for the matrix:-
+1 2
+3 4
+will be [1, 3, 4, 2].
+Sample Input 1:
+1 2 3 4
+5 6 7 8
+9 10 11 12
+
+1 2 4 5
+3 6 8 10
+11 12 13 15
+16 14 9 7
+Sample Output 1:
+1 5 9 10 6 2 3 7 11 12 8 4
+1 3 11 16 14 12 6 2 4 8 13 9 7 15 10 5 
+Explanation For Sample Input 1:
+Here, the elements are printed in a form of a wave, first, the 0th column is printed from top to bottom then the 1st column from bottom to top, and so on. Basically, the even column is printed from top to bottom and the odd column in the opposite direction.
+
+public class Solution {
+
+    public static void wavePrint(int[][] arr, int n, int m) {
+
+        for (int col = 0; col < m; col++) {
+
+            // even column -> top to bottom
+            if (col % 2 == 0) {
+                for (int row = 0; row < n; row++) {
+                    System.out.print(arr[row][col] + " ");
+                }
+            } 
+            // odd column -> bottom to top
+            else {
+                for (int row = n - 1; row >= 0; row--) {
+                    System.out.print(arr[row][col] + " ");
+                }
+            }
+        }
+        System.out.println();
+    }
+}
+====================================================================================================================================================================================================================================================
+You are given an integer mountainHeight denoting the height of a mountain.You are also given an integer array workerTimes representing the work time of workers in seconds.The workers work simultaneously to reduce the height of the mountain. For worker i:To decrease the mountain's height by x, it takes workerTimes[i] + workerTimes[i] * 2 + ... + workerTimes[i] * x seconds. For example:To reduce the height of the mountain by 1, it takes workerTimes[i] seconds.To reduce the height of the mountain by 2, it takes workerTimes[i] + workerTimes[i] * 2 seconds, and so on.Return an integer representing the minimum number of seconds required for the workers to make the height of the mountain 0.
+Example 1:Input: mountainHeight = 4, workerTimes = [2,1,1]					Output: 3
+Explanation:One way the height of the mountain can be reduced to 0 is:Worker 0 reduces the height by 1, taking workerTimes[0] = 2 seconds.Worker 1 reduces the height by 2, taking workerTimes[1] + workerTimes[1] * 2 = 3 seconds.Worker 2 reduces the height by 1, taking workerTimes[2] = 1 second.Since they work simultaneously, the minimum time needed is max(2, 3, 1) = 3 seconds.
+Example 2:Input: mountainHeight = 10, workerTimes = [3,2,2,4]				Output: 12
+Explanation:Worker 0 reduces the height by 2, taking workerTimes[0] + workerTimes[0] * 2 = 9 seconds.Worker 1 reduces the height by 3, taking workerTimes[1] + workerTimes[1] * 2 + workerTimes[1] * 3 = 12 seconds.Worker 2 reduces the height by 3, taking workerTimes[2] + workerTimes[2] * 2 + workerTimes[2] * 3 = 12 seconds.Worker 3 reduces the height by 2, taking workerTimes[3] + workerTimes[3] * 2 = 12 seconds.The number of seconds needed is max(9, 12, 12, 12) = 12 seconds.
+
+class Solution {
+
+    public long minNumberOfSeconds(int mountainHeight, int[] workerTimes) {
+
+        long left = 0;
+        long right = (long)1e18;
+        long ans = right;
+
+        while (left <= right) {
+
+            long mid = left + (right - left) / 2;
+
+            if (canReduce(mid, mountainHeight, workerTimes)) {
+                ans = mid;
+                right = mid - 1;
+            } else {
+                left = mid + 1;
+            }
+        }
+
+        return ans;
+    }
+
+    private boolean canReduce(long time, int height, int[] workers) {
+
+        long total = 0;
+
+        for (int t : workers) {
+
+            long k = (2 * time) / t;
+
+            long x = (long)((Math.sqrt(1 + 4.0 * k) - 1) / 2);
+
+            total += x;
+
+            if (total >= height)
+                return true;
+        }
+
+        return false;
+    }
+}
+====================================================================================================================================================================================================================================================
+You are given two strings s1 and s2, both of length n, consisting of lowercase English letters.You can apply the following operation on any of the two strings any number of times:Choose any two indices i and j such that i < j and the difference j - i is even, then swap the two characters at those indices in the string.Return true if you can make the strings s1 and s2 equal, and false otherwise.
+Example 1:Input: s1 = "abcdba", s2 = "cabdab"				Output: true
+Explanation: We can apply the following operations on s1:
+- Choose the indices i = 0, j = 2. The resulting string is s1 = "cbadba".
+- Choose the indices i = 2, j = 4. The resulting string is s1 = "cbbdaa".
+- Choose the indices i = 1, j = 5. The resulting string is s1 = "cabdab" = s2.
+Example 2:Input: s1 = "abe", s2 = "bea"						Output: false
+Explanation: It is not possible to make the two strings equal.
+
+public class Solution {
+
+    public static boolean canBeEqual(String s1, String s2) {
+        int n = s1.length();
+
+        int[] even1 = new int[26];
+        int[] odd1 = new int[26];
+        int[] even2 = new int[26];
+        int[] odd2 = new int[26];
+
+        // Count frequencies
+        for (int i = 0; i < n; i++) {
+            if (i % 2 == 0) {
+                even1[s1.charAt(i) - 'a']++;
+                even2[s2.charAt(i) - 'a']++;
+            } else {
+                odd1[s1.charAt(i) - 'a']++;
+                odd2[s2.charAt(i) - 'a']++;
+            }
+        }
+
+        // Compare frequencies
+        return Arrays.equals(even1, even2) && Arrays.equals(odd1, odd2);
+    }
+}
+====================================================================================================================================================================================================================================================
+You are given a string 'S'. Your task is to check whether the string is palindrome or not. For checking palindrome, consider alphabets and numbers only and ignore the symbols and whitespaces.
+Sample Input 1 : N2 i&nJA?a& jnI2n					A1b22Ba
+Sample Output 1 : Yes 								No
+Explanation 1 :For the first test case, S = “N2 i&nJA?a& jnI2n”. If we ignore the special characters, whitespaces and convert all uppercase letters to lowercase, we get S = “n2injaajni2n”, which is a palindrome. Hence, the given string is also a palindrome.For the second test case, S = “A1b22Ba”. If we ignore the special characters, whitespaces and convert all uppercase letters to lowercase, we get S = “a1b22ba”, which is not a palindrome. Hence, the given string is not a palindrome.
+Sample Input 2 :codingninjassajNiNgNidoc      5?36@6?35    aaBBa@
+Sample Output 2 : Yes							Yes			No
+ 
+public class Solution {
+
+	public static boolean checkPalindrome(String str) {
+
+		str = str.replaceAll("[^a-zA-Z0-9]","");
+
+		int right = str.length()-1;
+		int left = 0;
+
+		while(left < right){
+			if(str.charAt(left++)!=str.charAt(right--)){
+				return false;
+			}
+		}
+		return true;
+	 
+	}
+}
+====================================================================================================================================================================================================================================================
+Given two integers ‘Left’ and ‘Right’. Your task is to find the total count of ‘megaprime’ numbers from the range ‘Left’ to ‘Right’. A ‘megaprime’ number is a prime number and its individual digits are also prime.For example, ‘53’ is a ‘megaprime’ number because ‘53’ is a prime number and its individual digits,‘3’ and ‘5’, are also prime. ‘13’ is not a ‘megaprime’ number because out of its individual digits (1, 3), ‘1’ is not prime.
+
+Sample Input 1 :	2 15					11 24
+Sample Output 1 :   4							1
+Explanation Of Sample Input 1 :
+Test Case 1:‘Left’ = ‘2’ and ‘Right’ = ‘15’ .All prime numbers from ‘2’ to ‘15’ are 2, 3, 5, 7, 11, 13
+2 is ‘megaprime’ number because its individual digit ‘2’ is prime.3 is ‘megaprime’ number because its individual digit ‘3’ is prime.5 is ‘megaprime’ number because its individual digit ‘5’ is prime.7 is ‘megaprime’ number because its individual digit ‘7’ is prime.11 is not ‘megaprime’ number because its individual digits ‘1’ and ‘1’ both are not prime.13 is not ‘megaprime’ number because its individual digits ‘1’ is not prime.Hence because there are four ‘megaprime’ numbers 2, 3, 5, 7 out of 2, 3, 5, 7, 11, 13, we return four.
+Test case 2:‘Left’ = 11 and ‘Right’ = 24 .All prime numbers from ‘11’ to ‘24’ are 11, 13, 17, 19, 23. 11 is not a ‘megaprime’ number because its individual digit ‘1’ is not prime.13 is not ‘megaprime’ number because its individual digit ‘1’ is not prime.17 is not ‘megaprime’ number because its individual digit ‘1’ is not prime.19 is not ‘megaprime’ number because its individual digits ‘1’ and ‘9’ both are not prime.23 is ‘megaprime’ number because its individual digits ‘2’ and ‘3’ both are prime.Since there is only one ‘megaprime’ number, 23 out of 11 13, 17, 19, 23, we return one.
+
+public class Solution {
+
+    // Check if a number is prime
+    static boolean isPrime(int n) {
+        if (n < 2) return false;
+        for (int i = 2; i * i <= n; i++) {
+            if (n % i == 0) return false;
+        }
+        return true;
+    }
+
+    // Check if all digits are prime digits
+    static boolean isMegaPrime(int n) {
+        while (n > 0) {
+            int digit = n % 10;
+            if (!(digit == 2 || digit == 3 || digit == 5 || digit == 7)) {
+                return false;
+            }
+            n /= 10;
+        }
+        return true;
+    }
+
+    static int countMegaPrimes(int left, int right) {
+        int count = 0;
+
+        for (int i = left; i <= right; i++) {
+            if (isPrime(i) && isMegaPrime(i)) {
+                count++;
+            }
+        }
+
+        return count;
+    }
+}
+=================================================================================================================================================================================================================================
+You are given a string ‘S’ consisting of alphanumeric characters, the string divided into groups by a ‘-’. Your task is to reformat the string that all the groups contain exactly ‘K’ characters. All the lowercase characters should be converted to uppercase.
+Sample Input 1: Ab-ijklmno-pqr K=3			Isa-dkj k=4
+Sample Output 1: ABI-JKL-MNO-PQR			IS-ADKJ
+Explanation:For the first test case ‘S’ = ’Ab-ijklmno-pqr’ and ‘K’ = ‘3’, then the string contains 3 groups, [“Ab”, “ijklmno”, “pqr”], then you can form the string in groups ["ABI”, “JKL”, “MNO”, “PQR"] of uppercase characters. Hence the answer is "ABI-JKL-MNO-PQR".For the second test case ‘S’ = “Isa-dkj” and ‘K’ = ‘4’, then the string contains 2 groups, [“Isa”, “dkj”], then you can form the string in groups ["IS”, “ADKJ”] of uppercase characters. Hence the answer is "IS-ADKJ".
+
+public class Solution {
+    public static String reformatString(String s, int k) {
+        // Step 1 & 2: Remove '-' and convert to uppercase
+        StringBuilder cleaned = new StringBuilder();
+        for (char ch : s.toCharArray()) {
+            if (ch != '-') {
+                cleaned.append(Character.toUpperCase(ch));
+            }
+        }
+
+        // Step 3: Build result from end
+        StringBuilder result = new StringBuilder();
+        int count = 0;
+
+        for (int i = cleaned.length() - 1; i >= 0; i--) {
+            result.append(cleaned.charAt(i));
+            count++;
+
+            if (count == k && i != 0) {
+                result.append('-');
+                count = 0;
+            }
+        }
+
+        // Step 4: Reverse final string
+        return result.reverse().toString();
+    }
+}
+=================================================================================================================================================================================================================================
+There is a robot starting at the position (0, 0), the origin, on a 2D plane. Given a sequence of its moves, judge if this robot ends up at (0, 0) after it completes its moves.
+You are given a string moves that represents the move sequence of the robot where moves[i] represents its ith move. Valid moves are 'R' (right), 'L' (left), 'U' (up), and 'D' (down).Return true if the robot returns to the origin after it finishes all of its moves, or false otherwise.
+Example 1:Input: moves = "UD"			Output: true
+Explanation: The robot moves up once, and then down once. All moves have the same magnitude, so it ended up at the origin where it started. Therefore, we return true.
+Example 2:Input: moves = "LL"			Output: false
+Explanation: The robot moves left twice. It ends up two "moves" to the left of the origin. We return false because it is not at the origin at the end of its moves.
+
+public class Solution {
+    public static boolean judgeCircle(String moves) {
+        int x = 0, y = 0;
+
+        for (char move : moves.toCharArray()) {
+            switch (move) {
+                case 'R': x++; break;
+                case 'L': x--; break;
+                case 'U': y++; break;
+                case 'D': y--; break;
+            }
+        }
+
+        return x == 0 && y == 0;
+    }
+}
+or
+return moves.count('U')==moves.count('D') and moves.count('L')==moves.count('R')
+=================================================================================================================================================================================================================================
+You are given an array ‘ARR’ of length ‘N’. There are two operations, ‘FIRST_SUM’ and ‘LAST_SUM’ for every index ‘i’ (1 <= i <= N) in the array,
+i) FIRST_SUM(i) calculates the sum of first i numbers.
+ii) LAST_SUM(i) calculates the sum of last N-i+1 numbers.
+Also for every ‘i’, SPECIAL_SUM(i) can be calculated as:SPECIAL_SUM(i) = FIRST_SUM(i) + LAST_SUM(i). Your task is to return the minimum SPECIAL_SUM for 0 <= i <= N - 1.
+For example:Given ‘N’ = 4 and ‘ARR’ = [1, 2, 3, 4].Then the minimum special sum will be 5 for i = 0 (0-based indexing), which is (1 + 4) = 5.Sum of 1 integer from beginning and end.For i = 1 it will be (1 + 2) + (3 + 4) = 10.For i = 2 it will be (1 + 2 + 3) + (2 + 3 + 4) = 15. For i = 3 it will be (1 + 2 + 3 + 4) + (1 + 2 + 3 + 4) = 20. All of which are greater than 5.  
+Sample Input 1:	1 2 3 4				1 -2 -3 4
+Sample Output 1: 5					-5
+Explanation of the Sample Input 1:
+For the first test case:The  minimum special sum will be 5 for i = 0 (0-based indexing), which is (1 + 4) = 5.For i = 1 it will be (1 + 2) + (3 + 4) = 10. For i = 2 it will be (1 + 2 + 3) + (2 + 3 + 4) = 15. For i = 3 it will be (1 + 2 + 3 + 4) + (1 + 2 + 3 + 4) = 20. All of which are greater than 5.  
+For the second test case:The  minimum special sum will be -5 for i = 2 (0-based indexing), which is (1 + (-2) + (-3)) +  (-2 + (-3) + (4)) = -5.. For i = 0 it will be (1) + (4) = 5. For i = 1 it will be (1 + (-2) ) + ( (-3) + 4) = 0 . For i = 3 it will be (1 + (-2) + (-3) + 4)  + (1 + (-2) + (-3) + 4) = 0. All of which are less than -5.
+
+public class Solution {
+	public static int specialSum(ArrayList<Integer> arr, int n) {
+
+		long[] prefix = new long[n];
+		long[] suffix = new long[n];
+
+		// prefix sum
+		prefix[0] = arr.get(0);
+		for(int i = 1; i < n; i++){
+			prefix[i] = prefix[i - 1] + arr.get(i);
+		}
+
+		// suffix sum
+		suffix[n - 1] = arr.get(n - 1);
+		for(int i = n - 2; i >= 0; i--){
+			suffix[i] = suffix[i + 1] + arr.get(i);
+		}
+
+		long minSum = Long.MAX_VALUE;
+
+		// FIXED LOGIC HERE
+		for(int i = 0; i < n; i++){
+			long current = prefix[i] + suffix[n - i - 1];
+			minSum = Math.min(minSum, current);
+		}
+
+		return (int)minSum; // keep only if constraints guarantee safe range
+	}
+}
+=================================================================================================================================================================================================================================
+A robot on an infinite XY-plane starts at point (0, 0) facing north. The robot receives an array of integers commands, which represents a sequence of moves that it needs to execute. There are only three possible types of instructions the robot can receive:
+-2: Turn left 90 degrees.
+-1: Turn right 90 degrees.1 <= k <= 9: Move forward k units, one unit at a time.Some of the grid squares are obstacles. The ith obstacle is at grid point obstacles[i] = (xi, yi). If the robot runs into an obstacle, it will stay in its current location (on the block adjacent to the obstacle) and move onto the next command.
+Return the maximum squared Euclidean distance that the robot reaches at any point in its path (i.e. if the distance is 5, return 25).
+Note:There can be an obstacle at (0, 0). If this happens, the robot will ignore the obstacle until it has moved off the origin. However, it will be unable to return to (0, 0) due to the obstacle.
+North means +Y direction.
+East means +X direction.
+South means -Y direction.
+West means -X direction.
+Example 1:Input: commands = [4,-1,3], obstacles = []			Output: 25
+Explanation:The robot starts at (0, 0):Move north 4 units to (0, 4).Turn right.Move east 3 units to (3, 4).The furthest point the robot ever gets from the origin is (3, 4), which squared is 32 + 42 = 25 units away.
+Example 2:Input: commands = [4,-1,4,-2,4], obstacles = [[2,4]]			Output: 65
+Explanation:The robot starts at (0, 0):Move north 4 units to (0, 4).Turn right.Move east 1 unit and get blocked by the obstacle at (2, 4), robot is at (1, 4).Turn left.Move north 4 units to (1, 8).The furthest point the robot ever gets from the origin is (1, 8), which squared is 12 + 82 = 65 units away.
+Example 3:Input: commands = [6,-1,-1,6], obstacles = [[0,0]]				Output: 36
+Explanation:The robot starts at (0, 0):Move north 6 units to (0, 6).Turn right.Turn right.Move south 5 units and get blocked by the obstacle at (0,0), robot is at (0, 1).The furthest point the robot ever gets from the origin is (0, 6), which squared is 62 = 36 units away.
+
+public class Solution {
+    public int robotSim(int[] commands, int[][] obstacles) {
+
+        // Store obstacles
+        Set<String> set = new HashSet<>();
+        for (int[] obs : obstacles) {
+            set.add(obs[0] + "," + obs[1]);
+        }
+
+        // Directions: N, E, S, W
+        int[][] dirs = {
+            {0, 1},   // North
+            {1, 0},   // East
+            {0, -1},  // South
+            {-1, 0}   // West
+        };
+
+        int dir = 0; // start facing North
+        int x = 0, y = 0;
+        int maxDist = 0;
+
+        for (int cmd : commands) {
+
+            if (cmd == -1) {
+                dir = (dir + 1) % 4; // turn right
+            } else if (cmd == -2) {
+                dir = (dir + 3) % 4; // turn left
+            } else {
+
+                // move step by step
+                for (int i = 0; i < cmd; i++) {
+                    int nx = x + dirs[dir][0];
+                    int ny = y + dirs[dir][1];
+
+                    if (set.contains(nx + "," + ny)) {
+                        break; // obstacle hit
+                    }
+
+                    x = nx;
+                    y = ny;
+
+                    maxDist = Math.max(maxDist, x * x + y * y);
+                }
+            }
+        }
+
+        return maxDist;
+    }
+}
+=================================================================================================================================================================================================================================
+Ninja and his friends go to the park every day. But now, due to his homework, he wasn’t able to go to the park with his friends. So when he figures out, he notes that a lot of time is consumed in doing maths homework where he has to convert some real number to a binary string. So he is deciding to build a calculator which can convert real numbers to the binary string.So help our Ninja to write a code for the calculator, which can convert the real numbers into a binary string and save his time to join his friends in the park.So your task is to write a code that can convert real numbers between ‘0’ and ‘1’into a binary string.For example, you have given a number “0.750” so you have to convert it in its binary form that is “0.110”
+Sample Input 1 :	0.625				0.72
+Sample Output 1 :	0.101				ERROR
+Explanation Of Sample Input 1 :In the first line, there is the number of test cases i.e., 1, and in the next line ‘0.625’ is the real number in a decimal form which we have to convert into a binary string.
+Here, we have started with multiplying the number that is ‘N’with ‘2’ and hence write its binary number like String s= ‘0’+ ‘.’+ ‘1’+ ‘0’+ ‘1’   =[0.101].
+Test case 2:Here the number is “0.72” on multiplication with 2 we see we didn’t get its equivalent Binary number or we can say that we weren’t able to convert our number into binary form up to the 32 characters as 32 can be the maximum length of our string so we return our string as “ERROR”.
+Sample Input 2 : 0.248				0.50
+Sample Output 2 :ERROR				0.1
+
+public class Solution {
+    public static String toBinary(double num) {
+        // Edge case
+        if (num <= 0 || num >= 1) {
+            return "ERROR";
+        }
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("0.");
+
+        while (num > 0) {
+            // Limit length to 32
+            if (sb.length() >= 34) { // "0." + 32 bits
+                return "ERROR";
+            }
+
+            num = num * 2;
+
+            if (num >= 1) {
+                sb.append("1");
+                num = num - 1;
+            } else {
+                sb.append("0");
+            }
+        }
+
+        return sb.toString();
+    }
+}
+=================================================================================================================================================================================================================================
+A width x height grid is on an XY-plane with the bottom-left cell at (0, 0) and the top-right cell at (width - 1, height - 1). The grid is aligned with the four cardinal directions ("North", "East", "South", and "West"). A robot is initially at cell (0, 0) facing direction "East".The robot can be instructed to move for a specific number of steps. For each step, it does the following.Attempts to move forward one cell in the direction it is facing.
+If the cell the robot is moving to is out of bounds, the robot instead turns 90 degrees counterclockwise and retries the step.After the robot finishes moving the number of steps required, it stops and awaits the next instruction.Implement the Robot class:Robot(int width, int height) Initializes the width x height grid with the robot at (0, 0) facing "East".void step(int num) Instructs the robot to move forward num steps.int[] getPos() Returns the current cell the robot is at, as an array of length 2, [x, y].String getDir() Returns the current direction of the robot, "North", "East", "South", or "West".
+Example 1:Input
+["Robot", "step", "step", "getPos", "getDir", "step", "step", "step", "getPos", "getDir"]
+[[6, 3], [2], [2], [], [], [2], [1], [4], [], []]
+Output [null, null, null, [4, 0], "East", null, null, null, [1, 2], "West"]
+Explanation
+Robot robot = new Robot(6, 3); // Initialize the grid and the robot at (0, 0) facing East.
+robot.step(2);  // It moves two steps East to (2, 0), and faces East.
+robot.step(2);  // It moves two steps East to (4, 0), and faces East.
+robot.getPos(); // return [4, 0]
+robot.getDir(); // return "East"
+robot.step(2);  // It moves one step East to (5, 0), and faces East.
+                // Moving the next step East would be out of bounds, so it turns and faces North.
+                // Then, it moves one step North to (5, 1), and faces North.
+robot.step(1);  // It moves one step North to (5, 2), and faces North (not West).
+robot.step(4);  // Moving the next step North would be out of bounds, so it turns and faces West.
+                // Then, it moves four steps West to (1, 2), and faces West.
+robot.getPos(); // return [1, 2]
+robot.getDir(); // return "West"
+
+class Robot {
+
+    int width, height;
+    int x, y;
+    int dir; // 0=East, 1=North, 2=West, 3=South
+
+    String[] directions = {"East", "North", "West", "South"};
+    int[][] moves = {
+        {1, 0},   // East
+        {0, 1},   // North
+        {-1, 0},  // West
+        {0, -1}   // South
+    };
+
+    int cycle;
+
+    public Robot(int width, int height) {
+        this.width = width;
+        this.height = height;
+        this.x = 0;
+        this.y = 0;
+        this.dir = 0; // East
+        this.cycle = 2 * (width + height) - 4;
+    }
+
+    public void step(int num) {
+        if (cycle == 0) return;
+
+        num = num % cycle;
+
+        // Important edge case
+        if (num == 0) {
+            if (x == 0 && y == 0) {
+                dir = 3; // South
+            }
+            return;
+        }
+
+        while (num > 0) {
+            int nx = x + moves[dir][0];
+            int ny = y + moves[dir][1];
+
+            // Out of bounds → turn
+            if (nx < 0 || nx >= width || ny < 0 || ny >= height) {
+                dir = (dir + 1) % 4;
+            } else {
+                x = nx;
+                y = ny;
+                num--;
+            }
+        }
+    }
+
+    public int[] getPos() {
+        return new int[]{x, y};
+    }
+
+    public String getDir() {
+        return directions[dir];
+    }
+}
+=================================================================================================================================================================================================================================
+You are given an integer array nums.A tuple (i, j, k) of 3 distinct indices is good if nums[i] == nums[j] == nums[k].The distance of a good tuple is abs(i - j) + abs(j - k) + abs(k - i), where abs(x) denotes the absolute value of x.Return an integer denoting the minimum possible distance of a good tuple. If no good tuples exist, return -1.
+Example 1: Input: nums = [1,2,1,1,3]			Output: 6
+Explanation:The minimum distance is achieved by the good tuple (0, 2, 3).(0, 2, 3) is a good tuple because nums[0] == nums[2] == nums[3] == 1. Its distance is abs(0 - 2) + abs(2 - 3) + abs(3 - 0) = 2 + 1 + 3 = 6.
+Example 2:Input: nums = [1,1,2,3,2,1,2]			Output: 8
+Explanation:The minimum distance is achieved by the good tuple (2, 4, 6). (2, 4, 6) is a good tuple because nums[2] == nums[4] == nums[6] == 2. Its distance is abs(2 - 4) + abs(4 - 6) + abs(6 - 2) = 2 + 2 + 4 = 8.
+Example 3: Input: nums = [1]					Output: -1
+Explanation:There are no good tuples. Therefore, the answer is -1.
+
+class Solution {
+    public int minimumDistance(int[] nums) {
+        Map<Integer, List<Integer>> map = new HashMap<>();
+        
+        // Step 1: Store indices for each value
+        for (int i = 0; i < nums.length; i++) {
+            map.computeIfAbsent(nums[i], k -> new ArrayList<>()).add(i);
+        }
+        
+        int minDist = Integer.MAX_VALUE;
+        
+        // Step 2: Process each list
+        for (List<Integer> list : map.values()) {
+            if (list.size() < 3) continue;
+            
+            // Step 3: Check consecutive triplets
+            for (int i = 0; i <= list.size() - 3; i++) {
+                int first = list.get(i);
+                int third = list.get(i + 2);
+                
+                int dist = 2 * (third - first);
+                minDist = Math.min(minDist, dist);
+            }
+        }
+        
+        return minDist == Integer.MAX_VALUE ? -1 : minDist;
+    }
+}
+=================================================================================================================================================================================================================================
+Ninja is studying sorting algorithms. He has studied all comparison-based sorting algorithms and now decided to learn sorting algorithms that do not require comparisons.He was learning counting sort, but he is facing some problems. Can you help Ninja implement the counting sort?
+Sample Input 1: -2 1 2 -1 0				1 2 3 -4 -5
+Sample Output 1:-2 -1 0 1 2				-5 -4 1 2 3
+Explanation:For the first test case, the sorted array will be {-2, -1, 0, 1, 2}.For the second test case, the sorted array will be {-5, -4, 1, 2, 3}.
+
+public class Solution {
+
+    public static int[] sort(int n, int arr[]) {
+		// Write your code here.
+		int min = arr[0];
+		int max = arr[0];
+
+		for(int num : arr){
+			min = Math.min(min,num);
+			max = Math.max(max,num);
+		}
+		int range = max-min+1;
+
+		int[] count = new int[range];
+
+		int index = 0;
+
+		for(int i=0;i< range;i++){
+			while(count[i] > 0){
+				arr[index++] = i + min;
+				count[i]--;
+			}
+		}
+		return arr;
+	}
+}
+=================================================================================================================================================================================================================================
+You are given a number ‘NUM’, return the maximum distance between any two adjacent 1s in the binary representation of 'NUM'.
+Sample Input 1: 7
+Sample Output 1: 1
+Explanation For Sample Input 1:In the first test case, the binary representation of 7 is “111”. The max distance between the first and second bit or the second and third bit is 1. Hence the answer is 1.
+Sample Input 2: 5 		11
+Sample Output 2: 2      2
+Explanation For Sample Input 2:For test case 1, The binary representation of 5 is “101”. The max distance between the first and last bit is 2. 
+Hence the answer is 2.For test case 2, The binary representation of 11 is “1011”. The max distance between the first and third bit(1 based indexing) is 2, between the third and fourth bit, is 1. 
+Hence the answer is 2.     
+
+public class Solution {
+
+    public static int maxDistance(int num) {
+        int lastPos = -1;
+        int maxDist = 0;
+        int pos = 0;
+
+        while (num > 0) {
+
+            // Check if current bit is 1
+            if ((num & 1) == 1) {
+
+                // If previous 1 exists, calculate distance
+                if (lastPos != -1) {
+                    maxDist = Math.max(maxDist, pos - lastPos);
+                }
+
+                lastPos = pos;
+            }
+
+            num = num >> 1;
+            pos++;
+        }
+
+        return maxDist;
+    }
+}  
+=================================================================================================================================================================================================================================
+You are given a 2D integer grid of size m x n and an integer x. In one operation, you can add x to or subtract x from any element in the grid.A uni-value grid is a grid where all the elements of it are equal.Return the minimum number of operations to make the grid uni-value. If it is not possible, return -1.
+Example 1:Input: grid = [[2,4],[6,8]], x = 2			Output: 4
+Explanation: We can make every element equal to 4 by doing the following: 
+- Add x to 2 once.
+- Subtract x from 6 once.
+- Subtract x from 8 twice.
+A total of 4 operations were used.
+Example 2:Input: grid = [[1,5],[2,3]], x = 1			Output: 5
+Explanation: We can make every element equal to 3.
+Example 3:Input: grid = [[1,2],[3,4]], x = 2			Output: -1
+Explanation: It is impossible to make every element equal.
+
+class Solution {
+    public int minOperations(int[][] grid, int x) {
+
+        List<Integer> list = new ArrayList<>();
+
+        // Flatten the grid
+        for (int[] row : grid) {
+            for (int num : row) {
+                list.add(num);
+            }
+        }
+
+        // Check if conversion is possible
+        int remainder = list.get(0) % x;
+
+        for (int num : list) {
+            if (num % x != remainder) {
+                return -1;
+            }
+        }
+
+        // Sort to find median
+        Collections.sort(list);
+
+        int median = list.get(list.size() / 2);
+
+        int operations = 0;
+
+        // Calculate operations needed
+        for (int num : list) {
+            operations += Math.abs(num - median) / x;
+        }
+
+        return operations;
+    }
+}
+=================================================================================================================================================================================================================================

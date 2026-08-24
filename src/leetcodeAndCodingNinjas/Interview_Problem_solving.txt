@@ -1,0 +1,70 @@
+In a complete binary tree, if the root node is labeled as 1, and for any node labeled as s:The left child is labeled as 2s
+The right child is labeled as 2s + 1
+To find the shortest distance between two nodes A and B in terms of edge count, follow these steps:
+
+public class BinaryTreeDistance {
+    public static int findLevel(int node) {
+        return (int) (Math.log(node) / Math.log(2)); // floor(log2(node))
+    }
+
+    public static int findLCA(int A, int B) {
+        while (A != B) {
+            if (A > B) A /= 2;  // Move A up
+            else B /= 2;        // Move B up
+        }
+        return A; // or B, both are the same now
+    }
+
+    public static int shortestDistance(int A, int B) {
+        int LCA = findLCA(A, B);
+        return findLevel(A) + findLevel(B) - 2 * findLevel(LCA);
+    }
+
+    public static void main(String[] args) {
+        System.out.println(shortestDistance(4, 7)); // Output: 4
+        System.out.println(shortestDistance(5, 6)); // Output: 4
+    }
+}
+=====================================================================================================================================
+Java solution to determine the minimum number of bottles required to exactly fill a given number of liters of beer using the available bottle sizes: 10L, 7L, 5L, and 1L.
+
+public class MinimumBottles {
+    public static int minBottles(int totalBeer) {
+        int[] bottles = {10, 7, 5, 1}; // Available bottle sizes
+        int count = 0;
+
+        for (int bottle : bottles) {
+            if (totalBeer == 0) break; // If we filled all the beer, stop
+
+            int numBottles = totalBeer / bottle; // How many of this bottle can we use?
+            totalBeer -= numBottles * bottle; // Reduce the total beer
+            count += numBottles; // Increase bottle count
+        }
+
+        return count;
+    }
+
+    public static void main(String[] args) {
+        System.out.println(minBottles(13)); // Output: 3 (7 + 5 + 1)
+        System.out.println(minBottles(18)); // Output: 3 (10 + 7 + 1)
+        System.out.println(minBottles(20)); // Output: 2 (10 + 10)
+        System.out.println(minBottles(6));  // Output: 2 (5 + 1)
+    }
+}
+=======================================================================================================================================
+public class PickupDeliveryCombinations {
+    public static long countWays(int n) {
+        long result = 1;
+        for (int i = 1; i <= n; i++) {
+            result *= (2 * i - 1) * i; // (2n-1) * n
+        }
+        return result;
+    }
+
+    public static void main(String[] args) {
+        System.out.println(countWays(1)); // Output: 1
+        System.out.println(countWays(2)); // Output: 6
+        System.out.println(countWays(3)); // Output: 90
+        System.out.println(countWays(4)); // Output: 2520
+    }
+}

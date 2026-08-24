@@ -1,0 +1,455 @@
+1) Reverse a String
+
+function reverse(str) {
+  return str.split('').reverse().join('');
+}
+console.log(reverse("hello")); // "olleh"
+--------------------------------------------------------------------------------------------------------------
+2)Check Palindrome
+function isPalindrome(str) {
+  return str === str.split('').reverse().join('');
+}
+console.log(isPalindrome("racecar")); // true
+-------------------------------------------------------------------------------------------------------------
+3)Find Duplicate Elements in Array
+
+function findDuplicates(arr) {
+  return arr.filter((item, index) => arr.indexOf(item) !== index);
+}
+console.log(findDuplicates([1,2,3,2,4,5,1])); // [2,1]
+--------------------------------------------------------------------------------------------------------------
+4) Remove Duplicates from Array
+
+let arr = [1,2,2,3,4,4];
+let unique = [...new Set(arr)];
+console.log(unique); // [1,2,3,4]
+-------------------------------------------------------------------------------------------------------------
+5️)Flatten Nested Array
+let arr = [1, [2, [3, 4], 5]];
+console.log(arr.flat(Infinity)); // [1,2,3,4,5]
+-------------------------------------------------------------------------------------------------------------
+6) Anagram Checker
+function isAnagram(a, b) {
+  return a.split('').sort().join('') === b.split('').sort().join('');
+}
+console.log(isAnagram('listen', 'silent')); // true
+-------------------------------------------------------------------------------------------------------------
+7)Count Vowels
+function countVowels(str) {
+  return (str.match(/[aeiou]/gi) || []).length;
+}
+console.log(countVowels("hello")); // 2
+-------------------------------------------------------------------------------------------------------------
+8)FizzBuzz
+for (let i = 1; i <= 15; i++) {
+  console.log(i % 3 === 0 && i % 5 === 0 ? 'FizzBuzz' :
+              i % 3 === 0 ? 'Fizz' :
+              i % 5 === 0 ? 'Buzz' : i);
+}
+-------------------------------------------------------------------------------------------------------------
+9)Factorial (Recursion)
+function fact(n) {
+  return n <= 1 ? 1 : n * fact(n - 1);
+}
+console.log(fact(5)); // 120
+-------------------------------------------------------------------------------------------------------------
+10)Fibonacci Series
+function fib(n) {
+  let [a, b] = [0, 1];
+  while (n--) [a, b] = [b, a + b];
+  return a;
+}
+console.log(fib(7)); // 13
+-------------------------------------------------------------------------------------------------------------
+11)Find Max Number
+let arr = [1, 5, 9, 2];
+console.log(Math.max(...arr)); // 9
+-------------------------------------------------------------------------------------------------------------
+12)Find 2nd Largest Number
+function secondLargest(arr) {
+  let first = -Infinity, second = -Infinity;
+  for (let n of arr) {
+    if (n > first) [second, first] = [first, n];
+    else if (n > second && n != first) second = n;
+  }
+  return second;
+}
+console.log(secondLargest([1,5,2,4])); // 4
+-------------------------------------------------------------------------------------------------------------
+13) Sum of array
+let arr = [1,2,3];
+console.log(arr.reduce((a,b) => a + b, 0)); // 6
+-------------------------------------------------------------------------------------------------------------
+14) Shuffle array
+function shuffle(arr) {
+  return arr.sort(() => Math.random() - 0.5);
+}
+console.log(shuffle([1,2,3,4]));
+-------------------------------------------------------------------------------------------------------------
+15) Find Missing Number (1 to N)
+function findMissing(arr, n) {
+  let sum = n * (n + 1) / 2;
+  let actual = arr.reduce((a,b) => a + b, 0);
+  return sum - actual;
+}
+console.log(findMissing([1,2,4,5], 5)); // 3
+-------------------------------------------------------------------------------------------------------------
+16)Debounce Function
+function debounce(fn, delay) {
+  let timer;
+  return function (...args) {
+    clearTimeout(timer);
+    timer = setTimeout(() => fn.apply(this, args), delay);
+  };
+}
+-------------------------------------------------------------------------------------------------------------
+17) Throttle function
+function throttle(fn, delay) {
+  let last = 0;
+  return function (...args) {
+    let now = Date.now();
+    if (now - last >= delay) {
+      last = now;
+      fn.apply(this, args);
+    }
+  };
+}
+-------------------------------------------------------------------------------------------------------------
+18) Frequency of each number
+let arr = [1,2,2,3,1];
+let freq = {};
+arr.forEach(x => freq[x] = (freq[x] || 0) + 1);
+console.log(freq); // {1:2, 2:2, 3:1}
+-------------------------------------------------------------------------------------------------------------
+19) String to camel case
+
+function toCamel(str) {
+  return str.replace(/[-_](.)/g, (_, c) => c.toUpperCase());
+}
+console.log(toCamel('hello_world-test')); // helloWorldTest
+-------------------------------------------------------------------------------------------------------------
+20)Group By Property
+
+let arr = [
+  {type: 'fruit', name: 'apple'},
+  {type: 'veg', name: 'carrot'},
+  {type: 'fruit', name: 'banana'}
+];
+
+let grouped = arr.reduce((acc, obj) => {
+  acc[obj.type] = acc[obj.type] || [];
+  acc[obj.type].push(obj.name);
+  return acc;
+}, {});
+
+console.log(grouped);
+// { fruit: ['apple', 'banana'], veg: ['carrot'] }
+-------------------------------------------------------------------------------------------------------------
+First non repearing character
+
+function firstUniqueChar(s) {
+  const freq = new Array(26).fill(0);
+  const aCode = 'a'.charCodeAt(0);
+
+  // Count frequencies
+  for (let char of s) {
+    freq[char.charCodeAt(0) - aCode]++;
+  }
+
+  // Find first unique character
+  for (let i = 0; i < s.length; i++) {
+    if (freq[s.charCodeAt(i) - aCode] === 1) {
+      return i;
+    }
+  }
+
+  return -1;
+}
+or
+let obj = str.split('').reduce((map,char)=>{
+    map[char]=(map[char]||0)+1
+    return map;
+},{})
+
+for(let char of str){
+    if(obj[char]==1){
+        console.log(char);
+        
+    }
+}
+-------------------------------------------------------------------------------------------------------------
+function lengthOfLongestSubstring(s) {
+    let set = new Set();
+    let left = 0, maxLen = 0;
+
+    for (let right = 0; right < s.length; right++) {
+        while (set.has(s[right])) {
+            set.delete(s[left]);
+            left++;
+        }
+        set.add(s[right]);
+        maxLen = Math.max(maxLen, right - left + 1);
+    }
+
+    return maxLen;
+}
+
+// Example usage:
+console.log(lengthOfLongestSubstring("abcabcbb")); // Output: 3
+console.log(lengthOfLongestSubstring("bbbbb"));    // Output: 1
+console.log(lengthOfLongestSubstring("pwwkew"));   // Output: 3
+-------------------------------------------------------------------------------------------------------------
+Rotate array by k steps
+
+let arr = [1, 2, 3, 4, 5, 6, 7];
+rotate(arr, 3);
+console.log(arr); // [5, 6, 7, 1, 2, 3, 4]
+
+function rotate(nums, k) {
+    k = k % nums.length; // handle k > length
+
+    // Reverse helper
+    function reverse(start, end) {
+        while (start < end) {
+            [nums[start], nums[end]] = [nums[end], nums[start]];
+            start++;
+            end--;
+        }
+    }
+
+    // 3-step reverse
+    reverse(0, nums.length - 1);       // Reverse whole array
+    reverse(0, k - 1);                 // Reverse first k elements
+    reverse(k, nums.length - 1);       // Reverse remaining elements
+}
+-------------------------------------------------------------------------------------------------------------
+Group anargrams
+
+let arr = ["eat", "tea", "tan", "ate", "nat", "bat"];
+
+let group = arr.reduce((map, val) => {
+    let key = val.split('').sort().join('');
+    if (!map[key]) {
+        map[key] = [];
+    }
+    map[key].push(val);
+    return map;
+}, {});
+
+console.log(Object.values(group));
+-------------------------------------------------------------------------------------------------------------
+Given an array of integers, return a new array containing only the first occurrence of each number in order.
+Input: [1, 2, 3, 2, 1, 4, 3]
+Output: [1, 2, 3, 4]
+
+function uniqueInOrder(arr) {
+  const seen = new Set();
+  return arr.filter(num => {
+    if (!seen.has(num)) {
+      seen.add(num);
+      return true;
+    }
+    return false;
+  });
+}
+
+String version : Input = "abcabcd" Output: "abcd"
+
+function uniqueChars(str) {
+  const seen = new Set();
+  return [...str]
+    .filter(char => {
+      if (!seen.has(char)) {
+        seen.add(char);
+        return true;
+      }
+      return false;
+    })
+    .join('');
+}
+--------------------------------------------------------------------------------------------------------------------------------------------------------------
+Subarray Sum Equals K problem using a prefix sum + HashMap approach
+
+let arr = [1, 1, 1];
+let k = 2;
+let count = 0;
+
+const map = new Map();
+map.set(0, 1); // Important to handle subarrays starting at index 0
+
+let sum = 0;
+
+for (const num of arr) {
+    sum += num;
+
+    if (map.has(sum - k)) {
+        count += map.get(sum - k);
+    }
+
+    map.set(sum, (map.get(sum) || 0) + 1);
+}
+
+console.log(count); // Output: 2
+--------------------------------------------------------------------------------------------------------------------------------------------------------------
+function isBalanced(s) {
+  const stack = [];
+  const bracketMap = {
+    ')': '(',
+    ']': '[',
+    '}': '{'
+  };
+
+  for (let char of s) {
+    if (['(', '[', '{'].includes(char)) {
+      stack.push(char);
+    } else if ([')', ']', '}'].includes(char)) {
+      if (stack.pop() !== bracketMap[char]) {
+        return false;
+      }
+    }
+  }
+
+  return stack.length === 0;
+}
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+function longestConsecutive(nums) {
+    const numSet = new Set(nums);
+    let maxLen = 0;
+
+    for (let num of nums) {
+        if (!numSet.has(num - 1)) {
+            let currentNum = num;
+            let streak = 1;
+
+            while (numSet.has(currentNum + 1)) {
+                currentNum++;
+                streak++;
+            }
+
+            maxLen = Math.max(maxLen, streak);
+        }
+    }
+
+    return maxLen;
+}
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+function chunkArray(arr, size) {
+  if (size <= 0) return []; // handle invalid chunk sizes
+
+  const result = [];
+
+  for (let i = 0; i < arr.length; i += size) {
+    const chunk = arr.slice(i, i + size);
+    result.push(chunk);
+  }
+
+  return result;
+}
+
+// Example usage:
+console.log(chunkArray([1, 2, 3, 4, 5, 6, 7], 3));
+// Output: [[1, 2, 3], [4, 5, 6], [7]]
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+Element that appears more than n/2 times Boyer-moye voting alogorithm
+function majorityElement(nums) {
+  let candidate = null;
+  let count = 0;
+
+  for (let num of nums) {
+    if (count === 0) {
+      candidate = num;
+    }
+    count += (num === candidate) ? 1 : -1;
+  }
+
+  return candidate;
+}
+
+// Test
+console.log(majorityElement([2, 2, 1, 1, 1, 2, 2])); // Output: 2
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+Finding anagrams within given string
+
+function findAnagrams(a, b) {
+    let res = [];
+    let n = a.length;
+    let m = b.length;
+
+    if (n < m) return res;
+
+    let freqA = new Array(26).fill(0);
+    let freqB = new Array(26).fill(0);
+
+    for (let char of b) {
+        freqB[char.charCodeAt(0) - 97]++;
+    }
+
+    for (let j = 0; j < m; j++) {
+        freqA[a[j].charCodeAt(0) - 97]++;
+    }
+
+    if (isArrayEqual(freqA, freqB)) res.push(0);
+
+    for (let j = m; j < n; j++) {
+        freqA[a[j].charCodeAt(0) - 97]++;
+        freqA[a[j - m].charCodeAt(0) - 97]--;
+
+        if (isArrayEqual(freqA, freqB)) res.push(j - m + 1);
+    }
+
+    return res;
+}
+
+function isArrayEqual(a, b) {
+    for (let i = 0; i < 26; i++) {
+        if (a[i] !== b[i]) return false;
+    }
+    return true;
+}
+
+console.log(findAnagrams('cbaebabacd', 'abc')); // Output: [0, 6]
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+Longest balanced length
+Input: [0, 1, 0, 0, 1, 1, 0]
+Output: 6
+Explanation: The subarray [1, 0, 0, 1, 1, 0] has equal 0s and 1s.
+Solution: convert 0's to -1 so that problem would be to find the longest sequence that retruns 0
+function findMaxLength(nums) {
+    const map = new Map();
+    map.set(0, -1); // sum 0 at index -1 to handle subarrays starting at index 0
+
+    let maxLength = 0;
+    let sum = 0;
+
+    for (let i = 0; i < nums.length; i++) {
+        sum += nums[i] === 0 ? -1 : 1;
+
+        if (map.has(sum)) {
+            maxLength = Math.max(maxLength, i - map.get(sum));
+        } else {
+            map.set(sum, i);
+        }
+    }
+
+    return maxLength;
+}
+
+// Example:
+console.log(findMaxLength([0, 1, 0, 0, 1, 1, 0])); // Output: 6
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+Longest string without repeating characters
+let str = "abcabcbb";
+
+let map = new Map();
+let l = 0;
+let max = 0;
+
+for (let r = 0; r < str.length; r++) {
+    if (map.has(str[r])) {
+        l = Math.max(map.get(str[r]) + 1, l);
+    }
+    max = Math.max(max, r - l + 1);
+    map.set(str[r], r);
+}
+
+console.log(max); // Output: 3

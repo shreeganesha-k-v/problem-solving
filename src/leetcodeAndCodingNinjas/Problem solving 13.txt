@@ -1,0 +1,1426 @@
+You are given an array/list consisting of 0 and 1 only. Your task is to find the sum of the number of subarrays that contains only 1 and the number of subarrays that contains only 0.An array 'C' is a subarray of array 'D' if 'C' can be obtained from 'D' by deletion of several elements from the beginning and several elements from the end. Example :Let 'ARR' = [1,0,0] then the possible subarrays of 'ARR' will be: {1}, {0}, {0}, {1,0}, {0,0}, {1,0,0}.
+ExampleIf the given array 'ARR' = [1,0,0,0,1,1,0,1] Then the number of 1’s subarrays will be 5. [{1},{1},{1},{1,1},{1}] And the number of 0’s subarrays will be 7. [{0},{0},{0},{0,0},{0,0},{0,0,0},{0}] So our answer will be 5 + 7 = 12.
+
+Sample Input 1:	1 0 0 0 1 0 1					1 0 1 0 1 0 1 0 
+Sample Output 1: 10								8
+: Test case 1: Here ARR = {1,0,0,0,1,0,1}, so number of 1’s subarray is 3 [{1}, {1}, {1}], and number of 0’s subarray is 7 [{0}, {0},{0}, {0,0}, {0,0}, {0,0,: Hence the output will be 3 + : Test case 2: Here ARR = {1,0,1,0,1,0,1,0} so number of 1’s subarray is 4 [{1}, {1}, {1}, {1}], and the number of 0’s subarray is 4; [{0}, {0}, {0}, : Hence the output will be 4 + 4 = 8.
+Sample Input 2: 1 1 1 1 1 1		1 0 0 0 0 0 0 1
+Sample Output 2: 21				23
+Explanation Of Sample Input 2:Test case 1: Here ARR = {1, 1, 1, 1, 1, 1}, so number of 1’s subarray is 21, and number of 0’s subarray is 0.Hence the output will be 21 + 0 = 21.
+Test case 2: Here ARR = {1, 0, 0, 0, 0, 0, 0, 1} so number of 1’s subarray is 2, and the number of 0’s subarray is 21.Hence the output will be 2 + 21 = 23.
+
+public class Solution {
+    public static int numberofSubarrays(int n, int[] arr) {
+        
+        int ans = 0;
+        int count = 1;
+        
+        for (int i = 1; i < n; i++) {
+            
+            // Count consecutive same elements
+            if (arr[i] == arr[i - 1]) {
+                count++;
+            } else {
+                // Add subarrays formed by previous group
+                ans += (count * (count + 1)) / 2;
+                count = 1;
+            }
+        }
+        
+        // Add last group contribution
+        ans += (count * (count + 1)) / 2;
+        
+        return ans;
+    }
+}
+========================================================================================================================================================================================================
+You are given an integer array nums of length n.Assume arrk to be an array obtained by rotating nums by k positions clock-wise. We define the rotation function F on nums as follow:F(k) = 0 * arrk[0] + 1 * arrk[1] + ... + (n - 1) * arrk[n - 1].Return the maximum value of F(0), F(1), ..., F(n-1).The test cases are generated so that the answer fits in a 32-bit integer.
+Example 1:Input: nums = [4,3,2,6]					Output: 26
+Explanation:F(0) = (0 * 4) + (1 * 3) + (2 * 2) + (3 * 6) = 0 + 3 + 4 + 18 = 25. F(1) = (0 * 6) + (1 * 4) + (2 * 3) + (3 * 2) = 0 + 4 + 6 + 6 = 16. F(2) = (0 * 2) + (1 * 6) + (2 * 4) + (3 * 3) = 0 + 6 + 8 + 9 = 23. F(3) = (0 * 3) + (1 * 2) + (2 * 6) + (3 * 4) = 0 + 2 + 12 + 12 = 26
+So the maximum value of F(0), F(1), F(2), F(3) is F(3) = 26.
+Example 2:Input: nums = [100]						Output: 0
+
+public class Solution {
+
+    public static int maxRotateFunction(int[] nums) {
+        int n = nums.length;
+
+        long sum = 0;
+        long f0 = 0;
+
+        // Compute sum and F(0)
+        for (int i = 0; i < n; i++) {
+            sum += nums[i];
+            f0 += (long) i * nums[i];
+        }
+
+        long max = f0;
+        long current = f0;
+
+        // Compute F(k) using relation
+        for (int k = 1; k < n; k++) {
+            current = current + sum - (long) n * nums[n - k];
+            max = Math.max(max, current);
+        }
+
+        return (int) max;
+    }
+}
+========================================================================================================================================================================================================
+Given 'N' number of slices have, 'K' maximum number of slices Ninja can cut and two arrays ‘L’ and ‘B’ stating the length and breadth of each slice, your task is to help Ninja find out the maximum extra cheese needed to fill the newly formed boundaries in pizza.
+EXAMPLE:
+Input: 'N' = 2, 'K' = 1
+       'L' = [4, 2]
+       'B' = [6, 8]
+Output: 16
+To maximize the cheese usage, Ninja can cut a second cake parallel to the side of length 8. So extra cheese needed will be 16.
+Sample Input 1 : N = 2 k = 1
+4 2
+6 8
+
+1 1
+4 6
+Sample Output 1 :
+16
+12
+Explanation Of Sample Input 1 :
+For the first test case, to maximize the cheese usage, Ninja can cut a second slice parallel to the side of length 8. So extra cheese needed will be 16.For the second test case, Ninja can cut the slice parallel to side 6 to get the extra cheese = (40) - (28) = 12
+Sample Input 2 :
+2
+3 2
+1 2
+3 2
+1 3
+5 3
+2 3
+4 5
+2 3
+2 3
+1 2
+Sample Output 2 :
+12
+22
+
+public class Solution {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        int T = sc.nextInt();
+
+        while (T-- > 0) {
+            int N = sc.nextInt();
+            int K = sc.nextInt();
+
+            int[] L = new int[N];
+            int[] B = new int[N];
+
+            for (int i = 0; i < N; i++) {
+                L[i] = sc.nextInt();
+            }
+
+            for (int i = 0; i < N; i++) {
+                B[i] = sc.nextInt();
+            }
+
+            // Store max side of each slice
+            int[] maxSides = new int[N];
+            for (int i = 0; i < N; i++) {
+                maxSides[i] = Math.max(L[i], B[i]);
+            }
+
+            // Sort in descending order
+            Arrays.sort(maxSides);
+
+            int result = 0;
+
+            // Pick top K largest
+            for (int i = N - 1; i >= N - K; i--) {
+                result += 2 * maxSides[i];
+            }
+
+            System.out.println(result);
+        }
+
+        sc.close();
+    }
+}
+========================================================================================================================================================================================================
+Given a string ‘S’ find whether the given string is periodic or not.A string is said to be periodic if it repeats itself after a certain number of characters and the period of repetition is less than the size of the string.
+For example: Let ‘S’ be “ababab” we can clearly see that this string is periodic as ‘ab’ is repeated 3 times to make the string ‘S’.
+Sample Input 1: xxxxxx				aabbaaabba			abcba
+Sample Output 1: True				True				False      
+Explanation of sample input 1 :
+Test Case 1:In the first test case, we can clearly see that the string has a repeating string ‘x’ 6 times. So we return true
+Test Case 2:In the second test case, we can see that the string ‘aabba’ repeats twice to form the given string. Hence we return true,
+Test Case 3:In the third test case, we can see that there is no string which repeats itself to form the given string, hence we return false.
+Sample Input 2:	vwvnqpnchqik			ubzumubzumubzumubzum
+Sample Output 2:	False				True
+
+public class Solution {
+
+    // Function to check periodicity
+    public static boolean isPeriodic(String s) {
+        int n = s.length();
+        int[] lps = new int[n];
+
+        // Build LPS array
+        int len = 0;
+        int i = 1;
+
+        while (i < n) {
+            if (s.charAt(i) == s.charAt(len)) {
+                len++;
+                lps[i] = len;
+                i++;
+            } else {
+                if (len != 0) {
+                    len = lps[len - 1];
+                } else {
+                    lps[i] = 0;
+                    i++;
+                }
+            }
+        }
+
+        int longestPrefixSuffix = lps[n - 1];
+
+        // Check periodic condition
+        if (longestPrefixSuffix > 0 && n % (n - longestPrefixSuffix) == 0) {
+            return true;
+        }
+
+        return false;
+    }
+}
+========================================================================================================================================================================================================
+You are given an m x n matrix of characters boxGrid representing a side-view of a box. Each cell of the box is one of the following:A stone '#', A stationary obstacle '*' , Empty '.' The box is rotated 90 degrees clockwise, causing some of the stones to fall due to gravity. Each stone falls down until it lands on an obstacle, another stone, or the bottom of the box. Gravity does not affect the obstacles' positions, and the inertia from the box's rotation does not affect the stones' horizontal positions.It is guaranteed that each stone in boxGrid rests on an obstacle, another stone, or the bottom of the box.Return an n x m matrix representing the box after the rotation described above.
+Example 1:Input: boxGrid = [["#",".","#"]]
+Output: [["."],
+         ["#"],
+         ["#"]]
+Example 2:Input: boxGrid = [["#",".","*","."],
+							["#","#","*","."]]
+Output: [["#","."],
+         ["#","#"],
+         ["*","*"],
+         [".","."]]
+Example 3:Input: boxGrid = [["#","#","*",".","*","."],
+							["#","#","#","*",".","."],
+							["#","#","#",".","#","."]]
+Output: [[".","#","#"],
+         [".","#","#"],
+         ["#","#","*"],
+         ["#","*","."],
+         ["#",".","*"],
+         ["#",".","."]]
+
+class Solution {
+
+    public char[][] rotateTheBox(char[][] grid) {
+
+        int m = grid.length;
+        int n = grid[0].length;
+
+        // Move stones to right
+        for (int i = 0; i < m; i++) {
+
+            int empty = n - 1;
+
+            for (int j = n - 1; j >= 0; j--) {
+
+                if (grid[i][j] == '*') {
+
+                    empty = j - 1;
+
+                } else if (grid[i][j] == '#') {
+
+                    grid[i][j] = '.';
+                    grid[i][empty] = '#';
+
+                    empty--;
+                }
+            }
+        }
+
+        // Rotate matrix
+        char[][] res = new char[n][m];
+
+        for (int i = 0; i < m; i++) {
+
+            for (int j = 0; j < n; j++) {
+
+                res[j][m - i - 1] = grid[i][j];
+            }
+        }
+
+        return res;
+    }
+}
+========================================================================================================================================================================================================
+You are given an array 'ARR' of positive integers, each of which represents the number of liters of water in that particular bucket, we have to make the liters of water in every bucket equal.
+We are allowed to do two types of operations any number of times:
+1. We can altogether remove a bucket from the sequence 2. We can draw some water from a bucket. We have to tell the minimum number of liters removed to make all buckets have the same amount of water.
+For example:Given ‘N’ = 4 and ‘ARR’ = [1, 1, 2, 2].The answer will be 2, i.e., if we chose that all buckets should have 1 unit of water, we will have to throw 1 unit of water from buckets 3 and 4. Hence 2.
+Detailed explanation ( Input/output format, Notes, Images )
+Sample Input 1:	1 1 2 2				1 2 3
+Sample Output 1: 2						2
+Explanation of the Sample Input 1 For the first test case:The answer will be 2, i.e., if we chose that all buckets should have 1 unit of water, we will have to throw 1 unit of water from buckets 3 and 4. Hence 2.
+For the second test case:The answer will be 2, i.e., if we chose that all buckets should have 2 units of water, then we will have to throw 1 unit of water from bucket 3 and discard bucket 1.
+Sample Input 2: 	1 1 1 1 				1 1 2 3 3 4
+Sample Output 2:    0						5
+
+public class Solution {
+
+    public static int minimumLitersRemoved(int[] arr) {
+        int n = arr.length;
+
+        Arrays.sort(arr);
+
+        long totalSum = 0;
+
+        for (int num : arr) {
+            totalSum += num;
+        }
+
+        long maxRemainingWater = 0;
+
+        // Assume arr[i] is the final equal water level
+        for (int i = 0; i < n; i++) {
+
+            long remainingBuckets = n - i;
+
+            long waterKept = (long) arr[i] * remainingBuckets;
+
+            maxRemainingWater = Math.max(maxRemainingWater, waterKept);
+        }
+
+        return (int) (totalSum - maxRemainingWater);
+    }
+}
+========================================================================================================================================================================================================
+You are given an integer array nums.From any index i, you can jump to another index j under the following rules:Jump to index j where j > i is allowed only if nums[j] < nums[i].Jump to index j where j < i is allowed only if nums[j] > nums[i].For each index i, find the maximum value in nums that can be reached by following any sequence of valid jumps starting at i.Return an array ans where ans[i] is the maximum value reachable starting from index i.
+Example 1:	Input: nums = [2,1,3]				Output: [2,2,3]
+Explanation:For i = 0: No jump increases the value.For i = 1: Jump to j = 0 as nums[j] = 2 is greater than nums[i].For i = 2: Since nums[2] = 3 is the maximum value in nums, no jump increases the value.Thus, ans = [2, 2, 3].
+Example 2: Input: nums = [2,3,1]					Output: [3,3,3]
+Explanation:For i = 0: Jump forward to j = 2 as nums[j] = 1 is less than nums[i] = 2, then from i = 2 jump to j = 1 as nums[j] = 3 is greater than nums[2].For i = 1: Since nums[1] = 3 is the maximum value in nums, no jump increases the value.For i = 2: Jump to j = 1 as nums[j] = 3 is greater than nums[2] = 1.Thus, ans = [3, 3, 3].
+
+class Solution {
+    public int[] maxValue(int[] nums) {
+        int n = nums.length;
+
+        int[] pre = new int[n];
+        int[] suf = new int[n];
+        int[] res = new int[n];
+
+        // prefix max
+        pre[0] = nums[0];
+        for (int i = 1; i < n; i++) {
+            pre[i] = Math.max(pre[i - 1], nums[i]);
+        }
+
+        // suffix min
+        suf[n - 1] = nums[n - 1];
+        for (int i = n - 2; i >= 0; i--) {
+            suf[i] = Math.min(suf[i + 1], nums[i]);
+        }
+
+        res[n - 1] = pre[n - 1];
+
+        // build answer
+        for (int i = n - 2; i >= 0; i--) {
+
+            // merge segment
+            if (pre[i] > suf[i + 1]) {
+                res[i] = res[i + 1];
+            }
+
+            // new segment
+            else {
+                res[i] = pre[i];
+            }
+        }
+
+        return res;
+    }
+}
+========================================================================================================================================================================================================
+Given an array nums, return true if the array was originally sorted in non-decreasing order, then rotated some number of positions (including zero). Otherwise, return false.There may be duplicates in the original array.Note: An array A rotated by x positions results in an array B of the same length such that B[i] == A[(i+x) % A.length] for every valid index i.
+Example 1:Input: nums = [3,4,5,1,2]					Output: true
+Explanation: [1,2,3,4,5] is the original sorted array.
+You can rotate the array by x = 2 positions to begin on the element of value 3: [3,4,5,1,2].
+Example 2:Input: nums = [2,1,3,4] 					Output: false
+Explanation: There is no sorted array once rotated that can make nums.
+Example 3:Input: nums = [1,2,3]						Output: true
+Explanation: [1,2,3] is the original sorted array.
+You can rotate the array by x = 0 positions (i.e. no rotation) to make nums.
+
+class Solution {
+    public boolean check(int[] nums) {
+
+        int count = 0;
+        int n = nums.length;
+
+        for(int i = 0; i < n; i++) {
+
+            if(nums[i] > nums[(i + 1) % n]) {
+                count++;
+            }
+
+            if(count > 1) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+}
+========================================================================================================================================================================================================
+Rohit love strings. But he has many strings with him, and he is confused about which one he loves more. So he decided to come up with a scoring system for the strings. The scoring system took two strings as input, let's call them ‘STR1’ and ‘STR2’ of length ‘N’ and length ‘M’ respectively.The system will return ‘1’ if ‘STR1’ is better than ‘STR2’.The system will return ‘0’ if ‘STR1’ is the same as ‘STR2’.The system will return ‘-1’ if ‘STR2’ is better than ‘STR1’.To decide which string is better he followed the below steps.Let’s suppose there exists a index ‘i’ such that ‘0’ <= ‘i’ < ‘min(N,M)’ and for all ‘j<i’, ‘STR1[j]’ is equal to ‘STR2[j]’, and ‘STR1[i] != STR2[i]’.Then if ‘STR1[i]>STR2[i]’, ‘STR1’ is better otherwise if ‘STR2[i]>STR1[i]’, ‘STR2’ is better,And if there doesn’t exist any such ‘i’ then if ‘N>M’, ‘STR1’ is better,And if ‘N<M’, ‘STR2’ is better, and if ‘N’ is equal to ‘M’, both strings are the same.But Rohit has so many strings, so he doesn’t have time to go through all strings, So being his friend can you help him automate this process?.
+Input: ‘N’ = 3, ‘M’ = 4, ‘STR1’ = xyz, ‘STR2’ = abcd			Output: 1   In this case, ‘STR1[0]>STR2[0]’ hence ‘STR1’ is better than ‘STR2’. Hence the output will be ‘1’. 
+‘STR1’ and ‘STR2’ consists of lowercase letters.It is guaranteed that sum of ‘N’ over all test cases is <= 10^5. It is guaranteed that sum of ‘M’ over all test cases is <= 10^5
+Sample Input 1 : str1=a str2=abc 			str1= abz    str2=abc
+Sample Output 1 : -1						1
+Explanation Of Sample Input 1 :For the first test case, ‘STR2’ is better than ‘STR1’, as they are the same until the ‘0th’ index and then string ‘STR1’ ends and as explained in the statement for ‘M>N’, the answer is ‘-1’.Hence, the output will be: -1For the second test case, ‘STR1’ is better than ‘STR2’, as they are the same until the ‘1st’ index and then ‘STR1[2]>STR2[2]’.Hence, the output will be: 1
+Sample Input 2 : str1= ez			str2= ehz           str1=acefi    str2=acefi    str1=ags		str2=agtaa
+Sample Output 2 : 1										0								-1
+
+public class Main {
+
+    public static int compareStrings(String str1, String str2) {
+        int n = str1.length();
+        int m = str2.length();
+
+        int minLen = Math.min(n, m);
+
+        // Compare character by character
+        for (int i = 0; i < minLen; i++) {
+            if (str1.charAt(i) > str2.charAt(i)) {
+                return 1;
+            } else if (str1.charAt(i) < str2.charAt(i)) {
+                return -1;
+            }
+        }
+
+        // If all compared characters are same
+        if (n > m) {
+            return 1;
+        } else if (n < m) {
+            return -1;
+        }
+
+        return 0;
+    }
+}
+========================================================================================================================================================================================================
+You are given a 0-indexed binary string s and two integers minJump and maxJump. In the beginning, you are standing at index 0, which is equal to '0'. You can move from index i to index j if the following conditions are fulfilled:i + minJump <= j <= min(i + maxJump, s.length - 1), and	s[j] == '0'. Return true if you can reach index s.length - 1 in s, or false otherwise.
+Example 1:Input: s = "011010", minJump = 2, maxJump = 3				Output: true
+Explanation:In the first step, move from index 0 to index 3. In the second step, move from index 3 to index 5.
+Example 2:Input: s = "01101110", minJump = 2, maxJump = 3			Output: false
+
+class Solution {
+
+    public boolean canReach(String s, int minJump, int maxJump) {
+
+        int n = s.length();
+
+        boolean[] visited = new boolean[n];
+        visited[0] = true;
+
+        int farthest = 0;
+
+        for (int i = 0; i < n; i++) {
+
+            // If current index is not reachable, skip
+            if (!visited[i]) {
+                continue;
+            }
+
+            // Start checking from max(previous farthest, i + minJump)
+            int start = Math.max(farthest, i + minJump);
+            int end = Math.min(i + maxJump, n - 1);
+
+            for (int j = start; j <= end; j++) {
+                if (s.charAt(j) == '0') {
+                    visited[j] = true;
+                }
+            }
+
+            // Update farthest checked position
+            farthest = end + 1;
+        }
+
+        return visited[n - 1];
+    }
+}
+========================================================================================================================================================================================================
+You are given a sorted array of ‘N’ distinct integers that are in the Arithmetic Progression sequence except for one element which is missing from the sequence. You have to find that missing number from the given sequence.
+1. A sequence [arr0, arr1,…, arr(n-1)] is called an Arithmetic progression if for each 'i' ( 0 ≤ i < n - 1) the value arr[i+1] − arr[i] is the same. 2. There is exactly one missing number in the given sequence.3. All the numbers present in the sequence are distinct.4. It is the guarantee that the first and last elements of the sequence are not missing elements.
+Sample Input 1: 	1 4 10						5 10 20 25 
+Sample Output 1:	7								15
+Explanation for sample input 1:Test case 1:The arithmetic sequence present in the first test case will have its first term as 4 and common difference as 3. So, the complete sequence will look like this ....- 1 4 7 10... Hence 7 is the missing element in the given sequence.
+Test case 2:The first term and common difference will be 5. The complete sequence will be ...5 10 15 20 25.... Hence 15 is the missing element from the given sequence.
+Sample Input 2:			1 0 2			10 20 30 50 60			12 18 21 24
+Sample Output 2:		1				40						15
+
+public class Solution {
+
+    public static int missingNumber(int[] arr, int n) {
+
+        // Common difference of AP
+        int diff = (arr[n - 1] - arr[0]) / n;
+
+        int low = 0;
+        int high = n - 1;
+
+        while (low <= high) {
+
+            int mid = low + (high - low) / 2;
+
+            // Expected value at mid index
+            int expected = arr[0] + mid * diff;
+
+            // Missing number lies on right side
+            if (arr[mid] == expected) {
+                low = mid + 1;
+            }
+            // Missing number lies on left side
+            else {
+                high = mid - 1;
+            }
+        }
+
+        // Missing number
+        return arr[0] + low * diff;
+    }
+}
+========================================================================================================================================================================================================
+You are given a string word. A letter is called special if it appears both in lowercase and uppercase in word.Return the number of special letters in word.
+Example 1:Input: word = "aaAbcBC"			Output: 3
+Explanation:The special characters in word are 'a', 'b', and 'c'.
+Example 2:Input: word = "abc"			Output: 0
+Explanation:No character in word appears in uppercase.
+Example 3:Input: word = "abBCab"			Output: 1
+Explanation:The only special character in word is 'b'.
+
+class Solution {
+    public int numberOfSpecialChars(String word) {
+
+        boolean[] lower = new boolean[26];
+        boolean[] upper = new boolean[26];
+
+        for (char ch : word.toCharArray()) {
+
+            if (ch >= 'a' && ch <= 'z') {
+                lower[ch - 'a'] = true;
+            } else if (ch >= 'A' && ch <= 'Z') {
+                upper[ch - 'A'] = true;
+            }
+        }
+
+        int count = 0;
+
+        for (int i = 0; i < 26; i++) {
+            if (lower[i] && upper[i]) {
+                count++;
+            }
+        }
+
+        return count;
+    }
+}
+
+or
+
+class Solution {
+    public int numberOfSpecialChars(String word) {
+
+        Set<Character> lower = new HashSet<>();
+        Set<Character> upper = new HashSet<>();
+
+        for (char ch : word.toCharArray()) {
+
+            if (Character.isLowerCase(ch)) {
+                lower.add(ch);
+            } else {
+                upper.add(Character.toLowerCase(ch));
+            }
+        }
+
+        int count = 0;
+
+        for (char ch : lower) {
+            if (upper.contains(ch)) {
+                count++;
+            }
+        }
+
+        return count;
+    }
+}
+========================================================================================================================================================================================================
+Ninja is on a secret mission and wants to reach the enemy's base camp. However, his enemies have planted bombs in a grid of ‘N’ rows and ‘M’ columns called ‘BOMB-GRID’. To reach the camp, Ninja has to safely cross ‘BOMB-GRID’. The value at each cell in ‘BOMB-GRID’ denotes the power of that bomb. An empty cell (without a bomb) is represented as 0. The ‘BOMB-GRID’ has the following properties:
+1. If three or more bombs with the same power are adjacent vertically or horizontally, then they blast at the same time immediately and their cells become empty.
+2. After the bombs blast simultaneously if an empty cell on ‘BOMB-GRID’ has a bomb on top of itself, then these bombs will drop until they hit a bomb or hit at the bottom at the same time. (No new bombs will drop from outside of the top boundary of the ‘BOMB-GRID').
+3. After the above steps, there may exist more bombs that can be blasted. If so, the above steps will be repeated.
+4. If there does not exist more bombs that can be blasted (ie. the 'BOMB-GRID' is safe), then return the current ‘BOMB-GRID’.
+5. The time taken by bombs to shift from one position to another can be neglected.
+We will call ‘BOMB-GRID' safe if and only if no more blasts happen in ‘BOMB-GRID’. Ninja wants to know the safe state of ‘BOMB-GRID’ after every possible blast.As Ninja is busy planning, he asks you for help. Can you help Ninja determine the safe state of ‘BOMB-GRID’?
+For Example :For the ‘BOMB-GRID’ shown below, the third grid represents a safe state i.e after all possible blasts.Where BOMB-GRID[i][j] denotes the power of the bomb placed in the ‘i’-th row and ‘j’-th column of ‘BOMB-GRID’.
+Sample Input 1 :
+2
+4 3
+1 0 1
+2 0 4
+2 1 1
+1 2 3
+3 3
+1 1 1
+1 2 1
+1 1 1
+Sample Output 1 :
+1 0 1
+2 0 4
+2 1 1
+1 2 3
+0 0 0
+0 0 0
+0 2 0
+Explanation For Sample Input 1 :For the first test case :The given ‘BOMB-GRID’ is safe as there exist no 3 or more than 3 bombs with the same powers adjacent together either horizontally or vertically.
+For the second test case :The given ‘BOMB-GRID’ all the bombs with power 1 in row 0, row 2 and column 0 and column 2 (0-based indexing) will blast simultaneously and the bomb with power 2 will be shifted to the bottom of column 1 as shown in the output. The ‘BOMB-GRID’ now becomes safe.
+Sample Input 2 :
+2
+3 3
+4 5 3
+6 5 1
+6 5 1
+4 3
+6 7 8
+3 4 8
+5 3 2
+5 9 1
+Sample Output 2 :
+4 0 3 
+6 0 1 
+6 0 1 
+6 7 8 
+3 4 8 
+5 3 2 
+5 9 1 
+
+import java.util.*;
+
+public class Solution {
+
+    public static int[][] bombGrid(int[][] grid, int n, int m) {
+
+        boolean changed = true;
+
+        while (changed) {
+
+            changed = false;
+
+            // Stores cells that should blast
+            boolean[][] blast = new boolean[n][m];
+
+            // =========================
+            // 1. CHECK HORIZONTAL
+            // =========================
+            for (int i = 0; i < n; i++) {
+
+                int j = 0;
+
+                while (j < m) {
+
+                    // Skip empty cells
+                    if (grid[i][j] == 0) {
+                        j++;
+                        continue;
+                    }
+
+                    int k = j;
+
+                    // Find consecutive equal bombs
+                    while (k < m && grid[i][k] == grid[i][j]) {
+                        k++;
+                    }
+
+                    // If count >= 3 -> mark blast
+                    if (k - j >= 3) {
+
+                        changed = true;
+
+                        for (int x = j; x < k; x++) {
+                            blast[i][x] = true;
+                        }
+                    }
+
+                    j = k;
+                }
+            }
+
+            // =========================
+            // 2. CHECK VERTICAL
+            // =========================
+            for (int j = 0; j < m; j++) {
+
+                int i = 0;
+
+                while (i < n) {
+
+                    if (grid[i][j] == 0) {
+                        i++;
+                        continue;
+                    }
+
+                    int k = i;
+
+                    while (k < n && grid[k][j] == grid[i][j]) {
+                        k++;
+                    }
+
+                    if (k - i >= 3) {
+
+                        changed = true;
+
+                        for (int x = i; x < k; x++) {
+                            blast[x][j] = true;
+                        }
+                    }
+
+                    i = k;
+                }
+            }
+
+            // =========================
+            // 3. BLAST BOMBS
+            // =========================
+            for (int i = 0; i < n; i++) {
+
+                for (int j = 0; j < m; j++) {
+
+                    if (blast[i][j]) {
+                        grid[i][j] = 0;
+                    }
+                }
+            }
+
+            // =========================
+            // 4. APPLY GRAVITY
+            // =========================
+            for (int j = 0; j < m; j++) {
+
+                int bottom = n - 1;
+
+                // Move non-zero bombs downward
+                for (int i = n - 1; i >= 0; i--) {
+
+                    if (grid[i][j] != 0) {
+
+                        int temp = grid[i][j];
+
+                        grid[i][j] = 0;
+
+                        grid[bottom][j] = temp;
+
+                        bottom--;
+                    }
+                }
+            }
+        }
+
+        return grid;
+    }
+}
+================================================================================================================================================================================================================================
+Ninja is an avid story lover. Today, he decides to go to the famous Storyteller of Ninjaland to listen to new stories. The Storyteller takes 'Y' coins to tell one story. The Storyteller has also put on a special offer for Ninja that for every 'X' story that the Storyteller tells to Ninja, the Storyteller will tell one story to Ninja free of cost, i.e., without taking any extra coins. Ninja currently has 'Z' coins with himself. He wants to know how many stories the Storyteller will tell him if he goes to the Storyteller with 'Z' coins.
+Sample Input 1: 2 2 4				3 3 3
+Sample Output 1: 3						1
+Explanation for Sample Input 1:For the first test case :  The ninja will use the 4 coins that he has to listen to 2 stories. After listening to the two stories, the Storyteller will tell Ninja a free story. Hence, the answer is 3 in this case.For the second test case : The ninja will give 3 coins to the Storyteller to listen to one story. Hence, the answer is 1 in this case.
+Sample Input 2: 2 1 4				2 3 2
+Sample Output 2: 7					0
+
+public class Solution {
+
+    public static int storyteller(int x, int y, int z) {
+
+        // Stories bought using coins
+        int bought = z / y;
+
+        int total = bought;
+
+        // Remaining stories coupons/wrappers
+        int current = bought;
+
+        while (current >= x) {
+
+            int free = current / x;
+
+            total += free;
+
+            // leftover + newly earned free stories
+            current = free + (current % x);
+        }
+
+        return total;
+    }
+}
+================================================================================================================================================================================================================================
+You are given a binary string ‘STR’, containing only zeroes and ones. This string does not contain any leading zero.Your task is to determine if this string contains at most one contiguous segment of ones.
+Sample Input 1:11100				Sample Output 1:Yes
+Explanation for sample input 1:In this test case, we can observe that the string contains only one contiguous segment of ones. This segment starts at the 0th index and ends at the 2nd index. 
+Sample Input 2:111011				Sample Output 2:No
+In this case, the string contains two contiguous segments of ones. The first segment starts at the 0th index and ends at the 2nd index. The second segment starts at the 4th index and ends at the 5th index.
+
+public class Solution {
+    public static String checkSegments(String str) {
+        int count = 0;
+        int n = str.length();
+
+        for (int i = 0; i < n; i++) {
+
+            // Start of a new segment of ones
+            if (str.charAt(i) == '1' && (i == 0 || str.charAt(i - 1) == '0')) {
+                count++;
+            }
+
+            if (count > 1) {
+                return "No";
+            }
+        }
+
+        return "Yes";
+    }
+}
+================================================================================================================================================================================================================================
+A school campus is represented as a 2D grid. The campus has N students and M cycles, and the number of students are less than or equal to the number of cycles. Each student and cycle is represented as a 2D coordinate (X, Y) on this grid.Our goal is to assign exactly one cycle to each student. Among the available cycles and students, we choose the (student, cycle) pair with the shortest Manhattan distance between each other, and assign the cycle to that student. If there are multiple (student, cycle) pairs with the same shortest Manhattan distance, we choose the pair with the smallest student index; if there are multiple ways to do that, we choose the pair with the smallest cycle index. We repeat this process until a cycle is assigned to each student.Given the description of the school campus, your task is to find the index (0-based) of the cycle that is assigned to each student.The Manhattan distance between two points P1 and P2 is defined as D = |P1.X - P2.X| + |P1.Y - P2.Y| where X, Y represents the location of a point in both horizontal as well as vertical direction respectively from the origin(0,0).
+Sample Input 1:
+2
+2 2
+0 0
+2 1
+1 2
+3 3
+2 2
+1 1
+2 1 
+2 2
+2 1
+Sample Output 1:
+1 0
+0 1
+Explanation 1:For the first test case, Distance of Student 0 from Cycle 0  = |1-0| + |2-0| = 3 Distance of Student 0 from Cycle 1  = |3-0| + |3-0| = 6 Distance of Student 1 from Cycle 0  = |1-2| + |2-1| = 2Distance of Student 0 from Cycle 0  = |1-0| + |2-0| = 3 Student 1 grabs Cycle 0 as it is closest (without ties), and Student 0 is assigned Cycle 1. So the output is [1, 0].
+For the second test case, Distance of Student 0 from Cycle 0  = |2-1| + |2-1| = 2 Distance of Student 0 from Cycle 1  = |2-1| + |1-1| = 1 Distance of Student 1 from Cycle 0  = |2-2| + |2-1| = 1 Distance of Student 1 from Cycle 1  = |2-1| + |2-1| = 0 Student 1 grabs Cycle 1 as it is closest and Student 0 is assigned Cycle 0. So the output is [1, 0]
+Sample Input 2:
+2
+3 3
+0 0
+1 1
+2 0
+1 0
+2 2
+2 1
+2 3
+0 1
+2 0 
+0 0
+1 1
+2 2
+Sample Output 2:
+ 0 2 1
+ 0 1
+
+public class Solution {
+
+    static class Pair {
+        int distance;
+        int student;
+        int cycle;
+
+        Pair(int distance, int student, int cycle) {
+            this.distance = distance;
+            this.student = student;
+            this.cycle = cycle;
+        }
+    }
+
+    public static int[] assignCycles(int[][] students, int[][] cycles) {
+
+        int n = students.length;
+        int m = cycles.length;
+
+        List<Pair> allPairs = new ArrayList<>();
+
+        // Generate all student-cycle pairs
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < m; j++) {
+
+                int dist =
+                        Math.abs(students[i][0] - cycles[j][0]) +
+                        Math.abs(students[i][1] - cycles[j][1]);
+
+                allPairs.add(new Pair(dist, i, j));
+            }
+        }
+
+        // Sort according to:
+        // 1. Distance
+        // 2. Student index
+        // 3. Cycle index
+        Collections.sort(allPairs, (a, b) -> {
+
+            if (a.distance != b.distance) {
+                return a.distance - b.distance;
+            }
+
+            if (a.student != b.student) {
+                return a.student - b.student;
+            }
+
+            return a.cycle - b.cycle;
+        });
+
+        int[] result = new int[n];
+
+        Arrays.fill(result, -1);
+
+        boolean[] usedStudents = new boolean[n];
+        boolean[] usedCycles = new boolean[m];
+
+        int assigned = 0;
+
+        // Greedily assign cycles
+        for (Pair p : allPairs) {
+
+            if (!usedStudents[p.student] &&
+                !usedCycles[p.cycle]) {
+
+                result[p.student] = p.cycle;
+
+                usedStudents[p.student] = true;
+                usedCycles[p.cycle] = true;
+
+                assigned++;
+
+                // All students assigned
+                if (assigned == n) {
+                    break;
+                }
+            }
+        }
+
+        return result;
+    }
+}
+================================================================================================================================================================================================================================
+A shop is selling candies at a discount. For every two candies sold, the shop gives a third candy for free.The customer can choose any candy to take away for free as long as the cost of the chosen candy is less than or equal to the minimum cost of the two candies bought.For example, if there are 4 candies with costs 1, 2, 3, and 4, and the customer buys candies with costs 2 and 3, they can take the candy with cost 1 for free, but not the candy with cost 4.Given a 0-indexed integer array cost, where cost[i] denotes the cost of the ith candy, return the minimum cost of buying all the candies.
+Example 1:Input: cost = [1,2,3]			Output: 5
+Explanation: We buy the candies with costs 2 and 3, and take the candy with cost 1 for free.The total cost of buying all candies is 2 + 3 = 5. This is the only way we can buy the candies.Note that we cannot buy candies with costs 1 and 3, and then take the candy with cost 2 for free.The cost of the free candy has to be less than or equal to the minimum cost of the purchased candies.
+Example 2:Input: cost = [6,5,7,9,2,2]			Output: 23
+Explanation: The way in which we can get the minimum cost is described below:
+- Buy candies with costs 9 and 7
+- Take the candy with cost 6 for free
+- We buy candies with costs 5 and 2
+- Take the last remaining candy with cost 2 for free
+Hence, the minimum cost to buy all candies is 9 + 7 + 5 + 2 = 23.
+Example 3:
+Input: cost = [5,5]			Output: 10
+Explanation: Since there are only 2 candies, we buy both of them. There is not a third candy we can take for free.Hence, the minimum cost to buy all candies is 5 + 5 = 10.
+
+class Solution {
+    public int minimumCost(int[] cost) {
+
+        // Sort in ascending order first
+        Arrays.sort(cost);
+
+        int total = 0;
+        int count = 0;
+
+        // Traverse from largest to smallest
+        for (int i = cost.length - 1; i >= 0; i--) {
+
+            count++;
+
+            // Every 3rd candy is free
+            if (count % 3 == 0) {
+                continue;
+            }
+
+            total += cost[i];
+        }
+
+        return total;
+    }
+}
+or
+class Solution:
+    def minimumCost(self, cost: List[int]) -> int:
+        total_cost = 0
+        cost.sort(reverse=True)
+
+        l = len(cost)
+
+        num_three = l // 3
+        mod_three = l % 3
+
+        pos = 0
+        for i in range(0, num_three):
+            first_candy = cost[pos]
+            total_cost = total_cost + first_candy
+            pos+=1
+            second_candy = cost[pos]
+            total_cost = total_cost + second_candy 
+            pos+=2
+            # third candy is free
+
+        for i in range(0, mod_three):
+            candy = cost[pos]
+            total_cost = total_cost + candy
+            pos+=1
+
+        return total_cost
+================================================================================================================================================================================================================================
+You have been given an array/list HEIGHT denoting the heights of ‘N’ adjacent hills. The hills are said to be dangerous if their heights are turbulent.A range of hills is turbulent if the comparison sign for their heights flips between each adjacent pair of hills. For example, if HEIGHT = [1, 2, 10, 3, 5, 1, 10, 10], then the hills in index range [1, 6] are turbulent as 2 < 10 > 3 < 5 > 1 < 10.Your task is to find the length of the longest dangerous hill range.
+Sample Input 1 :	9 4 2 10 7 8 8 1 9			1 2 1 4
+Sample Output 1 :	5							4
+Sample Output 1 Explanation:For the first test case, the longest dangerous hill range is [4, 2, 10, 7, 8].For the second test case, the longest dangerous hill range is [1, 2, 1, 4].
+Sample Input 2 :	2 8				Sample Output 2 :	2
+
+public class Solution {
+
+    public static int longestTurbulentRange(int[] height) {
+
+        int n = height.length;
+
+        if (n == 1) {
+            return 1;
+        }
+
+        int maxLen = 1;
+        int currLen = 1;
+
+        for (int i = 1; i < n; i++) {
+
+            int cmp = Integer.compare(height[i - 1], height[i]);
+
+            // Equal elements break turbulence
+            if (cmp == 0) {
+                currLen = 1;
+            }
+            // First valid comparison
+            else if (i == 1 ||
+                    cmp * Integer.compare(height[i - 2], height[i - 1]) != -1) {
+
+                currLen = 2;
+            }
+            // Alternating sign continues turbulence
+            else {
+                currLen++;
+            }
+
+            maxLen = Math.max(maxLen, currLen);
+        }
+
+        return maxLen;
+    }
+}
+================================================================================================================================================================================================================================
+You are given two categories of theme park attractions: land rides and water rides.Land rides landStartTime[i] – the earliest time the ith land ride can be boarded. landDuration[i] – how long the ith land ride lasts.
+Water rides waterStartTime[j] – the earliest time the jth water ride can be boarded. waterDuration[j] – how long the jth water ride lasts. A tourist must experience exactly one ride from each category, in either order.A ride may be started at its opening time or any later moment.If a ride is started at time t, it finishes at time t + duration.Immediately after finishing one ride the tourist may board the other (if it is already open) or wait until it opens.Return the earliest possible time at which the tourist can finish both rides.
+Example 1:Input: landStartTime = [2,8], landDuration = [4,1], waterStartTime = [6], waterDuration = [3]			Output: 9
+Explanation:​​​​​​​Plan A (land ride 0 → water ride 0):Start land ride 0 at time landStartTime[0] = 2. Finish at 2 + landDuration[0] = 6.Water ride 0 opens at time waterStartTime[0] = 6. Start immediately at 6, finish at 6 + waterDuration[0] = 9.Plan B (water ride 0 → land ride 1):Start water ride 0 at time waterStartTime[0] = 6. Finish at 6 + waterDuration[0] = 9.Land ride 1 opens at landStartTime[1] = 8. Start at time 9, finish at 9 + landDuration[1] = 10.Plan C (land ride 1 → water ride 0):Start land ride 1 at time landStartTime[1] = 8. Finish at 8 + landDuration[1] = 9.Water ride 0 opened at waterStartTime[0] = 6. Start at time 9, finish at 9 + waterDuration[0] = 12.Plan D (water ride 0 → land ride 0):Start water ride 0 at time waterStartTime[0] = 6. Finish at 6 + waterDuration[0] = 9.Land ride 0 opened at landStartTime[0] = 2. Start at time 9, finish at 9 + landDuration[0] = 13.Plan A gives the earliest finish time of 9.
+Example 2:Input: landStartTime = [5], landDuration = [3], waterStartTime = [1], waterDuration = [10]			Output: 14
+Explanation:​​​​​​​Plan A (water ride 0 → land ride 0):Start water ride 0 at time waterStartTime[0] = 1. Finish at 1 + waterDuration[0] = 11.Land ride 0 opened at landStartTime[0] = 5. Start immediately at 11 and finish at 11 + landDuration[0] = 14.Plan B (land ride 0 → water ride 0):Start land ride 0 at time landStartTime[0] = 5. Finish at 5 + landDuration[0] = 8.Water ride 0 opened at waterStartTime[0] = 1. Start immediately at 8 and finish at 8 + waterDuration[0] = 18.Plan A provides the earliest finish time of 14.
+
+class Solution {
+
+    public int earliestFinishTime(int[] landStartTime, int[] landDuration,
+                                  int[] waterStartTime, int[] waterDuration) {
+
+        int m = landStartTime.length;
+        int n = waterStartTime.length;
+
+        int ans = Integer.MAX_VALUE;
+
+        // Case 1: Land -> Water
+        for (int i = 0; i < m; i++) {
+
+            int landEndTime = landStartTime[i] + landDuration[i];
+
+            for (int j = 0; j < n; j++) {
+
+                int waterStart = Math.max(landEndTime, waterStartTime[j]);
+
+                int waterEndTime = waterStart + waterDuration[j];
+
+                ans = Math.min(ans, waterEndTime);
+            }
+        }
+
+        // Case 2: Water -> Land
+        for (int i = 0; i < n; i++) {
+
+            int waterEndTime = waterStartTime[i] + waterDuration[i];
+
+            for (int j = 0; j < m; j++) {
+
+                int landStart = Math.max(waterEndTime, landStartTime[j]);
+
+                int landEndTime = landStart + landDuration[j];
+
+                ans = Math.min(ans, landEndTime);
+            }
+        }
+
+        return ans;
+    }
+}
+================================================================================================================================================================================================================================
+You are given two categories of theme park attractions: land rides and water rides.
+Land rides landStartTime[i] – the earliest time the ith land ride can be boarded. landDuration[i] – how long the ith land ride lasts. Water rides waterStartTime[j] – the earliest time the jth water ride can be boarded. waterDuration[j] – how long the jth water ride lasts. A tourist must experience exactly one ride from each category, in either order. A ride may be started at its opening time or any later moment. If a ride is started at time t, it finishes at time t + duration. Immediately after finishing one ride the tourist may board the other (if it is already open) or wait until it opens. Return the earliest possible time at which the tourist can finish both rides.
+Example 1:Input: landStartTime = [2,8], landDuration = [4,1], waterStartTime = [6], waterDuration = [3]				Output: 9
+Explanation:​​​​​​​Plan A (land ride 0 → water ride 0): Start land ride 0 at time landStartTime[0] = 2. Finish at 2 + landDuration[0] = 6. Water ride 0 opens at time waterStartTime[0] = 6. Start immediately at 6, finish at 6 + waterDuration[0] = 9. Plan B (water ride 0 → land ride 1): Start water ride 0 at time waterStartTime[0] = 6. Finish at 6 + waterDuration[0] = 9. Land ride 1 opens at landStartTime[1] = 8. Start at time 9, finish at 9 + landDuration[1] = 10. Plan C (land ride 1 → water ride 0): Start land ride 1 at time landStartTime[1] = 8. Finish at 8 + landDuration[1] = 9. Water ride 0 opened at waterStartTime[0] = 6. Start at time 9, finish at 9 + waterDuration[0] = 12. Plan D (water ride 0 → land ride 0): Start water ride 0 at time waterStartTime[0] = 6. Finish at 6 + waterDuration[0] = 9. Land ride 0 opened at landStartTime[0] = 2. Start at time 9, finish at 9 + landDuration[0] = 13. Plan A gives the earliest finish time of 9.
+Example 2:Input: landStartTime = [5], landDuration = [3], waterStartTime = [1], waterDuration = [10]				Output: 14
+Explanation:​​​​​​​ Plan A (water ride 0 → land ride 0): Start water ride 0 at time waterStartTime[0] = 1. Finish at 1 + waterDuration[0] = 11. Land ride 0 opened at landStartTime[0] = 5. Start immediately at 11 and finish at 11 + landDuration[0] = 14. Plan B (land ride 0 → water ride 0): Start land ride 0 at time landStartTime[0] = 5. Finish at 5 + landDuration[0] = 8. Water ride 0 opened at waterStartTime[0] = 1. Start immediately at 8 and finish at 8 + waterDuration[0] = 18. Plan A provides the earliest finish time of 14.​​​​​​​
+
+class Solution {
+
+    private int solve(
+        int[] start1,
+        int[] duration1,
+        int[] start2,
+        int[] duration2
+    ) {
+        int finish1 = Integer.MAX_VALUE;
+        for (int i = 0; i < start1.length; i++) {
+            finish1 = Math.min(finish1, start1[i] + duration1[i]);
+        }
+        int finish2 = Integer.MAX_VALUE;
+        for (int i = 0; i < start2.length; i++) {
+            finish2 = Math.min(
+                finish2,
+                Math.max(start2[i], finish1) + duration2[i]
+            );
+        }
+        return finish2;
+    }
+
+    public int earliestFinishTime(
+        int[] landStartTime,
+        int[] landDuration,
+        int[] waterStartTime,
+        int[] waterDuration
+    ) {
+        int land_water = solve(
+            landStartTime,
+            landDuration,
+            waterStartTime,
+            waterDuration
+        );
+        int water_land = solve(
+            waterStartTime,
+            waterDuration,
+            landStartTime,
+            landDuration
+        );
+        return Math.min(land_water, water_land);
+    }
+}
+================================================================================================================================================================================================================================
+Ninja loves cooking, and he decided to make the pizza for his friend. His friend loves eating cheese with the pizza; hence Ninja decided to fill the pizza with the cheese.For our convenience, let's consider the rectangular pizza slices only, and to increase the amount of cheese, the Ninja decided to cut some slices in pizza. Each slice can be cut only once, and the resulting pieces must also be rectangular.Ninja decided to cut it in at most 'K' slices so that no one gets suspicious.Given 'N' number of slices have, 'K' maximum number of slices Ninja can cut and two arrays ‘L’ and ‘B’ stating the length and breadth of each slice, your task is to help Ninja find out the maximum extra cheese needed to fill the newly formed boundaries in pizza.
+EXAMPLE:
+Input: 'N' = 2, 'K' = 1
+       'L' = [4, 2]
+       'B' = [6, 8]
+Output: 16 To maximize the cheese usage, Ninja can cut a second cake parallel to the side of length 8. So extra cheese needed will be 16.
+
+public class Solution {
+
+    public static long maximumCheese(int n, int k, int[] L, int[] B) {
+
+        List<Integer> extraCheese = new ArrayList<>();
+
+        // Compute extra cheese for every slice
+        for (int i = 0; i < n; i++) {
+
+            int extra = 2 * Math.max(L[i], B[i]);
+
+            extraCheese.add(extra);
+        }
+
+        // Sort in descending order
+        extraCheese.sort(Collections.reverseOrder());
+
+        long ans = 0;
+
+        // Take top K cuts
+        for (int i = 0; i < k; i++) {
+            ans += extraCheese.get(i);
+        }
+
+        return ans;
+    }
+}
+================================================================================================================================================================================================================================
+It is a sweltering summer day, and a boy wants to buy some ice cream bars.At the store, there are n ice cream bars. You are given an array costs of length n, where costs[i] is the price of the ith ice cream bar in coins. The boy initially has coins coins to spend, and he wants to buy as many ice cream bars as possible. Note: The boy can buy the ice cream bars in any order.Return the maximum number of ice cream bars the boy can buy with coins coins.You must solve the problem by counting sort.
+Example 1:Input: costs = [1,3,2,4,1], coins = 7					Output: 4
+Explanation: The boy can buy ice cream bars at indices 0,1,2,4 for a total price of 1 + 3 + 2 + 1 = 7.
+Example 2:Input: costs = [10,6,8,7,7,8], coins = 5				utput: 0
+Explanation: The boy cannot afford any of the ice cream bars.
+Example 3:Input: costs = [1,6,3,1,2,5], coins = 20				Output: 6
+Explanation: The boy can buy all the ice cream bars for a total price of 1 + 6 + 3 + 1 + 2 + 5 = 18.
+
+class Solution {
+    public int maxIceCream(int[] costs, int coins) {
+
+        // Step 1: Find maximum cost
+        int maxCost = 0;
+        for (int cost : costs) {
+            maxCost = Math.max(maxCost, cost);
+        }
+
+        // Step 2: Build frequency array
+        int[] freq = new int[maxCost + 1];
+
+        for (int cost : costs) {
+            freq[cost]++;
+        }
+
+        int barsBought = 0;
+
+        // Step 3: Buy from cheapest to costliest
+        for (int price = 1; price <= maxCost; price++) {
+
+            if (freq[price] == 0) {
+                continue;
+            }
+
+            // Number of bars we can afford at this price
+            int canBuy = Math.min(freq[price], coins / price);
+
+            barsBought += canBuy;
+            coins -= canBuy * price;
+
+            // If we cannot afford even one more at this price,
+            // no need to check higher prices.
+            if (coins < price) {
+                break;
+            }
+        }
+
+        return barsBought;
+    }
+}
+================================================================================================================================================================================================================================
+You have a bookshelf in the form of an array ‘arr’ in which names of the books(single word name) are given. You are also given names of two books, ‘book1’ and ‘book2’. You are supposed to find the minimum distance between ‘book1’ and ‘book2’.Distance between two books is defined as the absolute difference between the indices of the books i.e for two books at index 'i' and 'j' the distance is equal to |i-j|.
+1. There may be multiple occurrences of any book. 2. book1 and book2 are present on the bookshelf. 3. The name of the books is in lower-case. 4. book1 is not equal to book2.
+Sample Input 1: arr=[coding ninjas help to crack product based companies] book1=coding book2=product
+arr=[eat code sleep repeat eat code sleep repeat ] book1=eat book2=repeat
+Sample Output 1:5			1
+Explanation for Sample Input 1:
+In the first test case, there are 8 books on the bookshelf.
+book1 = “coding”, book2 = “product”. The distance between book1 and book2 is 5. So, the answer is 5.
+In the second test case, there are 8 books on the bookshelf. and there are 2 occurrences in every book.
+book1 = “eat”, book2 = “repeat”.  book1 is present at indices 0 and 4. book2 is present at indices 3 and 7. The distances are 3, 7, 1, 4. The minimum of these is 1. So, the answer is 1.
+
+public class Solution {
+
+    public static int minimumDistance(String[] arr, String book1, String book2) {
+
+        int lastIndex = -1;
+        int minDist = Integer.MAX_VALUE;
+
+        for (int i = 0; i < arr.length; i++) {
+
+            if (arr[i].equals(book1) || arr[i].equals(book2)) {
+
+                if (lastIndex != -1 &&
+                    !arr[i].equals(arr[lastIndex])) {
+
+                    minDist = Math.min(minDist, i - lastIndex);
+                }
+
+                // Update only when current book is book1 or book2
+                lastIndex = i;
+            }
+        }
+
+        return minDist;
+    }
+}
+================================================================================================================================================================================================================================
+You are given an integer array nums and an integer target.Return the number of subarrays of nums in which target is the majority element.The majority element of a subarray is the element that appears strictly more than half of the times in that subarray.
+Example 1:Input: nums = [1,2,2,3], target = 2				Output: 5
+Explanation:Valid subarrays with target = 2 as the majority element:nums[1..1] = [2] nums[2..2] = [2] nums[1..2] = [2,2] nums[0..2] = [1,2,2] nums[1..3] = [2,2,3] So there are 5 such subarrays.
+Example 2:Input: nums = [1,1,1,1], target = 1				Output: 10
+Explanation:All 10 subarrays have 1 as the majority element.
+Example 3:Input: nums = [1,2,3], target = 4					Output: 0
+Explanation:target = 4 does not appear in nums at all. Therefore, there cannot be any subarray where 4 is the majority element. Hence the answer is 0.
+
+import java.util.*;
+
+class Solution {
+
+    static class Fenwick {
+        int[] bit;
+
+        Fenwick(int n) {
+            bit = new int[n + 1];
+        }
+
+        void update(int idx, int delta) {
+            while (idx < bit.length) {
+                bit[idx] += delta;
+                idx += idx & -idx;
+            }
+        }
+
+        int query(int idx) {
+            int sum = 0;
+            while (idx > 0) {
+                sum += bit[idx];
+                idx -= idx & -idx;
+            }
+            return sum;
+        }
+    }
+
+    public long countSubarrays(int[] nums, int target) {
+        int n = nums.length;
+
+        // Compute prefix sums of transformed array
+        int[] prefix = new int[n + 1];
+        for (int i = 0; i < n; i++) {
+            prefix[i + 1] = prefix[i] + (nums[i] == target ? 1 : -1);
+        }
+
+        // Coordinate compression
+        int[] sorted = prefix.clone();
+        Arrays.sort(sorted);
+
+        Map<Integer, Integer> rank = new HashMap<>();
+        int idx = 1;
+        for (int x : sorted) {
+            if (!rank.containsKey(x)) {
+                rank.put(x, idx++);
+            }
+        }
+
+        Fenwick bit = new Fenwick(idx);
+        long ans = 0;
+
+        // Initially prefix sum 0 is present
+        bit.update(rank.get(prefix[0]), 1);
+
+        for (int i = 1; i <= n; i++) {
+            // Count previous prefix sums smaller than current
+            ans += bit.query(rank.get(prefix[i]) - 1);
+
+            // Add current prefix sum
+            bit.update(rank.get(prefix[i]), 1);
+        }
+
+        return ans;
+    }
+}
+================================================================================================================================================================================================================================
+You are given an array of ‘N’ sentences. Each sentence is a space-delimited string of words. The first word in each sentence is an alphanumeric identifier. Then, at least one of the following conditions will hold true:
+1. After identifier, each word will consist only of lowercase English letters 2. After the identifier, each word will consist only of numbers.We will call these two types of sentences, letter – sentence and number– sentence. It is guaranteed that each sentence has at least one word after its identifier. Your task is to sort these sentences such that the following two conditions will hold.
+1. All letter - sentences must come before number- sentences.
+2. The letter - sentences must be ordered lexicographically ignoring identifiers. The identifier will be used in case of ties.
+3. The number– sentence must be put in their original order of occurrence. 
+Sample Input 1 :
+d1 2 3
+love8 coding world
+a1 coding ninjas 
+3 
+rating1 2143 1706
+g1 raone 
+avengers1 assemble
+Sample Output 1 :
+a1 coding ninjas
+love8 coding world
+d1 2 3
+avengers1 assemble
+g1 raone
+rating1 2143 1706
+Explanation for sample input1:
+For the first test case, 
+Letter sentences are [“love8 coding world”,   “a1 coding ninjas”], and number sentences are [“d1 2 3”]
+Sorted order of letter sentences = [“a1 coding ninjas”, “love8 coding world”]
+The original order of number sentences =[“d1 2 3”]
+So the answer is [“a1 coding ninjas”, “love8 coding world”, “d1 2 3”].
+
+For the second test case:
+Letter sentences are [“g1 raone”,  “avengers1 assemble”], and number sentences are [“rating1 2143 1706”]
+Sorted order of letter sentences = [“avengers1 assemble”, “g1 raone”].
+Original order of number sentences = [ “rating1 2143 1706”]
+So the answer is [“avengers1 assemble” , “g1 raone” , “rating1 2143 1706”]
+Sample Input 2 :
+1
+4
+wait8 opportunity is coming
+coding24 7 365
+coding1 2 3 4 5
+goodluck2 you my friend
+Sample Output 2 :
+wait8 opportunity is coming
+goodluck2 you my friend
+coding24 7 365 
+coding1 2 3 4 5
+Explanation for sample input2:
+For the first test case:
+Letter sentences are [“wait8 opportunity is coming”,  “goodluck2 you my friend”], and number sentences are [  “coding24 7 365”, “coding1 2 3 4 5”].
+Sorted order of letter sentences = [“wait8 opportunity is coming”, “goodluck2 you my friend”].
+Original order of number sentences =[“coding24 7 365”, “coding1 2 3 4 5”].
+So the answer is [“wait8 opportunity is coming”, “goodluck2 you my friend”, “coding24 7 365”, “coding1 2 3 4 5”].
+
+import java.util.*;
+
+public class Solution {
+
+    public static List<String> sortSentences(List<String> sentences) {
+
+        List<String> letterLogs = new ArrayList<>();
+        List<String> numberLogs = new ArrayList<>();
+
+        // Separate letter and number sentences
+        for (String sentence : sentences) {
+
+            int firstSpace = sentence.indexOf(' ');
+            String content = sentence.substring(firstSpace + 1);
+
+            // Check first character after identifier
+            if (Character.isDigit(content.charAt(0))) {
+                numberLogs.add(sentence);
+            } else {
+                letterLogs.add(sentence);
+            }
+        }
+
+        // Sort letter sentences
+        Collections.sort(letterLogs, (a, b) -> {
+
+            int idxA = a.indexOf(' ');
+            int idxB = b.indexOf(' ');
+
+            String idA = a.substring(0, idxA);
+            String idB = b.substring(0, idxB);
+
+            String contentA = a.substring(idxA + 1);
+            String contentB = b.substring(idxB + 1);
+
+            int cmp = contentA.compareTo(contentB);
+
+            // If contents are same, compare identifiers
+            if (cmp == 0) {
+                return idA.compareTo(idB);
+            }
+
+            return cmp;
+        });
+
+        // Add number sentences in original order
+        letterLogs.addAll(numberLogs);
+
+        return letterLogs;
+    }
+}

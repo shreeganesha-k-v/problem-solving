@@ -1,0 +1,428 @@
+Hire the maximum number of senior employees such that their total salary does not exceed the combined salary budget of junior employees, which is <= 60000:Input Office
+| emp_id  | experience | salary |
+| ------- | ---------- | ------ |
+| 1       | Junior     | 10000  |
+| 2       | Junior     | 15000  |
+| 3       | Junior     | 40000  |
+| 4       | Senior     | 16000  |
+| 5       | Senior     | 20000  |
+| 6       | Senior     | 50000  |
+Output:
+| emp_id  | experience | salary |
+| ------- | ---------- | ------ |
+| 4       | Senior     | 16000  |
+| 5       | Senior     | 20000  |
+| 1       | Junior     | 10000  |
+
+WITH senior_total AS (
+	SELECT *, SUM(salary) OVER (ORDER BY salary) AS running_total
+	FROM Office
+	WHERE experience = 'Senior'
+),
+junior_total AS (
+	SELECT *, SUM(salary) OVER (ORDER BY salary) AS running_total
+	FROM Office
+	WHERE experience = 'Junior'
+),
+total_senior AS (
+	SELECT COALESCE(SUM(salary), 0) AS total
+	FROM senior_total
+	WHERE running_total <= 60000
+)
+
+SELECT emp_id, experience, salary
+FROM senior_total
+WHERE running_total <= 60000
+
+UNION ALL
+
+SELECT emp_id, experience, salary
+FROM junior_total
+WHERE running_total <= (60000 - (SELECT total FROM total_senior));
+====================================================================================================================================================================
+Find the minimum group of 3 consecutive days where each day had visitors > 100 . Input: Visit
+| id | visit_date  | visitors |
+| -- | ----------- | -------- |
+| 1  | 2025-01-01  | 101      |
+| 2  | 2025-01-02  | 110      |
+| 3  | 2025-01-03  | 70       |
+| 4  | 2025-01-04  | 105      |
+| 5  | 2025-01-05  | 107      |
+| 6  | 2025-01-06  | 70       |
+| 7  | 2025-01-07  | 107      |
+| 8  | 2025-01-08  | 120      |
+| 9  | 2025-01-09  | 109      |
+| 10 | 2025-01-10  | 99       |
+Output:
+| id | visit_date | visitors  |   
+| -- | ----------- | -------- |
+| 7  | 2025-01-07  | 107      |   
+| 8  | 2025-01-08  | 120      |   
+| 9  | 2025-01-09  | 109      | 
+
+WITH filtered AS (
+    SELECT * 
+    FROM Visit 
+    WHERE visitors > 100
+),
+tagged AS (
+    SELECT *, 
+           ROW_NUMBER() OVER (ORDER BY visit_date) AS rn,
+           id - ROW_NUMBER() OVER (ORDER BY visit_date) AS grp
+    FROM filtered
+),
+grouped AS (
+    SELECT grp
+    FROM tagged
+    GROUP BY grp
+    HAVING COUNT(*) >= 3
+)
+SELECT t.id, t.visit_date, t.visitors
+FROM tagged t
+JOIN grouped g ON t.grp = g.grp
+ORDER BY t.visit_date
+LIMIT 3;  -- optional: only first 3 if multiple groups
+====================================================================================================================================================================
+Query to find person with Most number of friends and his total friends: Table request
+| send_id  | receive_id  | date_id    |
+| -------- | ----------- | ---------- |
+| 1        | 2           | 2024-01-01 |
+| 1        | 3           | 2024-01-02 |
+| 1        | 4           | 2024-01-03 |
+| 2        | 3           | 2024-01-04 |
+| 3        | 4           | 2024-01-05 |
+| 5        | 1           | 2024-01-06 |
+Output:
+| person_id  | total_friends  |
+| ---------- | -------------- |
+| 1          | 4              |
+
+SELECT person_id, COUNT(DISTINCT friend_id) AS total_friends
+FROM (
+    SELECT send_id AS person_id, receive_id AS friend_id FROM request
+    UNION
+    SELECT receive_id AS person_id, send_id AS friend_id FROM request
+) AS all_friends
+GROUP BY person_id
+ORDER BY total_friends DESC
+LIMIT 1;
+======================================================================================================================================
+Query to set result as Y if both condition1 and condition2 are true and atleast 2 member of team are true Input : Puzzle
+| teamID | memberID | condition1 | condition2 |
+| ------ | -------- | ---------- | ---------- |
+| 1      | m1       | Y          | Y          |
+| 1      | m2       | Y          | Y          |
+| 1      | m3       | Y          | Y          |
+| 1      | m4       | Y          | N          |
+| 2      | m1       | Y          | Y          |
+| 2      | m2       | Y          | N          |
+| 2      | m3       | N          | Y          |
+| 2      | m4       | N          | N          |
+| 2      | m5       | N          | Y          |
+| 3      | m1       | Y          | Y          |
+| 3      | m2       | Y          | N          |
+| 3      | m3       | N          | Y          |
+| 3      | m4       | N          | N          |
+| 3      | m5       | Y          | Y          |
+Output:
+| teamID | memberID | condition1 | condition2 | result |
+| ------ | -------- | ---------- | ---------- | ------ |
+| 1      | m1       | Y          | Y          | Y      |
+| 1      | m2       | Y          | Y          | Y      |
+| 1      | m3       | Y          | Y          | Y      |
+| 1      | m4       | Y          | N          | N      |
+| 2      | m1       | Y          | Y          | N      |
+| 2      | m2       | Y          | N          | N      |
+| 2      | m3       | N          | Y          | N      |
+| 2      | m4       | N          | N          | N      |
+| 2      | m5       | N          | Y          | N      |
+| 3      | m1       | Y          | Y          | Y      |
+| 3      | m2       | Y          | N          | N      |
+| 3      | m3       | N          | Y          | N      |
+| 3      | m4       | N          | N          | N      |
+| 3      | m5       | Y          | Y          | Y      |
+
+WITH cte as (
+	SELECT * , CASE WHEN condition1='Y' AND condition2='Y' THEN 1 ELSE 0 END as flag
+	FROM Puzzle
+) WITH counts as (
+	SELECT * , SUM(flag) OVER (PARTITION BY teamID ORDER BY teamID) as count
+	FROM cte
+)
+
+SELECT teamID , memberID , condition1 , condition2 , CASE WHEN flag = 1 AND count > 1 THEN 'Y' ELSE 'N' END as result
+FROM counts
+===========================================================================================================================================================================
+Query to merge overlaping intervals:Input events
+| hall_id  | from_date  | to_date    |
+| -------- | ---------- | ---------- |
+| 1        | 2025-01-05 | 2025-01-09 |
+| 1        | 2025-01-06 | 2025-01-10 |
+| 1        | 2025-01-07 | 2025-01-10 |
+| 1        | 2025-01-11 | 2025-01-15 |
+| 2        | 2025-02-15 | 2025-02-19 |
+| 2        | 2025-02-16 | 2025-02-20 |
+| 2        | 2025-02-21 | 2025-02-25 |
+Output:
+| hall_id  | from_date  | to_date    |
+| -------- | ---------- | ---------- |
+| 1        | 2025-01-05 | 2025-01-10 |
+| 1        | 2025-01-11 | 2025-01-15 |
+| 2        | 2025-02-15 | 2025-02-20 |
+| 2        | 2025-02-21 | 2025-02-25 |
+
+WITH cte AS (
+    SELECT *, 
+           LAG(to_date) OVER (PARTITION BY hall_id ORDER BY to_date) AS prev_end_date
+    FROM events
+),
+grouped AS (
+    SELECT *, 
+           CASE 
+               WHEN prev_end_date IS NULL OR prev_end_date < from_date THEN 1 
+               ELSE 0 
+           END AS group_id
+    FROM cte
+),
+cte2 AS (
+    SELECT *, 
+           SUM(group_id) OVER (PARTITION BY hall_id ORDER BY from_date ROWS UNBOUNDED PRECEDING) AS grp
+    FROM grouped
+)
+SELECT hall_id, 
+       MIN(from_date) AS from_date, 
+       MAX(to_date) AS to_date
+FROM cte2
+GROUP BY hall_id, grp
+ORDER BY hall_id, from_date;
+
+Or using recursion less effecient
+
+WITH RECURSIVE sorted_events AS (
+    SELECT * 
+    FROM events
+    ORDER BY hall_id, from_date
+),
+rec_merge AS (
+    -- anchor: take the first row for each hall
+    SELECT hall_id, from_date, to_date
+    FROM (
+        SELECT *, ROW_NUMBER() OVER (PARTITION BY hall_id ORDER BY from_date) as rn
+        FROM sorted_events
+    ) t
+    WHERE rn = 1
+
+    UNION ALL
+
+    -- recursive part: merge current with next overlapping
+    SELECT e.hall_id,
+           LEAST(r.from_date, e.from_date) AS from_date,
+           GREATEST(r.to_date, e.to_date) AS to_date
+    FROM rec_merge r
+    JOIN sorted_events e
+      ON r.hall_id = e.hall_id
+     AND e.from_date <= r.to_date
+     AND e.from_date > r.from_date
+)
+SELECT DISTINCT hall_id, from_date, to_date
+FROM rec_merge
+ORDER BY hall_id, from_date;
+===========================================================================================================================================================================
+Query to find prices of all products before '2024-12-16' if no price value is there return 10 as default.Input Products
+| product_id  | new_price  | change_date  |
+| ----------- | ---------- | ------------ |
+| 1           | 20         | 2024-12-14   |
+| 2           | 50         | 2024-12-14   |
+| 1           | 30         | 2024-12-15   |
+| 1           | 35         | 2024-12-16   |
+| 2           | 65         | 2024-12-17   |
+| 3           | 20         | 2024-12-18   |
+Output:
+| product_id  | price_before_2024_12_16     |
+| ----------- | --------------------------- |
+| 1           | 30                          |
+| 2           | 50                          |
+| 3           | 10                          |
+
+SELECT 
+    p.product_id,
+    COALESCE(
+        (
+            SELECT new_price 
+            FROM products sub 
+            WHERE sub.product_id = p.product_id 
+              AND sub.change_date < '2024-12-16'
+            ORDER BY sub.change_date DESC
+            LIMIT 1
+        ), 10
+    ) AS price_before_2024_12_16
+FROM (
+    SELECT DISTINCT product_id FROM products
+) p;
+
+OR
+
+WITH cte as (
+	SELECT * , ROW_NUMBER() OVER (PARTITION BY product_id ORDER BY change_date DESC) as row_num
+	FROM Products WHERE change_date < '2024-12-16'
+)
+
+SELECT product_id,new_price as price_before_2024_12_16
+FROM cte WHERE row_num=1
+
+UNION ALL
+
+SELECT product_id, 10 AS price_before_2024_12_16
+FROM Products p
+WHERE NOT EXISTS (
+    SELECT 1 FROM cte WHERE cte.product_id = p.product_id
+)
+===========================================================================================================================================================================
+For each product, find the year with the highest total sales amount (quantity × price), and return:product_name,year,highest sales
+Input:Products
+| product_id  | product_name  |
+| ----------- | ------------- |
+| 1           | mobile        |
+| 2           | computer      |
+| 3           | tv            |
+Sales
+| product_id  | year | quantity | price |
+| ----------- | ---- | -------- | ----- |
+| 1           | 2022 | 10       | 1000  |
+| 1           | 2023 | 12       | 1000  |
+| 1           | 2024 | 11       | 1000  |
+| 2           | 2022 | 15       | 1300  |
+| 2           | 2023 | 18       | 1300  |
+| 3           | 2022 | 13       | 1500  |
+Output:
+| product_name  | year | quantity | total_sales  |
+| ------------- | ---- | -------- | ------------ |
+| mobile        | 2023 | 12       | 12000        |
+| computer      | 2023 | 18       | 23400        |
+| tv            | 2022 | 13       | 19500        |
+
+WITH cte AS (
+    SELECT *, 
+           RANK() OVER (PARTITION BY product_id ORDER BY quantity * price DESC) AS ranked
+    FROM Sales
+), 
+top_sales AS (
+    SELECT * 
+    FROM cte 
+    WHERE ranked = 1
+)
+
+SELECT 
+    p.product_name, 
+    s.year, 
+    s.quantity, 
+    (s.quantity * s.price) AS total_sales
+FROM Products p
+JOIN top_sales s ON p.product_id = s.product_id;
+===========================================================================================================================================================================
+Query to find same salary 
+SELECT id, name, dept, salary
+FROM (
+    SELECT *, 
+           COUNT(*) OVER (PARTITION BY dept, salary) AS same_salary_count
+    FROM emp_info
+) e
+WHERE same_salary_count > 1;
+===========================================================================================================================================================================
+You want to interpret the rules (like '1+3') as row references by ID, perform the operation on the value column of those referenced IDs, and output the result.Puzzle
+| id | rules | value |
+| -- | ----- | ----- |
+| 1  | 1+3   | 10    |
+| 2  | 2*5   | 12    | 
+| 3  | 3-1   | 14    |
+| 4  | 4/1   | 15    |
+| 5  | 5+4   | 18    |
+Output:
+| id | rules | computed\_value |
+| -- | ----- | --------------- |
+| 1  | 1+3   | 24              |
+| 2  | 2*5  | 216              |
+| 3  | 3-1   | 4               |
+| 4  | 4/1   | 1.5             |
+| 5  | 5+4   | 33              |
+
+SELECT 
+    CASE 
+        WHEN INSTR(p.rules, '+') > 0 THEN p1.value + p2.value
+        WHEN INSTR(p.rules, '-') > 0 THEN p1.value - p2.value
+        WHEN INSTR(p.rules, '*') > 0 THEN p1.value * p2.value
+        WHEN INSTR(p.rules, '/') > 0 THEN p1.value / p2.value
+    END AS result
+FROM puzzle p
+JOIN puzzle p1 ON p1.id = CAST(SUBSTRING_INDEX(p.rules,  -- CAST(...AS UNSIGNED) converts to integer
+                         CASE 
+                           WHEN INSTR(p.rules, '+') > 0 THEN '+'
+                           WHEN INSTR(p.rules, '-') > 0 THEN '-'
+                           WHEN INSTR(p.rules, '*') > 0 THEN '*'
+                           WHEN INSTR(p.rules, '/') > 0 THEN '/'
+                         END, 1) AS UNSIGNED)
+JOIN puzzle p2 ON p2.id = CAST(SUBSTRING_INDEX(p.rules, 
+                         CASE 
+                           WHEN INSTR(p.rules, '+') > 0 THEN '+'
+                           WHEN INSTR(p.rules, '-') > 0 THEN '-'
+                           WHEN INSTR(p.rules, '*') > 0 THEN '*'
+                           WHEN INSTR(p.rules, '/') > 0 THEN '/'
+                         END, -1) AS UNSIGNED);
+===========================================================================================================================================================================
+Write a query to find team , no of matches lost and won
+| match_id  | team1 | team2 | result |
+| --------- | ----- | ----- | ------ |
+| 1         | ENG   | NZ    | NZ     |
+| 2         | PAK   | NED   | PAK    |
+| 3         | AFG   | BAN   | BAN    |
+| 4         | SA    | SL    | SA     |
+| 5         | AUS   | IND   | AUS    |
+| 6         | NZ    | NED   | NZ     |
+| 7         | ENG   | BAN   | ENG    |
+| 8         | SL    | PAK   | PAK    |
+| 9         | AFG   | IND   | IND    |
+| 10        | SA    | AUS   | SA     |
+| 11        | BAN   | NZ    | BAN    |
+| 12        | PAK   | IND   | IND    |
+| 13        | SA    | IND   | DRAW   |
+Output:
+| team | matches_won  | matches_lost  |
+| ---- | ------------ | ------------- |
+| AFG  | 0            | 2             |
+| AUS  | 1            | 2             |
+| BAN  | 2            | 1             |
+| ENG  | 1            | 1             |
+| IND  | 3            | 1             |
+| NED  | 0            | 2             |
+| NZ   | 2            | 1             |
+| PAK  | 2            | 1             |
+| SA   | 3            | 0             |
+| SL   | 0            | 2             |
+
+WITH cte AS (
+    SELECT team1 AS team_name, CASE WHEN team1 = result THEN 1 ELSE 0 END AS win_count
+    FROM cricket_match
+    WHERE result != 'DRAW'
+    UNION ALL
+    SELECT team2 AS team_name, CASE WHEN team2 = result THEN 1 ELSE 0 END AS win_count
+    FROM cricket_match
+    WHERE result != 'DRAW'
+),
+total AS (
+    SELECT team_name, COUNT(*) AS total_matches
+    FROM cte
+    GROUP BY team_name
+),
+wins AS (
+    SELECT team_name, SUM(win_count) AS matches_won
+    FROM cte
+    GROUP BY team_name
+)
+SELECT 
+    t.team_name AS team,
+    COALESCE(w.matches_won, 0) AS matches_won,
+    t.total_matches - COALESCE(w.matches_won, 0) AS matches_lost
+FROM total t
+LEFT JOIN wins w ON t.team_name = w.team_name
+ORDER BY team;
+===========================================================================================================================================================================

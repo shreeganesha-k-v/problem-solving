@@ -1,0 +1,28 @@
+The SOLID principles are five key design principles intended to make software designs more understandable, flexible, and maintainable. These principles are particularly useful in object-oriented programming but can be applied more broadly as well. Here's a breakdown of each of the SOLID principles:
+
+1. Single Responsibility Principle (SRP)
+Definition: A class should have only one reason to change, meaning it should have only one job or responsibility.
+Explanation: Each class or module in a system should focus on a single part of the functionality provided by the software. This makes the system easier to maintain and understand. If a class has multiple responsibilities, changes to one responsibility could affect or break the others.
+Example: A User class that handles both user data and user authentication should be split into two classes: one for managing user data (UserProfile) and another for handling authentication (UserAuth).
+2. Open/Closed Principle (OCP)
+Definition: Software entities (classes, modules, functions, etc.) should be open for extension but closed for modification.
+Explanation: This means that you should be able to extend the behavior of a system without modifying its existing code. This can typically be achieved through inheritance, interfaces, or dependency injection.
+Example: If you have a class that calculates the area of shapes, instead of modifying the class to add support for new shapes, you would extend it with new classes (e.g., Circle, Rectangle, etc.) that implement a common interface.
+3. Liskov Substitution Principle (LSP)
+Definition: Subtypes must be substitutable for their base types without altering the correctness of the program.
+Explanation: This principle ensures that a derived class can be used anywhere a base class is expected, without causing errors or unexpected behavior. In other words, subclasses should adhere to the contract defined by their superclass.
+Example: If Bird is a superclass and Penguin is a subclass, and Bird has a method fly(), Penguin should not override fly() with behavior that contradicts the expected behavior of fly() (since penguins can't fly). A better design might avoid the fly() method in the Bird class altogether or use a different abstraction.
+4. Interface Segregation Principle (ISP)
+Definition: No client should be forced to depend on methods it does not use.
+Explanation: Instead of having one large, general-purpose interface, it is better to have several smaller, more specific interfaces. This ensures that classes implementing the interfaces only need to concern themselves with methods that are relevant to them.
+Example: If you have an interface Worker with methods like work() and eat(), a robot class implementing Worker should not be forced to implement eat(). Instead, you could split it into two interfaces: Workable and Eatable.
+5. Dependency Inversion Principle (DIP)
+Definition: High-level modules should not depend on low-level modules. Both should depend on abstractions. Additionally, abstractions should not depend on details. Details should depend on abstractions.
+Explanation: This principle encourages decoupling of high-level and low-level components of a system by introducing abstractions (e.g., interfaces or abstract classes). This makes the system more modular, easier to change, and testable.
+Example: Instead of a NotificationService class depending directly on an EmailService class, both can depend on a MessageService interface. This allows NotificationService to work with any MessageService implementation, such as EmailService or SMSService.
+Summary:
+S: Single Responsibility Principle (SRP)
+O: Open/Closed Principle (OCP)
+L: Liskov Substitution Principle (LSP)
+I: Interface Segregation Principle (ISP)
+D: Dependency Inversion Principle (DIP)

@@ -1,0 +1,2622 @@
+Input: list1 = [1,2,4], list2 = [1,3,4]
+Output: [1,1,2,3,4,4]
+
+Example 2:
+Input: list1 = [], list2 = []
+Output: []
+
+Example 3:
+Input: list1 = [], list2 = [0]
+Output: [0]
+
+class Solution {
+    public ListNode mergeTwoLists(ListNode list1, ListNode list2) {
+        if(list1!=null && list2!=null){
+            if(list1.val<list2.val){
+                list1.next=mergeTwoLists(list1.next,list2);
+                return list1;
+            }else{
+                list2.next=mergeTwoLists(list1,list2.next);
+                return list2;
+            }
+        }
+        if(list1==null)return list2;
+        return list1;
+    }
+}
+
+or
+
+class Solution {
+    public ListNode mergeTwoLists(ListNode list1, ListNode list2) {
+        ListNode dummy = new ListNode();
+        ListNode cur = dummy;
+
+        while (list1 != null && list2 != null) {
+            if (list1.val > list2.val) {
+                cur.next = list2;
+                list2 = list2.next;
+            } else {
+                cur.next = list1;
+                list1 = list1.next;
+            }
+            cur = cur.next;
+        }
+
+        cur.next = (list1 != null) ? list1 : list2;
+
+        return dummy.next;        
+    }
+}
+===========================================================================================
+Given the head of a linked list, remove the nth node from the end of the list and return its head
+Input: head = [1,2,3,4,5], n = 2
+Output: [1,2,3,5]
+
+Example 2:
+Input: head = [1], n = 1
+Output: []
+
+Example 3:
+Input: head = [1,2], n = 1
+Output: [1]
+
+class Solution {
+    public ListNode removeNthFromEnd(ListNode head, int n) {
+        ListNode first = head;
+        ListNode second = head;
+
+        while(n-- >0){
+            first=first.next;
+        }
+        if(first==null){
+            return head.next;
+        }
+
+        while(first.next!=null){
+            second=second.next;
+            first=first.next;
+        }
+        second.next=second.next.next;
+        return head;
+    }
+
+}
+======================================================================
+Given a linked list, swap every two adjacent nodes and return its head. You must solve the problem without modifying the values in the list's nodes (i.e., only nodes themselves may be changed.)
+Input: head = [1,2,3,4]
+Output: [2,1,4,3]
+
+Example 2:
+Input: head = []
+Output: []
+
+Example 3:
+Input: head = [1]
+Output: [1]
+
+class Solution {
+    public ListNode swapPairs(ListNode head) {
+        if(head==null || head.next==null){
+            return head;
+        }
+
+        ListNode temp=head;
+
+        while(temp!=null){
+            int t = temp.val;
+            if(temp.next!=null){
+                temp.val=temp.next.val;
+                temp.next.val=t;
+                temp=temp.next;
+            }
+            temp=temp.next;
+        }
+        return head;
+    }
+}
+================================================================================
+You are given two non-empty linked lists representing two non-negative integers. The digits are stored in reverse order, and each of their nodes contains a single digit. Add the two numbers and return the sum as a linked list.
+You may assume the two numbers do not contain any leading zero, except the number 0 itself.
+Example 1:
+Input: l1 = [2,4,3], l2 = [5,6,4]
+Output: [7,0,8]
+Explanation: 342 + 465 = 807.
+
+Example 2:
+Input: l1 = [0], l2 = [0]
+Output: [0]
+
+Example 3:
+Input: l1 = [9,9,9,9,9,9,9], l2 = [9,9,9,9]
+Output: [8,9,9,9,0,0,0,1]
+ 
+class Solution {
+    public ListNode addTwoNumbers(ListNode l1, ListNode l2) {
+        ListNode dummy=new ListNode();
+        ListNode res = dummy;
+        int total = 0, carry = 0;
+
+        while(l1!=null || l2!=null || carry !=0){
+            total=carry;
+            if(l1!=null){
+                total+=l1.val;
+                l1=l1.next;
+            }
+
+            if(l2!=null){
+                total+=l2.val;
+                l2=l2.next;
+            }
+
+            int num=total%10;
+            carry=total/10;
+            dummy.next=new ListNode(num);
+            dummy=dummy.next;
+        }
+        return res.next;
+    }
+}
+=============================================================
+Given the head of a linked list, rotate the list to the right by k places.
+
+Example 1:
+Input: head = [1,2,3,4,5], k = 2
+Output: [4,5,1,2,3]
+
+Example 2:
+Input: head = [0,1,2], k = 4
+Output: [2,0,1]
+
+class Solution {
+    public ListNode rotateRight(ListNode head, int k) {
+        if(head==null || head.next==null || k==0){
+            return head;
+        }
+
+        int length = 1;
+        ListNode temp = head;
+
+        while (temp.next != null) {
+            temp = temp.next;
+            length++;
+        }
+        temp.next=head;// make as cyclic means now 5->1
+
+        k=k%length;
+        k=length-k;
+
+        while(k-- >0){
+            temp=temp.next;
+        }
+
+        head=temp.next;
+        temp.next=null;
+
+        return head;
+    }
+}
+===========================================================================
+Given head of a sorted linked list, delete all duplicates such that each element appears only once. Return the linked list sorted as well.
+Example 1:
+Input: head = [1,1,2]
+Output: [1,2]
+Example 2:
+Input: head = [1,1,2,3,3]
+Output: [1,2,3]
+ 
+class Solution {
+    public ListNode deleteDuplicates(ListNode head) {
+        if (head == null || head.next == null) {
+            return head;
+        }
+        ListNode current = head;
+        while(current!=null && current.next !=null){
+            if(current.val==current.next.val){
+                current.next = current.next.next;
+            }else{
+            current=current.next;
+            }
+        }
+        return head;
+    }
+}
+================================================================================================
+Given the head of a sorted linked list, delete all nodes that have duplicate numbers, leaving only distinct numbers from the original list. Return the linked list sorted as well.
+
+Example 1:
+Input: head = [1,2,3,3,4,4,5]
+Output: [1,2,5]
+Example 2:
+Input: head = [1,1,1,2,3]
+Output: [2,3]
+
+class Solution {
+    public ListNode deleteDuplicates(ListNode head) {
+        ListNode dummy = new ListNode(0);
+        dummy.next = head;
+
+        ListNode prev = dummy;
+        ListNode curr = head;
+
+        while (curr != null) {
+            // If the current node is a duplicate, skip all nodes with the same value
+            if (curr.next != null && curr.val == curr.next.val) {
+                while (curr.next != null && curr.val == curr.next.val) {
+                    curr = curr.next;
+                }
+                // Skip all the duplicates
+                prev.next = curr.next;
+            } else {
+                // If current node is not a duplicate, move the prev pointer
+                prev = prev.next;
+            }
+            // Move the curr pointer forward
+            curr = curr.next;
+        }
+        return dummy.next;
+        
+    }
+}
+=======================================================================================================================
+You are given the head of a linked list, which contains a series of integers separated by 0's. The beginning and end of the linked list will have Node.val == 0.
+For every two consecutive 0's, merge all the nodes lying in between them into a single node whose value is the sum of all the merged nodes. The modified list should not contain any 0's.
+Return the head of the modified linked list.
+
+Example 1:
+Input: head = [0,3,1,0,4,5,2,0]
+Output: [4,11]
+Explanation: 
+The above figure represents the given linked list. The modified list contains
+- The sum of the nodes marked in green: 3 + 1 = 4.
+- The sum of the nodes marked in red: 4 + 5 + 2 = 11.
+
+Example 2:
+Input: head = [0,1,0,3,0,2,2,0]
+Output: [1,3,4]
+Explanation: 
+The above figure represents the given linked list. The modified list contains
+- The sum of the nodes marked in green: 1 = 1.
+- The sum of the nodes marked in red: 3 = 3.
+- The sum of the nodes marked in yellow: 2 + 2 = 4.
+
+public class Solution {
+
+    public ListNode mergeNodes(ListNode head) {
+        // Initialize a sentinel/dummy node with the first non-zero value.
+        ListNode modify = head.next;
+        ListNode nextSum = modify;
+
+        while (nextSum != null) {
+            int sum = 0;
+            // Find the sum of all nodes until you encounter a 0.
+            while (nextSum.val != 0) {
+                sum += nextSum.val;
+                nextSum = nextSum.next;
+            }
+
+            // Assign the sum to the current node's value.
+            modify.val = sum;
+            // Move nextSum to the first non-zero value of the next block.
+            nextSum = nextSum.next;
+            // Move modify also to this node.
+            modify.next = nextSum;
+            modify = modify.next;
+        }
+        return head.next;
+    }
+}
+===================================================================================================
+A critical point in a linked list is defined as either a local maxima or a local minima.A node is a local maxima if the current node has a value strictly greater than the previous node and the next node.A node is a local minima if the current node has a value strictly smaller than the previous node and the next node.Note that a node can only be a local maxima/minima if there exists both a previous node and a next node.Given a linked list head, return an array of length 2 containing [minDistance, maxDistance] where minDistance is the minimum distance between any two distinct critical points and maxDistance is the maximum distance between any two distinct critical points. If there are fewer than two critical points, return [-1, -1].
+
+Example 1:
+Input: head = [3,1]
+Output: [-1,-1]
+Explanation: There are no critical points in [3,1].
+
+Example 2:
+Input: head = [5,3,1,2,5,1,2]
+Output: [1,3]
+Explanation: There are three critical points:
+- [5,3,1,2,5,1,2]: The third node is a local minima because 1 is less than 3 and 2.
+- [5,3,1,2,5,1,2]: The fifth node is a local maxima because 5 is greater than 2 and 1.
+- [5,3,1,2,5,1,2]: The sixth node is a local minima because 1 is less than 5 and 2.
+The minimum distance is between the fifth and the sixth node. minDistance = 6 - 5 = 1.
+The maximum distance is between the third and the sixth node. maxDistance = 6 - 3 = 3.
+
+Example 3:
+Input: head = [1,3,2,2,3,2,2,2,7]
+Output: [3,3]
+Explanation: There are two critical points:
+- [1,3,2,2,3,2,2,2,7]: The second node is a local maxima because 3 is greater than 1 and 2.
+- [1,3,2,2,3,2,2,2,7]: The fifth node is a local maxima because 3 is greater than 2 and 2.
+Both the minimum and maximum distances are between the second and the fifth node.
+Thus, minDistance and maxDistance is 5 - 2 = 3.
+Note that the last node is not considered a local maxima because it does not have a next node.
+
+import java.util.*;
+
+class ListNode {
+    int val;
+    ListNode next;
+    ListNode(int val) { this.val = val; }
+}
+
+public class CriticalPointsInLinkedList {
+
+    public int[] nodesBetweenCriticalPoints(ListNode head) {
+        List<Integer> criticalPoints = new ArrayList<>();
+        int index = 1;
+        
+        ListNode prev = head;
+        ListNode curr = head.next;
+        
+        while (curr != null && curr.next != null) {
+            int prevVal = prev.val;
+            int currVal = curr.val;
+            int nextVal = curr.next.val;
+
+            if ((currVal > prevVal && currVal > nextVal) ||
+                (currVal < prevVal && currVal < nextVal)) {
+                criticalPoints.add(index);
+            }
+
+            prev = curr;
+            curr = curr.next;
+            index++;
+        }
+
+        if (criticalPoints.size() < 2) {
+            return new int[]{-1, -1};
+        }
+
+        int minDist = Integer.MAX_VALUE;
+        for (int i = 1; i < criticalPoints.size(); i++) {
+            minDist = Math.min(minDist, criticalPoints.get(i) - criticalPoints.get(i - 1));
+        }
+
+        int maxDist = criticalPoints.get(criticalPoints.size() - 1) - criticalPoints.get(0);
+
+        return new int[]{minDist, maxDist};
+    }
+}
+
+======================================================================================================================
+You are given a string s that consists of lower case English letters and brackets.
+Reverse the strings in each pair of matching parentheses, starting from the innermost one.
+Your result should not contain any brackets.
+
+Example 1:
+Input: s = "(abcd)"
+Output: "dcba"
+
+Example 2:
+Input: s = "(u(love)i)"
+Output: "iloveu"
+Explanation: The substring "love" is reversed first, then the whole string is reversed.
+
+Example 3:
+Input: s = "(ed(et(oc))el)"
+Output: "leetcode"
+Explanation: First, we reverse the substring "oc", then "etco", and finally, the whole string.
+
+class Solution {
+    public String reverseParentheses(String s) {
+        Stack<Integer> stack = new Stack<>();
+        StringBuilder res= new StringBuilder();
+
+        for(char c:s.toCharArray()){
+            if(c=='('){
+                stack.push(res.length());
+            }else if(c==')'){
+                int start = stack.pop();
+                reverse(res,start,res.length()-1);
+                
+            }else res.append(c);
+        }
+        return res.toString();
+    }
+
+    private void reverse(StringBuilder sb,int start,int end){
+        while(start<end){
+            char temp= sb.charAt(start);
+            sb.setCharAt(start++,sb.charAt(end));
+            sb.setCharAt(end--,temp);
+        }
+    }
+}
+===============================================================================================
+You are given a string s and two integers x and y. You can perform two types of operations any number of times.
+Remove substring "ab" and gain x points.
+For example, when removing "ab" from "cabxbae" it becomes "cxbae".
+Remove substring "ba" and gain y points.
+For example, when removing "ba" from "cabxbae" it becomes "cabxe".
+Return the maximum points you can gain after applying the above operations on s.
+
+Example 1:
+Input: s = "cdbcbbaaabab", x = 4, y = 5
+Output: 19
+Explanation:
+- Remove the "ba" underlined in "cdbcbbaaabab". Now, s = "cdbcbbaaab" and 5 points are added to the score.
+- Remove the "ab" underlined in "cdbcbbaaab". Now, s = "cdbcbbaa" and 4 points are added to the score.
+- Remove the "ba" underlined in "cdbcbbaa". Now, s = "cdbcba" and 5 points are added to the score.
+- Remove the "ba" underlined in "cdbcba". Now, s = "cdbc" and 5 points are added to the score.
+Total score = 5 + 4 + 5 + 5 = 19.
+
+Example 2:
+Input: s = "aabbaaxybbaabb", x = 5, y = 4
+Output: 20
+
+class Solution {
+    public int maximumGain(String s, int x, int y) {
+        int sum=0;
+        if(x<y){
+            int temp=x;
+            x=y;
+            y=temp;
+            s=s.replace('a','t').replace('b','a').replace('t','b');
+        }
+        Stack<Character> st = new Stack<>();
+
+        for(char c:s.toCharArray()){
+            if(!st.isEmpty()&&st.peek()=='a' && c=='b'){
+                st.pop();
+                sum+=x;
+            }else{
+                st.push(c);
+            }
+        }
+
+        StringBuilder rem=new StringBuilder();
+
+        while(!st.isEmpty()){
+            rem.append(st.pop());
+        }
+        rem.reverse();
+
+        for(char c:rem.toString().toCharArray()){
+            if (!st.isEmpty() && st.peek() == 'b' && c == 'a') {
+                st.pop();
+                sum += y;
+            } else {
+                st.push(c);
+            }
+        }
+        return sum;
+    }
+}
+========================================================================
+Given the head of a linked list and an integer val, remove all the nodes of the linked list that has Node.val == val, and return the new head.
+
+Example 1:
+Input: head = [1,2,6,3,4,5,6], val = 6
+Output: [1,2,3,4,5]
+
+Example 2:
+Input: head = [], val = 1
+Output: []
+
+Example 3:
+Input: head = [7,7,7,7], val = 7
+Output: []
+
+public ListNode removeElements(ListNode head, int val) {
+        // Dummy node to handle edge cases where the head itself might be removed
+        ListNode dummy = new ListNode(0);
+        dummy.next = head;
+        ListNode temp = dummy;
+
+        // Traverse the list
+        while (temp.next != null) {
+            if (temp.next.val == val) {
+                // Skip the node with the target value
+                temp.next = temp.next.next;
+            } else {
+                // Move to the next node
+                temp = temp.next;
+            }
+        }
+
+        // Return the head of the modified list
+        return dummy.next;
+    }
+=============================================================================================================
+Given head, the head of a linked list, determine if the linked list has a cycle in it.
+There is a cycle in a linked list if there is some node in the list that can be reached again by continuously following the next pointer. Internally, pos is used to denote the index of the node that tail's next pointer is connected to. Note that pos is not passed as a parameter.
+Return true if there is a cycle in the linked list. Otherwise, return false.
+
+Example 1:
+Input: head = [3,2,0,-4], pos = 1
+Output: true
+Explanation: There is a cycle in the linked list, where the tail connects to the 1st node (0-indexed).
+
+Example 2:
+Input: head = [1,2], pos = 0
+Output: true
+Explanation: There is a cycle in the linked list, where the tail connects to the 0th node.
+
+Example 3:
+Input: head = [1], pos = -1
+Output: false
+Explanation: There is no cycle in the linked list.
+
+public class Solution {
+    public boolean hasCycle(ListNode head) {
+        ListNode fastPtr=head;
+        ListNode slowPtr=head;
+
+        while(fastPtr!=null && fastPtr.next!=null){
+            fastPtr=fastPtr.next.next;
+            slowPtr = slowPtr.next;
+
+            if(slowPtr==fastPtr){
+                return true;
+            }
+        }
+        return false;
+        
+    }
+}
+======================================================================================
+Given the head of a linked list, return the node where the cycle begins. If there is no cycle, return null.
+There is a cycle in a linked list if there is some node in the list that can be reached again by continuously following the next pointer. Internally, pos is used to denote the index of the node that tail's next pointer is connected to (0-indexed). It is -1 if there is no cycle. Note that pos is not passed as a parameter.Do not modify the linked list.
+
+Example 1:
+Input: head = [3,2,0,-4], pos = 1
+Output: tail connects to node index 1
+Explanation: There is a cycle in the linked list, where tail connects to the second node.
+
+Example 2:
+Input: head = [1,2], pos = 0
+Output: tail connects to node index 0
+Explanation: There is a cycle in the linked list, where tail connects to the first node.
+
+Example 3:
+Input: head = [1], pos = -1
+Output: no cycle
+Explanation: There is no cycle in the linked list.
+
+Floyd’s Cycle Detection Algorithm
+public class Solution {
+    public ListNode detectCycle(ListNode head) {
+        ListNode slowPtr = head;
+        ListNode fastPtr = head;
+
+        while(fastPtr!=null && fastPtr.next!=null){
+            slowPtr=slowPtr.next;
+            fastPtr=fastPtr.next.next;
+            if(slowPtr==fastPtr) break;
+        }
+
+        if(fastPtr==null || fastPtr.next==null) return null;
+
+        while(head!=slowPtr){
+            head=head.next;
+            slowPtr=slowPtr.next;
+        }
+
+        return slowPtr;
+    }
+}
+=============================================================================
+Given the root of a binary tree, return the preorder traversal of its nodes' values.
+Example 1:Input: root = [1,null,2,3]			Output: [1,2,3]
+Example 2:Input: root = []			Output: []
+Example 3:Input: root = [1]			Output: [1]
+
+class Solution {
+    public List<Integer> preorderTraversal(TreeNode root) {
+        List<Integer> res = new ArrayList<>();
+        if(root == null){
+            return res;
+        }
+
+        Stack<TreeNode> stack=new Stack<>();
+
+        stack.push(root);
+
+        while(!stack.isEmpty()){
+            TreeNode temp = stack.pop();
+            res.add(temp.val);
+
+            if(temp.right!=null){
+                stack.push(temp.right);
+            }
+
+            if(temp.left!=null){
+                stack.push(temp.left);
+            }
+        }
+        return res;
+    }
+}
+=============================================================================
+Given an absolute path for a Unix-style file system, which begins with a slash '/', transform this path into its simplified canonical path.In Unix-style file system context, a single period '.' signifies the current directory, a double period ".." denotes moving up one directory level, and multiple slashes such as "//" are interpreted as a single slash. In this problem, treat sequences of periods not covered by the previous rules (like "...") as valid names for files or directories.The simplified canonical path should adhere to thefollowing rules:It must start with a single slash '/'.Directories within the path should be separated by only one slash '/'.
+It should not end with a slash '/', unless it's the root directory.It should exclude any single or double periods used to denote current or parent directories.Return the new path.
+
+Example 1:
+Input: path = "/home/"
+Output: "/home"
+Explanation:The trailing slash should be removed.
+
+Example 2:
+Input: path = "/home//foo/"
+Output: "/home/foo"
+Explanation:Multiple consecutive slashes are replaced by a single one.
+
+Example 3:
+Input: path = "/home/user/Documents/../Pictures"
+Output: "/home/user/Pictures"
+Explanation:A double period ".." refers to the directory up a level.
+
+Example 4:
+Input: path = "/../"
+Output: "/"
+Explanation:
+Going one level up from the root directory is not possible.
+
+Example 5:
+Input: path = "/.../a/../b/c/../d/./"
+Output: "/.../b/d"
+Explanation:"..." is a valid name for a directory in this problem.
+
+ 
+class Solution {
+    public String simplifyPath(String path) {
+        Stack<String> stack = new Stack<>();
+        String[] paths = path.split("/");
+
+        for(String s: paths){
+            if(s.equals("..")){
+                if(!stack.isEmpty()){
+                    stack.pop();
+                }
+            }else if(!s.equals(".")&& !s.equals("")){
+                stack.push(s);
+            }
+        }
+
+        StringBuilder res = new StringBuilder();
+        for(String s:stack){
+            res.append("/").append(s);
+        }
+        return res.length()>0?res.toString():"/";
+    }
+}
+=============================================================================
+Given the root of a binary tree, return the postorder traversal of its nodes' values.
+Example 1:Input: root = [1,null,2,3]		Output: [3,2,1]
+Example 2:Input: root = []			Output: []
+Example 3:Input: root = [1]			Output: [1]
+
+class Solution {
+    public List<Integer> postorderTraversal(TreeNode root) {
+        List<Integer> res= new ArrayList<>();
+        postOrder(root,res);
+        return res;
+        
+    }
+
+    private void postOrder(TreeNode root,List<Integer> res){
+        if(root==null){
+            return;
+        }
+        postOrder(root.left,res);
+        postOrder(root.right,res);
+        res.add(root.val);
+    }
+}
+=========================================================================
+Given the root of a binary tree, return the inorder traversal of its nodes' values.
+Example 1:Input: root = [1,null,2,3]		Output: [1,3,2]
+Example 2:Input: root = []		Output: []
+Example 3:Input: root = [1]		Output: [1]
+
+class Solution {
+     List<Integer> res = new ArrayList<>();
+    public List<Integer> inorderTraversal(TreeNode root) {
+        List<Integer> res = new ArrayList<>();
+        inOrder(root,res);
+        return res;     
+    }
+
+    private void inOrder(TreeNode root,List<Integer> res){
+        if(root ==null) {
+           
+            return ;}
+        inOrder(root.left,res);
+        res.add(root.val);
+        inOrder(root.right,res);
+
+    }
+}
+==========================================================================
+Given the root of a binary tree, return the level order traversal of its nodes' values. (i.e., from left to right, level by level).
+
+Example 1:
+Input: root = [3,9,20,null,null,15,7]
+Output: [[3],[9,20],[15,7]]
+
+Example 2:
+Input: root = [1]
+Output: [[1]]
+
+Example 3:
+Input: root = []
+Output: []
+
+class Solution {
+    public List<List<Integer>> levelOrder(TreeNode root) {
+        Queue<TreeNode> queue = new LinkedList<>();
+        List<List<Integer>> res = new ArrayList<>();
+        queue.add(root);
+        if(root==null) return res;
+    
+        while(!queue.isEmpty()){
+            List<Integer> temp = new ArrayList();
+            int n = queue.size();
+
+            for(int i=0;i<n;i++){
+                TreeNode t1= queue.remove();
+                temp.add(t1.val);
+                if(t1.left!=null){
+                    queue.add(t1.left);
+                }
+                if(t1.right!=null){
+                    queue.add(t1.right);
+                }
+            }
+            res.add(temp);
+        }
+        return res;     
+    }
+}
+========================================================================================
+Given the root of a binary tree and an integer targetSum, return true if the tree has a root-to-leaf path such that adding up all the values along the path equals targetSum.
+A leaf is a node with no children.
+Example 1:
+Input: root = [5,4,8,11,null,13,4,7,2,null,null,null,1], targetSum = 22
+Output: true
+Explanation: The root-to-leaf path with the target sum is shown.
+
+Example 2:
+Input: root = [1,2,3], targetSum = 5
+Output: false
+Explanation: There two root-to-leaf paths in the tree:
+(1 --> 2): The sum is 3.
+(1 --> 3): The sum is 4.
+There is no root-to-leaf path with sum = 5.
+
+Example 3:
+Input: root = [], targetSum = 0
+Output: false
+Explanation: Since the tree is empty, there are no root-to-leaf paths.
+
+class Solution {
+    public boolean hasPathSum(TreeNode root, int targetSum) {
+
+        if(root==null){
+            return false;
+        }
+
+        if(root.left==null && root.right==null){
+            return root.val == targetSum;
+        }
+
+        boolean hasLeft= hasPathSum(root.left,targetSum-root.val);
+        boolean hasRight = hasPathSum(root.right,targetSum-root.val);
+        return hasLeft || hasRight;
+        
+    }
+}
+===================================================================================================
+Given the head of a singly linked list and two integers left and right where left <= right, reverse the nodes of the list from position left to position right, and return the reversed list.
+
+Example 1:
+Input: head = [1,2,3,4,5], left = 2, right = 4
+Output: [1,4,3,2,5]
+Example 2:
+Input: head = [5], left = 1, right = 1
+Output: [5]
+class Solution {
+    public ListNode reverseBetween(ListNode head, int left, int right) {
+        ListNode dummy = new ListNode(0); // created dummy node
+        dummy.next = head;
+        ListNode prev = dummy; // intialising prev pointer on dummy node
+        
+        for(int i = 0; i < left - 1; i++)
+            prev = prev.next; // adjusting the prev pointer on it's actual index
+        
+        ListNode curr = prev.next; // curr pointer will be just after prev
+        // reversing
+        for(int i = 0; i < right - left; i++){
+            ListNode forw = curr.next; // forw pointer will be after curr
+            curr.next = forw.next;
+            forw.next = prev.next;
+            prev.next = forw;
+        }
+        return dummy.next;
+    }
+}
+==========================================================================================================
+Given the root of a binary tree and an integer targetSum, return all root-to-leaf paths where the sum of the node values in the path equals targetSum. Each path should be returned as a list of the node values, not node references.
+A root-to-leaf path is a path starting from the root and ending at any leaf node. A leaf is a node with no children.
+
+Example 1:
+Input: root = [5,4,8,11,null,13,4,7,2,null,null,5,1], targetSum = 22
+Output: [[5,4,11,2],[5,8,4,5]]
+Explanation: There are two paths whose sum equals targetSum:
+5 + 4 + 11 + 2 = 22
+5 + 8 + 4 + 5 = 22
+
+Example 2:
+Input: root = [1,2,3], targetSum = 5
+Output: []
+
+Example 3:
+Input: root = [1,2], targetSum = 0
+Output: []
+
+class Solution {
+    public List<List<Integer>> pathSum(TreeNode root, int targetSum) {
+        List<List<Integer>> res = new ArrayList<>();
+        backTrack(root,targetSum,new ArrayList<>(),res);
+        return res;
+    }
+    private void backTrack(TreeNode root, int target,List<Integer> temp, List<List<Integer>> res){
+        if(root==null) return ;  
+        temp.add(root.val);
+        if(root.left==null && root.right==null && target==root.val){
+            res.add(new ArrayList<>(temp));
+        }
+        backTrack(root.left,target-root.val,temp,res);
+        backTrack(root.right,target-root.val,temp,res);
+        temp.remove(temp.size()-1);
+    }
+}
+=========================================================================================================================
+Example 1:
+Input
+["KthLargest", "add", "add", "add", "add", "add"]
+[[3, [4, 5, 8, 2]], [3], [5], [10], [9], [4]]
+Output
+[null, 4, 5, 5, 8, 8]
+Explanation
+KthLargest kthLargest = new KthLargest(3, [4, 5, 8, 2]);
+kthLargest.add(3);   // return 4
+kthLargest.add(5);   // return 5
+kthLargest.add(10);  // return 5
+kthLargest.add(9);   // return 8
+kthLargest.add(4);   // return 8
+
+Min-Heap:
+• Use a min-heap to store the k largest elements from the stream. The root of the min-heap (the smallest element) represents the kth largest element.
+• When initializing, insert elements into the heap until it contains k elements.
+• For every new element added to the stream:
+• If the heap contains fewer than k elements, simply add the element.
+• If the heap is full (contains k elements), compare the new element with the root of the heap:
+• If the new element is larger than the root, remove the root and insert the new element (since it is part of the k largest elements).
+• If the new element is smaller or equal to the root, ignore it (since it won’t affect the kth largest element).
+• The root of the heap always holds the kth largest element.
+Complexity
+Time complexity:
+• Initialization (KthLargest Constructor):
+• Inserting each element into the heap takes O(log k) time. For n elements, the time complexity is O(n log k).
+• Add Operation (add method):
+• Each call to add involves a potential insertion into the heap, which takes O(log k) time.
+• The worst-case time complexity for adding an element is O(log k).
+• Overall:
+• For m calls to add, the total time complexity is O(m log k).
+• If you include the initialization, the total complexity is O((n + m) log k).
+
+Space complexity:
+• Min-Heap Storage:
+• The heap contains at most k elements, leading to a space complexity of O(k).
+• Overall Space Complexity:
+• O(k) since that’s the space needed to store the heap. The size of the input array does not affect the space complexity as we only store the k largest elements.
+
+class KthLargest {
+
+    private PriorityQueue<Integer> minHeap;
+    private int k;
+
+    public KthLargest(int k, int[] nums) {
+        this.k=k;
+        minHeap = new PriorityQueue<>(k);
+
+        for(int num: nums){
+            add(num);
+        }
+        
+    }
+    
+    public int add(int val) {
+        if(minHeap.size()<k){
+            minHeap.offer(val);
+        }else if(val>minHeap.peek()){
+            minHeap.poll();
+            minHeap.offer(val);
+        }
+        return minHeap.peek();
+    }
+}
+====================================================================================
+Given the head of a singly linked list, reverse the list, and return the reversed list.
+
+Example 1:
+Input: head = [1,2,3,4,5]
+Output: [5,4,3,2,1]
+Example 2:
+Input: head = [1,2]
+Output: [2,1]
+Example 3:
+Input: head = []
+Output: []
+ 
+class Solution {
+    public ListNode reverseList(ListNode head) {
+        ListNode current =head;
+        ListNode prev=null;
+        ListNode next = null;
+
+        while(current!=null){
+            next = current.next;
+            current.next = prev;
+            prev=current;
+            current=next;
+        }
+        return prev;
+    }
+}
+==========================================================================================
+Given the root of an n-ary tree, return the postorder traversal of its nodes' values.
+Nary-Tree input serialization is represented in their level order traversal. Each group of children is separated by the null value (See examples)
+Example 1:
+Input: root = [1,null,3,2,4,null,5,6]
+Output: [5,6,3,2,4,1]
+Example 2:
+Input: root = [1,null,2,3,4,5,null,null,6,7,null,8,null,9,10,null,null,11,null,12,null,13,null,null,14]
+Output: [2,6,14,11,7,3,12,8,4,13,9,10,5,1]
+/*
+// Definition for a Node.
+class Node {
+    public int val;
+    public List<Node> children;
+
+    public Node() {}
+
+    public Node(int _val) {
+        val = _val;
+    }
+
+    public Node(int _val, List<Node> _children) {
+        val = _val;
+        children = _children;
+    }
+};
+*/
+
+class Solution {
+    
+    public List<Integer> postorder(Node root) {
+       List<Integer> res = new ArrayList<>();
+        postOrderTraversal(root,res);
+        return res;
+    }
+
+    private void postOrderTraversal(Node node,List<Integer> res){
+        if(node==null) return;
+        for(Node child:node.children){
+            postOrderTraversal(child,res);
+        }
+        res.add(node.val);
+    }
+}
+================================================================================================
+You are given an array of integers nums and the head of a linked list. Return the head of the modified linked list after removing all nodes from the linked list that have a value that exists in nums.
+Example 1:
+Input: nums = [1,2,3], head = [1,2,3,4,5]
+Output: [4,5]
+Explanation:
+Remove the nodes with values 1, 2, and 3.
+Example 2:
+Input: nums = [1], head = [1,2,1,2,1,2]
+Output: [2,2,2]
+Explanation:
+Remove the nodes with value 1.
+Example 3:
+Input: nums = [5], head = [1,2,3,4]
+Output: [1,2,3,4]
+
+class Solution {
+    public ListNode modifiedList(int[] nums, ListNode head) {
+        Set<Integer> set = Arrays.stream(nums).boxed().collect(Collectors.toSet());
+
+        ListNode dummy = new ListNode(0);
+        ListNode temp = dummy;
+
+        while(head!=null){
+            int val =head.val;
+            
+            if(!set.contains(val)){
+                temp.next = new ListNode(val);
+                temp = temp.next;
+            }
+            head= head.next;
+        }
+        return dummy.next;
+    }
+}
+or
+Set<Integer> set = new HashSet<>();
+        for (int num : nums) {
+            set.add(num);
+        }
+
+        ListNode res = new ListNode(0);
+        res.next = head;
+
+        ListNode curr = res;
+        while (curr.next != null) {
+            if (set.contains(curr.next.val)) {
+                curr.next = curr.next.next;
+            } else {
+                curr = curr.next;
+            }
+        }
+        return res.next;
+===========================================================================================================
+You are given two integers m and n, which represent the dimensions of a matrix.You are also given the head of a linked list of integers.
+Generate an m x n matrix that contains the integers in the linked list presented in spiral order (clockwise), starting from the top-left of the matrix.If there are remaining empty spaces, fill them with -1.
+Return the generated matrix
+Example 1:
+Input: m = 3, n = 5, head = [3,0,2,6,8,1,7,9,4,2,5,5,0]
+Output: [[3,0,2,6,8],[5,0,-1,-1,1],[5,2,4,9,7]]
+Explanation: The diagram above shows how the values are printed in the matrix.
+Note that the remaining spaces in the matrix are filled with -1.
+Example 2:
+Input: m = 1, n = 4, head = [0,1,2]
+Output: [[0,1,2,-1]]
+Explanation: The diagram above shows how the values are printed from left to right in the matrix.
+The last space in the matrix is set to -1.
+	
+class Solution {
+    public int[][] spiralMatrix(int m, int n, ListNode head) {
+
+        int[][] res = new int[m][];
+
+        for (int i = 0; i < m; i++) {
+            res[i] = new int[n];
+            Arrays.fill(res[i], -1); // fill all values with -1
+        }
+
+        int topRow = 0;
+        int bottomRow = m - 1;
+        int leftCol = 0;
+        int rightCol = n - 1;
+
+        while (head != null) {
+            // Traverse from left to right along the top row
+            for (int col = leftCol; col <= rightCol && head != null; col++) {
+                res[topRow][col] = head.val;
+                head = head.next;
+            }
+            topRow++;
+
+            // Traverse from top to bottom along the right column
+            for (int row = topRow; row <= bottomRow && head != null; row++) {
+                res[row][rightCol] = head.val;  // Fixed from leftCol to rightCol
+                head = head.next;
+            }
+            rightCol--;
+
+            // Traverse from right to left along the bottom row
+            for (int col = rightCol; col >= leftCol && head != null; col--) {
+                res[bottomRow][col] = head.val;
+                head = head.next;
+            }
+            bottomRow--;
+
+            // Traverse from bottom to top along the left column
+            for (int row = bottomRow; row >= topRow && head != null; row--) {
+                res[row][leftCol] = head.val;
+                head = head.next;
+            }
+            leftCol++;  // Fixed increment to prevent out-of-bound index
+        }
+        return res;
+    }
+}
+===========================================================================================
+Given the head of a linked list head, in which each node contains an integer value.Between every pair of adjacent nodes, insert a new node with a value equal to the greatest common divisor of them.Return the linked list after insertion.
+The greatest common divisor of two numbers is the largest positive integer that evenly divides both numbers.
+
+Example 1:
+Input: head = [18,6,10,3]
+Output: [18,6,6,2,10,1,3]
+Explanation: The 1st diagram denotes the initial linked list and the 2nd diagram denotes the linked list after inserting the new nodes (nodes in blue are the inserted nodes).
+- We insert the greatest common divisor of 18 and 6 = 6 between the 1st and the 2nd nodes.
+- We insert the greatest common divisor of 6 and 10 = 2 between the 2nd and the 3rd nodes.
+- We insert the greatest common divisor of 10 and 3 = 1 between the 3rd and the 4th nodes.
+There are no more adjacent nodes, so we return the linked list.
+Example 2:
+Input: head = [7]
+Output: [7]
+Explanation: The 1st diagram denotes the initial linked list and the 2nd diagram denotes the linked list after inserting the new nodes.
+There are no pairs of adjacent nodes, so we return the initial linked list.
+ 
+class Solution {
+    public ListNode insertGreatestCommonDivisors(ListNode head) {
+        if(head==null) return null;
+
+        ListNode prev = head;
+        ListNode curr = head.next;
+
+        while(curr !=null){
+            int gcd = gcd(prev.val,curr.val);
+            ListNode gcdNode = new ListNode(gcd);
+
+            prev.next = gcdNode;
+            gcdNode.next = curr;
+
+            prev=curr;
+            curr=curr.next;
+        }
+        return head;
+    }
+	//The Euclidean algorithm works by repeatedly subtracting the smaller number from the larger number until the two numbers are equal.
+    private int gcd(int a,int b){
+        while(b!=0){
+            int temp = b;
+            b = a%b;
+            a=temp;
+        }
+        return a;
+    }
+}
+======================================================================================================
+Given the root of a binary tree, check whether it is a mirror of itself (i.e., symmetric around its center).
+Example 1:
+Input: root = [1,2,2,3,4,4,3]
+Output: true
+Example 2:
+Input: root = [1,2,2,null,3,null,3]
+Output: false
+
+public boolean isSymmetric(TreeNode root) {
+        // A null tree is symmetric
+        if (root == null) {
+            return true;
+        }
+        // Use a helper function to check for symmetry
+        return isMirror(root.left, root.right);
+    }
+
+    // Helper function to check if two trees are mirrors of each other
+    private boolean isMirror(TreeNode left, TreeNode right) {
+        // Both nodes are null, so they are symmetric
+        if (left == null && right == null) {
+            return true;
+        }
+        // One of the nodes is null but not the other, not symmetric
+        if (left == null || right == null) {
+            return false;
+        }
+        // The values of the nodes must be equal, and the left and right children must be mirrors
+        return (left.val == right.val)
+                && isMirror(left.left, right.right)
+                && isMirror(left.right, right.left);
+    }
+==========================================================================================================================
+You are given a string s consisting only of uppercase English letters.You can apply some operations to this string where, in one operation, you can remove any occurrence of one of the substrings "AB" or "CD" from s.Return the minimum possible length of the resulting string that you can obtain.Note that the string concatenates after removing the substring and could produce new "AB" or "CD" substrings.
+
+Example 1:
+Input: s = "ABFCACDB"
+Output: 2
+Explanation: We can do the following operations:
+- Remove the substring "ABFCACDB", so s = "FCACDB".
+- Remove the substring "FCACDB", so s = "FCAB".
+- Remove the substring "FCAB", so s = "FC".
+So the resulting length of the string is 2.
+It can be shown that it is the minimum length that we can obtain.
+Example 2:
+Input: s = "ACBBD"
+Output: 5
+Explanation: We cannot do any operations on the string so the length remains the same.
+ 
+public class StringReducer {
+
+    public static int reduceString(String s) {
+        Stack<Character> stack = new Stack<>();
+        
+        // Iterate through each character in the string
+        for (char ch : s.toCharArray()) {
+            // If the current character is 'A' or 'B' and the top of the stack matches
+            // a reducible pair (like 'A' followed by 'B'), we pop it from the stack.
+            if (!stack.isEmpty() && ((stack.peek() == 'A' && ch == 'B') || (stack.peek() == 'B' && ch == 'A'))) {
+                stack.pop();  // Remove matching characters
+            } else {
+                // Otherwise, we add the current character to the stack
+                stack.push(ch);
+            }
+        }
+
+        // The size of the stack represents the remaining string's length.
+        return stack.size();
+    }
+
+}
+======================================================================================
+Given the root of a binary tree, return the bottom-up level order traversal of its nodes' values. (i.e., from left to right, level bylevel from leaf to root).
+Example 1:
+Input: root = [3,9,20,null,null,15,7]
+Output: [[15,7],[9,20],[3]]
+Example 2:
+Input: root = [1]
+Output: [[1]]
+Example 3:
+Input: root = []
+Output: []
+    public List<List<Integer>> levelOrderBottom(TreeNode root) {
+        List<List<Integer>> result = new LinkedList<>();
+
+        if (root == null) {
+            return result;
+        }
+
+        Queue<TreeNode> queue = new LinkedList<>();
+        queue.add(root);
+
+        while (!queue.isEmpty()) {
+            int levelSize = queue.size();  // number of nodes at current level
+            List<Integer> currentLevel = new LinkedList<>();
+
+            for (int i = 0; i < levelSize; i++) {
+                TreeNode currentNode = queue.poll();
+                currentLevel.add(currentNode.val);
+
+                // Add the children of currentNode into the queue
+                if (currentNode.left != null) {
+                    queue.add(currentNode.left);
+                }
+
+                if (currentNode.right != null) {
+                    queue.add(currentNode.right);
+                }
+            }
+
+            // Add the current level at the beginning of the result (to reverse the order)
+            result.add(0, currentLevel);
+        }
+
+        return result;
+    }
+
+}
+=======================================================================================
+You are given a 2D integer array intervals where intervals[i] = [lefti, righti] represents the inclusive interval [lefti, righti].You have to divide the intervals into one or more groups such that each interval is in exactly one group, and no two intervals that are in the same group intersect each other.Return the minimum number of groups you need to make.Two intervals intersect if there is at least one common number between them. For example, the intervals [1, 5] and [5, 8] intersect.
+Example 1:
+Input: intervals = [[5,10],[6,8],[1,5],[2,3],[1,10]]
+Output: 3
+Explanation: We can divide the intervals into the following groups:
+- Group 1: [1, 5], [6, 8].
+- Group 2: [2, 3], [5, 10].
+- Group 3: [1, 10].
+It can be proven that it is not possible to divide the intervals into fewer than 3 groups.
+Example 2:
+Input: intervals = [[1,3],[5,6],[8,10],[11,13]]
+Output: 1
+Explanation: None of the intervals overlap, so we can put all of them in one group.
+ 
+public class IntervalGroups {
+    public static int minGroups(int[][] intervals) {
+        // Step 1: Sort the intervals by their start times
+        Arrays.sort(intervals, (a, b) -> a[0] - b[0]);
+
+        // Step 2: Use a min-heap to track the end times of the groups
+        PriorityQueue<Integer> minHeap = new PriorityQueue<>();
+
+        // Step 3: Iterate through each interval
+        for (int[] interval : intervals) {
+            // If the current interval starts after the earliest end time, remove that end time
+            if (!minHeap.isEmpty() && interval[0] > minHeap.peek()) {
+                minHeap.poll();
+            }
+
+            // Add the current interval's end time to the heap (either in the same group or a new group)
+            minHeap.offer(interval[1]);
+        }
+
+        // Step 4: The size of the heap is the number of groups needed
+        return minHeap.size();
+    }
+
+}
+==============================================================================================
+You are given a 0-indexed integer array nums and an integer k. You have a starting score of 0.In one operation:choose an index i such that 0 <= i < nums.length,increase your score by nums[i], and replace nums[i] with ceil(nums[i] / 3).Return the maximum possible score you can attain after applying exactly k operations.The ceiling function ceil(val) is the least integer greater than or equal to val.
+
+Example 1:
+Input: nums = [10,10,10,10,10], k = 5
+Output: 50
+Explanation: Apply the operation to each array element exactly once. The final score is 10 + 10 + 10 + 10 + 10 = 50.
+Example 2:
+Input: nums = [1,10,3,3,3], k = 3
+Output: 17
+Explanation: You can do the following operations:
+Operation 1: Select i = 1, so nums becomes [1,4,3,3,3]. Your score increases by 10.
+Operation 2: Select i = 1, so nums becomes [1,2,3,3,3]. Your score increases by 4.
+Operation 3: Select i = 2, so nums becomes [1,1,1,3,3]. Your score increases by 3.
+
+The final score is 10 + 4 + 3 = 17.
+class Solution {
+    public long maxKelements(int[] nums, int k) {
+        PriorityQueue<Long> maxHeap = new PriorityQueue<>((a,b)->Long.compare(b,a));
+
+        for(int num:nums) maxHeap.offer((long)num);
+
+        long res = 0;
+
+        while(k-->0){
+            long max = maxHeap.poll();  
+            res += max;
+            maxHeap.add((long)Math.ceil(max/3.0));
+        }
+        return res;
+    }
+}
+========================================================================================
+Given the root of a binary tree, return its maximum depth.A binary tree's maximum depth is the number of nodes along the longest path from the root node down to the farthest leaf node.
+Example 1:
+Input: root = [3,9,20,null,null,15,7]
+Output: 3
+Example 2:
+Input: root = [1,null,2]
+Output: 2
+
+class Solution {
+    public int maxDepth(TreeNode root) {
+        if(root==null){
+            return 0;
+        }
+
+        int leftDepth = maxDepth(root.left);
+        int rightDepth = maxDepth(root.right);
+
+        return Math.max(leftDepth,rightDepth)+1;
+    }
+}
+===============================================================================================
+Given a binary tree, determine if it is height-balanced.A binary tree is considered height-balanced if, for every node in the tree:
+The height difference between its left and right subtrees is at most 1.Both the left and right subtrees are also height-balanced.
+
+Example 1:
+Input: root = [3,9,20,null,null,15,7]
+Output: true
+Example 2:
+Input: root = [1,2,2,3,3,null,null,4,4]
+Output: false
+Example 3:
+Input: root = []
+Output: true
+ 
+class Solution {
+    public boolean isBalanced(TreeNode root) {
+        return checkHeight(root)!=-1;
+    }
+
+    private int checkHeight(TreeNode node){
+        if(node == null) return 0;
+
+        int leftHeight = checkHeight(node.left);
+        if(leftHeight == -1) return -1;
+
+        int rightHeight = checkHeight(node.right);
+        if(rightHeight == -1) return -1;
+
+        if(Math.abs(leftHeight-rightHeight)>1) return -1;
+
+        return Math.max(leftHeight,rightHeight)+1;
+    }
+}
+======================================================================================================
+You are given the head of a singly linked-list. The list can be represented as:L0 → L1 → … → Ln - 1 → LnReorder the list to be on the following form:L0 → Ln → L1 → Ln - 1 → L2 → Ln - 2 → …You may not modify the values in the list's nodes. Only nodes themselves may be changed.
+Example 1
+Input: head = [1,2,3,4]
+Output: [1,4,2,3]
+Example 2:
+Input: head = [1,2,3,4,5]
+Output: [1,5,2,4,3]
+
+public class ReorderList {
+
+    public void reorderList(ListNode head) {
+        if (head == null || head.next == null) return;
+
+        // Step 1: Find the middle of the list using slow and fast pointers
+        ListNode slow = head, fast = head;
+        while (fast != null && fast.next != null) {
+            slow = slow.next;
+            fast = fast.next.next;
+        }
+
+        // Step 2: Reverse the second half of the list
+        ListNode secondHalf = reverseList(slow.next);
+        slow.next = null; // Split the list into two halves
+
+        // Step 3: Merge the two halves alternately
+        ListNode firstHalf = head;
+        while (secondHalf != null) {
+            ListNode temp1 = firstHalf.next;
+            ListNode temp2 = secondHalf.next;
+
+            firstHalf.next = secondHalf;
+            secondHalf.next = temp1;
+
+            firstHalf = temp1;
+            secondHalf = temp2;
+        }
+    }
+
+    // Helper function to reverse a linked list
+    private ListNode reverseList(ListNode head) {
+        ListNode prev = null;
+        while (head != null) {
+            ListNode nextNode = head.next;
+            head.next = prev;
+            prev = head;
+            head = nextNode;
+        }
+        return prev;
+    }
+
+}
+=========================================================================================
+Given the root of a binary tree, flatten the tree into a "linked list":The "linked list" should use the same TreeNode class where the right child pointer points to the next node in the list and the left child pointer is always null.The "linked list" should be in the same order as a pre-order traversal of the binary tree.
+Example 1:
+Input: root = [1,2,5,3,4,null,6]
+Output: [1,null,2,null,3,null,4,null,5,null,6]
+Example 2:
+Input: root = []
+Output: []
+Example 3:
+Input: root = [0]
+Output: [0]
+
+public class Solution {
+    public void flatten(TreeNode root) {
+        if (root == null) return;
+
+        // Flatten left and right subtrees
+        flatten(root.left);
+        flatten(root.right);
+
+        // Save the original right subtree
+        TreeNode tempRight = root.right;
+
+        // Move the left subtree to the right
+        root.right = root.left;
+        root.left = null;
+
+        // Traverse to the end of the new right subtree
+        TreeNode current = root;
+        while (current.right != null) {
+            current = current.right;
+        }
+
+        // Attach the original right subtree
+        current.right = tempRight;
+    }
+}
+==========================================================================================================
+Given the heads of two singly linked-lists headA and headB, return the node at which the two lists intersect. If the two linked lists have no intersection at all, return null.For example, the following two linked lists begin to intersect at node c1:The test cases are generated such that there are no cycles anywhere in the entire linked structure.Note that the linked lists must retain their original structure after the function returns.
+Custom Judge:The inputs to the judge are given as follows (your program is not given these inputs):
+intersectVal - The value of the node where the intersection occurs. This is 0 if there is no intersected node.
+listA - The first linked list.
+listB - The second linked list.
+skipA - The number of nodes to skip ahead in listA (starting from the head) to get to the intersected node.
+skipB - The number of nodes to skip ahead in listB (starting from the head) to get to the intersected node.
+The judge will then create the linked structure based on these inputs and pass the two heads, headA and headB to your program. If you correctly return the intersected node, then your solution will be accepted.
+Example 1:
+Input: intersectVal = 8, listA = [4,1,8,4,5], listB = [5,6,1,8,4,5], skipA = 2, skipB = 3
+Output: Intersected at '8'
+Explanation: The intersected node's value is 8 (note that this must not be 0 if the two lists intersect).
+From the head of A, it reads as [4,1,8,4,5]. From the head of B, it reads as [5,6,1,8,4,5]. There are 2 nodes before the intersected node in A; There are 3 nodes before the intersected node in B.
+- Note that the intersected node's value is not 1 because the nodes with value 1 in A and B (2nd node in A and 3rd node in B) are different node references. In other words, they point to two different locations in memory, while the nodes with value 8 in A and B (3rd node in A and 4th node in B) point to the same location in memory.
+Example 2:
+Input: intersectVal = 2, listA = [1,9,1,2,4], listB = [3,2,4], skipA = 3, skipB = 1
+Output: Intersected at '2'
+Explanation: The intersected node's value is 2 (note that this must not be 0 if the two lists intersect).
+From the head of A, it reads as [1,9,1,2,4]. From the head of B, it reads as [3,2,4]. There are 3 nodes before the intersected node in A; There are 1 node before the intersected node in B.
+Example 3:
+Input: intersectVal = 0, listA = [2,6,4], listB = [1,5], skipA = 3, skipB = 2
+Output: No intersection
+Explanation: From the head of A, it reads as [2,6,4]. From the head of B, it reads as [1,5]. Since the two lists do not intersect, intersectVal must be 0, while skipA and skipB can be arbitrary values.
+Explanation: The two lists do not intersect, so return null.
+ 
+public class IntersectionOfLinkedLists {
+    public static ListNode getIntersectionNode(ListNode headA, ListNode headB) {
+        if (headA == null || headB == null) return null;
+
+        ListNode ptrA = headA;
+        ListNode ptrB = headB;
+
+        // Traverse until both pointers meet or both become null.
+        while (ptrA != ptrB) {
+            // Move to the next node or switch to the head of the other list.
+            ptrA = (ptrA == null) ? headB : ptrA.next;
+            ptrB = (ptrB == null) ? headA : ptrB.next;
+        }
+
+        // Either both pointers meet at intersection or become null (no intersection).
+        return ptrA;
+    }
+}
+====================================================================================================================
+Given an integer array nums where the elements are sorted in ascending order, convert it to a height-balanced binary search tree.
+Example 1:
+Input: nums = [-10,-3,0,5,9]
+Output: [0,-3,9,-10,null,5]
+Explanation: [0,-10,5,null,-3,null,9] is also accepted:
+Example 2:
+Input: nums = [1,3]
+Output: [3,1]
+Explanation: [1,null,3] and [3,1] are both height-balanced BSTs.
+ 
+class Solution {
+    public TreeNode sortedArrayToBST(int[] nums) {
+        if (nums == null || nums.length == 0) {
+            return null;
+        }
+        return convertToBST(nums, 0, nums.length - 1);
+    }
+    
+    private TreeNode convertToBST(int[] nums, int left, int right) {
+        if (left > right) {
+            return null;
+        }
+        
+        // Choose middle element as the root
+        int mid = left + (right - left) / 2;
+        TreeNode node = new TreeNode(nums[mid]);
+        
+        // Recursively build the left and right subtrees
+        node.left = convertToBST(nums, left, mid - 1);
+        node.right = convertToBST(nums, mid + 1, right);
+        
+        return node;
+    }
+}
+==================================================================================================================================
+Given the head of a singly linked list where elements are sorted in ascending order, convert it to a height-balancedbinary search tree.
+Example 1:
+Input: head = [-10,-3,0,5,9]
+Output: [0,-3,9,-10,null,5]
+Explanation: One possible answer is [0,-3,9,-10,null,5], which represents the shown height balanced BST.
+Example 2:
+Input: head = []
+Output: []
+ 
+class Solution {
+    public TreeNode sortedListToBST(ListNode head) {
+        if (head == null) {
+            return null;
+        }
+        
+        return convertToBST(head, null);
+    }
+    
+    private TreeNode convertToBST(ListNode head, ListNode tail) {
+        if (head == tail) {
+            return null;
+        }
+        
+        ListNode mid = findMiddle(head, tail);
+        TreeNode node = new TreeNode(mid.val);
+        
+        // Recursively build the left and right subtrees
+        node.left = convertToBST(head, mid);
+        node.right = convertToBST(mid.next, tail);
+        
+        return node;
+    }
+    
+    private ListNode findMiddle(ListNode head, ListNode tail) {
+        ListNode slow = head;
+        ListNode fast = head;
+        
+        while (fast != tail && fast.next != tail) {
+            slow = slow.next;
+            fast = fast.next.next;
+        }
+        
+        return slow;
+    }
+}
+==========================================================================================================
+Implement a last-in-first-out (LIFO) stack using only two queues. The implemented stack should support all the functions of a normal stack (push, top, pop, and empty).Implement the MyStack class:void push(int x) Pushes element x to the top of the stack.int pop() Removes the element on the top of the stack and returns it.int top() Returns the element on the top of the stack.boolean empty() Returns true if the stack is empty, false otherwise.Notes:
+You must use only standard operations of a queue, which means that only push to back, peek/pop from front, size and is empty operations are valid.Depending on your language, the queue may not be supported natively. You may simulate a queue using a list or deque (double-ended queue) as long as you use only a queue's standard operations.
+
+Example 1:
+Input
+["MyStack", "push", "push", "top", "pop", "empty"]
+[[], [1], [2], [], [], []]
+Output
+[null, null, null, 2, 2, false]
+Explanation
+MyStack myStack = new MyStack();
+myStack.push(1);
+myStack.push(2);
+myStack.top(); // return 2
+myStack.pop(); // return 2
+myStack.empty(); // return False
+
+class MyStack {
+    private Queue<Integer> q1;
+    private Queue<Integer> q2;
+
+    public MyStack() {
+        q1 = new LinkedList<>();
+        q2 = new LinkedList<>();
+    }
+
+    // Push element x onto stack.
+    public void push(int x) {
+        // Step 1: Enqueue the new element into q2
+        q2.add(x);
+
+        // Step 2: Move all elements from q1 to q2
+        while (!q1.isEmpty()) {
+            q2.add(q1.remove());
+        }
+
+        // Step 3: Swap q1 and q2
+        Queue<Integer> temp = q1;
+        q1 = q2;
+        q2 = temp;
+    }
+
+    // Removes the element on top of the stack and returns it.
+    public int pop() {
+        return q1.remove();
+    }
+
+    // Get the top element.
+    public int top() {
+        return q1.peek();
+    }
+
+    // Returns whether the stack is empty.
+    public boolean empty() {
+        return q1.isEmpty();
+    }
+}
+=============================================================================================================================
+Implement queue using stack
+
+public class QueueUsingStacks {
+    private Stack<Integer> stack1;
+    private Stack<Integer> stack2;
+
+    // Constructor
+    public QueueUsingStacks() {
+        stack1 = new Stack<>();
+        stack2 = new Stack<>();
+    }
+
+    // Enqueue operation
+    public void enqueue(int value) {
+        stack1.push(value);
+    }
+
+    public int dequeue() {
+        if (stack2.isEmpty()) {
+            while (!stack1.isEmpty()) {
+                stack2.push(stack1.pop());
+            }
+        }
+        if (stack2.isEmpty()) {
+            throw new IllegalStateException("Queue is empty");
+        }
+        return stack2.pop();
+    }
+
+    public int peek() {
+        if (stack2.isEmpty()) {
+            while (!stack1.isEmpty()) {
+                stack2.push(stack1.pop());
+            }
+        }
+        if (stack2.isEmpty()) {
+            throw new IllegalStateException("Queue is empty");
+        }
+        return stack2.peek();
+    }
+    public boolean isEmpty() {
+        return stack1.isEmpty() && stack2.isEmpty();
+    }
+}
+==========================================================================================================================
+Design a stack that supports push, pop, top, and retrieving the minimum element in constant time.Implement the MinStack class:
+MinStack() initializes the stack object.void push(int val) pushes the element val onto the stack.void pop() removes the element on the top of the stack.int top() gets the top element of the stack.int getMin() retrieves the minimum element in the stack.You must implement a solution with O(1) time complexity for each function.
+Example 1:
+Input
+["MinStack","push","push","push","getMin","pop","top","getMin"]
+[[],[-2],[0],[-3],[],[],[],[]]
+Output
+[null,null,null,null,-3,null,0,-2]
+Explanation
+MinStack minStack = new MinStack();
+minStack.push(-2);
+minStack.push(0);
+minStack.push(-3);
+minStack.getMin(); // return -3
+minStack.pop();
+minStack.top();    // return 0
+minStack.getMin(); // return -2
+
+class MinStack {
+    private Stack<Integer> stack;       // Main stack to hold values
+    private Stack<Integer> minStack;    // Support stack to track minimum values
+
+    public MinStack() {
+        stack = new Stack<>();
+        minStack = new Stack<>();
+    }
+
+    public void push(int val) {
+        stack.push(val);
+        // Push the minimum value onto the minStack
+        if (minStack.isEmpty() || val <= minStack.peek()) {
+            minStack.push(val);
+        }
+    }
+
+    public void pop() {
+        // Pop from the main stack
+        int removed = stack.pop();
+        // If the popped value is the minimum, remove it from the minStack as well
+        if (removed == minStack.peek()) {
+            minStack.pop();
+        }
+    }
+
+    public int top() {
+        return stack.peek();
+    }
+
+    public int getMin() {
+        return minStack.peek();
+    }
+}
+
+==========================================================================================================================
+Given the head of a singly linked list, sort the list using insertion sort, and return the sorted list's head.The steps of the insertion sort algorithm:Insertion sort iterates, consuming one input element each repetition and growing a sorted output list.
+At each iteration, insertion sort removes one element from the input data, finds the location it belongs within the sorted list andinserts it there.It repeats until no input elements remain.The following is a graphical example of the insertion sort algorithm. The partially sorted list (black) initially contains only the first element in the list. One element (red) is removed from the input data and inserted in-place into the sorted list with each iteration.
+
+Example 1:
+Input: head = [4,2,1,3]
+Output: [1,2,3,4]
+Example 2:
+Input: head = [-1,5,3,4,0]
+Output: [-1,0,3,4,5]
+ 
+public class LinkedListInsertionSort {
+    public ListNode insertionSortList(ListNode head) {
+        // Dummy node to simplify insertions at the head of the sorted list
+        ListNode sortedDummy = new ListNode(0);
+        
+        ListNode current = head;
+        while (current != null) {
+            ListNode next = current.next; // Keep track of the next node
+            
+            // Find the correct position in the sorted list
+            ListNode prev = sortedDummy;
+            while (prev.next != null && prev.next.val < current.val) {
+                prev = prev.next;
+            }
+            
+            // Insert current node into sorted list
+            current.next = prev.next;
+            prev.next = current;
+            
+            // Move to the next node in the original list
+            current = next;
+        }
+        
+        return sortedDummy.next; // Return the sorted list
+    }
+}
+========================================================================================================
+Given a binary tree, find its minimum depth.The minimum depth is the number of nodes along the shortest path from the root node down to the nearest leaf node.Note: A leaf is a node with no children.
+
+Example 1:
+Input: root = [3,9,20,null,null,15,7]
+Output: 2
+Example 2:
+Input: root = [2,null,3,null,4,null,5,null,6]
+Output: 5
+ 
+public class Solution {
+    public int minDepth(TreeNode root) {
+        if (root == null) return 0;
+
+        // If the left subtree is null, recurse only on the right subtree
+        if (root.left == null) return minDepth(root.right) + 1;
+
+        // If the right subtree is null, recurse only on the left subtree
+        if (root.right == null) return minDepth(root.left) + 1;
+
+        // Both children exist, return the minimum depth between them
+        return Math.min(minDepth(root.left), minDepth(root.right)) + 1;
+    }
+}
+OR
+public class Solution {
+    public int minDepth(TreeNode root) {
+        if (root == null) return 0;
+
+        Queue<TreeNode> queue = new LinkedList<>();
+        queue.offer(root);
+        int depth = 1;
+
+        while (!queue.isEmpty()) {
+            int size = queue.size();
+            for (int i = 0; i < size; i++) {
+                TreeNode node = queue.poll();
+                
+                // If we find a leaf node, return the depth
+                if (node.left == null && node.right == null) {
+                    return depth;
+                }
+
+                // Otherwise, add the children to the queue
+                if (node.left != null) queue.offer(node.left);
+                if (node.right != null) queue.offer(node.right);
+            }
+            depth++;
+        }
+        return depth;
+    }
+}
+=====================================================================================================
+Given the root of a binary tree, invert the tree, and return its root.
+Example 1:
+Input: root = [4,2,7,1,3,6,9]
+Output: [4,7,2,9,6,3,1]
+Example 2:
+Input: root = [2,1,3]
+Output: [2,3,1]
+Example 3:
+Input: root = []
+Output: []
+
+public class Solution {
+    public TreeNode invertTree(TreeNode root) {
+        if (root == null) {
+            return null;
+        }
+
+        // Swap the left and right children
+        TreeNode temp = root.left;
+        root.left = root.right;
+        root.right = temp;
+
+        // Recursively invert the left and right subtrees
+        invertTree(root.left);
+        invertTree(root.right);
+
+        return root;
+    }
+}
+=======================================================================================================
+Given the head of a singly linked list, return true if it is a palindrome or false otherwise.
+
+Example 1:
+Input: head = [1,2,2,1]
+Output: true
+Example 2:
+Input: head = [1,2]
+Output: false
+class Solution {
+    public boolean isPalindrome(ListNode head) {
+        StringBuilder sb = new StringBuilder();
+
+        while(head!=null){
+            sb.append(head.val);
+            head = head.next;
+        }
+
+        String s = sb.toString();
+        int i = 0;
+        int j = s.length()-1;
+
+        while(i<j){
+            if(s.charAt(i)!=s.charAt(j)){
+                return false;
+            }
+            i++;
+            j--;
+        }
+        return true;
+    }
+}
+
+or
+
+public class Solution {
+    public boolean isPalindrome(ListNode head) {
+        if (head == null || head.next == null) {
+            return true;  // A list with 0 or 1 nodes is a palindrome
+        }
+        
+        // Step 1: Find the middle of the list
+        ListNode slow = head;
+        ListNode fast = head;
+        while (fast != null && fast.next != null) {
+            slow = slow.next;
+            fast = fast.next.next;
+        }
+        
+        // Step 2: Reverse the second half of the list
+        ListNode secondHalfStart = reverseList(slow);
+        
+        // Step 3: Compare the first and second half nodes
+        ListNode firstHalfStart = head;
+        ListNode secondHalfIter = secondHalfStart;
+        boolean isPalindrome = true;
+        while (isPalindrome && secondHalfIter != null) {
+            if (firstHalfStart.val != secondHalfIter.val) {
+                isPalindrome = false;
+            }
+            firstHalfStart = firstHalfStart.next;
+            secondHalfIter = secondHalfIter.next;
+        }
+        
+        // Step 4: Restore the list (optional)
+        reverseList(secondHalfStart);
+        
+        return isPalindrome;
+    }
+    
+    // Helper method to reverse a linked list
+    private ListNode reverseList(ListNode head) {
+        ListNode prev = null;
+        while (head != null) {
+            ListNode nextNode = head.next;
+            head.next = prev;
+            prev = head;
+            head = nextNode;
+        }
+        return prev;
+    }
+}
+====================================================================================================================================
+Given the head of a linked list, return the list after sorting it in ascending order.
+Example 1:
+Input: head = [4,2,1,3]
+Output: [1,2,3,4]
+Example 2:
+Input: head = [-1,5,3,4,0]
+Output: [-1,0,3,4,5]
+Example 3:
+Input: head = []
+Output: []
+
+class Solution {
+    public ListNode sortList(ListNode head) {
+        if (head == null || head.next == null) {
+            return head;
+        }
+
+        // Split the list into two halves
+        ListNode middle = getMiddle(head);
+        ListNode nextMiddle = middle.next;
+        middle.next = null;
+
+        // Sort each half recursively
+        ListNode left = sortList(head);
+        ListNode right = sortList(nextMiddle);
+
+        // Merge the sorted halves
+        return merge(left, right);
+    }
+
+    private ListNode getMiddle(ListNode head) {
+        if (head == null) {
+            return null;
+        }
+
+        ListNode fast = head;
+        ListNode slow = head;
+
+        // Use two-pointer technique to find the middle
+        while (fast.next != null && fast.next.next != null) {
+            fast = fast.next.next;
+            slow = slow.next;
+        }
+        return slow;
+    }
+
+    private ListNode merge(ListNode left, ListNode right) {
+        if (left == null) {
+            return right;
+        }
+        if (right == null) {
+            return left;
+        }
+
+        ListNode res;
+        if (left.val < right.val) {
+            res = left;
+            res.next = merge(left.next, right);
+        } else {
+            res = right;
+            res.next = merge(left, right.next);
+        }
+        return res;
+    }
+}
+========================================================================================================
+Given the root of a binary tree, check whether it is a mirror of itself (i.e., symmetric around its center).
+Example 1:
+Input: root = [1,2,2,3,4,4,3]
+Output: true
+Example 2:
+Input: root = [1,2,2,null,3,null,3]
+Output: false
+
+public class SymmetricTree {
+    public boolean isSymmetric(TreeNode root) {
+        // If the tree is empty, it is symmetric
+        if (root == null) {
+            return true;
+        }
+        // Use a helper function to check symmetry
+        return isMirror(root.left, root.right);
+    }
+
+    private boolean isMirror(TreeNode t1, TreeNode t2) {
+        // If both nodes are null, they are mirrors
+        if (t1 == null && t2 == null) {
+            return true;
+        }
+        // If one of the nodes is null or their values don't match, not mirrors
+        if (t1 == null || t2 == null || t1.val != t2.val) {
+            return false;
+        }
+        // Check the subtrees
+        return isMirror(t1.left, t2.right) && isMirror(t1.right, t2.left);
+    }
+}
+=================================================================================================================
+Given the root of a binary tree, determine if it is a valid binary search tree (BST).A valid BST is defined as follows:
+The left subtree of a node contains only nodes with keys less than the node's key.The right subtree of a node contains only nodes with keys greater than the node's key.Both the left and right subtrees must also be binary search trees.
+ 
+Example 1:
+Input: root = [2,1,3]
+Output: true
+Example 2:
+Input: root = [5,1,4,null,null,3,6]
+Output: false
+Explanation: The root node's value is 5 but its right child's value is 4.
+
+public class ValidBST {
+    public boolean isValidBST(TreeNode root) {
+        return validate(root, null, null);
+    }
+
+    private boolean validate(TreeNode node, Integer lower, Integer upper) {
+        // Base case: if the node is null, it's valid
+        if (node == null) {
+            return true;
+        }
+        int val = node.val;
+        // Check if the node value is within the valid range
+        if (lower != null && val <= lower) {
+            return false;
+        }
+        if (upper != null && val >= upper) {
+            return false;
+        }
+        // Recursively validate the left and right subtrees
+        // For the left subtree, the upper bound is the current node value
+        // For the right subtree, the lower bound is the current node value
+        if (!validate(node.left, lower, val)) {
+            return false;
+        }
+        if (!validate(node.right, val, upper)) {
+            return false;
+        }
+        return true;
+    }
+}
+========================================================================================================================
+You are given an integer array gifts denoting the number of gifts in various piles. Every second, you do the following:Choose the pile with the maximum number of gifts.If there is more than one pile with the maximum number of gifts, choose any.Leave behind the floor of the square root of the number of gifts in the pile. Take the rest of the gifts.Return the number of gifts remaining after k seconds.
+
+Example 1:
+Input: gifts = [25,64,9,4,100], k = 4
+Output: 29
+Explanation: 
+The gifts are taken in the following way:
+- In the first second, the last pile is chosen and 10 gifts are left behind.
+- Then the second pile is chosen and 8 gifts are left behind.
+- After that the first pile is chosen and 5 gifts are left behind.
+- Finally, the last pile is chosen again and 3 gifts are left behind.
+The final remaining gifts are [5,8,9,4,3], so the total number of gifts remaining is 29.
+Example 2:
+Input: gifts = [1,1,1,1], k = 4
+Output: 4
+Explanation: 
+In this case, regardless which pile you choose, you have to leave behind 1 gift in each pile. 
+That is, you can't take any pile with you. So, the total gifts remaining are 4.
+
+public class GiftsInPiles {
+    public static int remainingGifts(int[] gifts, int k) {
+        // Max-heap to store the piles in descending order
+        PriorityQueue<Integer> maxHeap = new PriorityQueue<>(Collections.reverseOrder());
+        
+        // Add all piles to the max-heap
+        for (int gift : gifts) {
+            maxHeap.add(gift);
+        }
+
+        // Perform k iterations
+        for (int i = 0; i < k; i++) {
+            // Get the pile with the maximum gifts
+            int maxPile = maxHeap.poll();
+
+            // Calculate the remaining gifts in the pile
+            int remainingGifts = (int) Math.floor(Math.sqrt(maxPile));
+
+            // Add the remaining gifts back to the heap
+            maxHeap.add(remainingGifts);
+        }
+
+        // Sum up all remaining gifts in the heap
+        int totalGifts = 0;
+        while (!maxHeap.isEmpty()) {
+            totalGifts += maxHeap.poll();
+        }
+
+        return totalGifts;
+    }
+}
+==============================================================================================================
+Given the root of a perfect binary tree, reverse the node values at each odd level of the tree.For example, suppose the node values at level 3 are [2,1,3,4,7,11,29,18], then it should become [18,29,11,7,4,3,1,2].Return the root of the reversed tree.A binary tree is perfect if all parent nodes have two children and all leaves are on the same level.The level of a node is the number of edges along the path between it and the root node.
+Example 1:
+Input: root = [2,3,5,8,13,21,34]
+Output: [2,5,3,8,13,21,34]
+Explanation: 
+The tree has only one odd level.
+The nodes at level 1 are 3, 5 respectively, which are reversed and become 5, 3.
+Example 2
+Input: root = [7,13,11]
+Output: [7,11,13]
+Explanation: 
+The nodes at level 1 are 13, 11, which are reversed and become 11, 13.
+Example 3:
+Input: root = [0,1,2,0,0,0,0,1,1,1,1,2,2,2,2]
+Output: [0,2,1,0,0,0,0,2,2,2,2,1,1,1,1]
+Explanation: 
+The odd levels have non-zero values.
+The nodes at level 1 were 1, 2, and are 2, 1 after the reversal.
+The nodes at level 3 were 1, 1, 1, 1, 2, 2, 2, 2, and are 2, 2, 2, 2, 1, 1, 1, 1 after the reversal.
+
+public class ReverseOddLevels {
+
+    public TreeNode reverseOddLevels(TreeNode root) {
+       if (root == null) return null;
+
+        Queue<TreeNode> queue = new LinkedList<>();
+        queue.add(root);
+
+        boolean isOddLevel = false;
+
+        while (!queue.isEmpty()) {
+            int size = queue.size();
+            List<TreeNode> currentLevelNodes = new ArrayList<>();
+            List<Integer> levelValues = new ArrayList<>();
+
+            // Collect nodes and values for the current level
+            for (int i = 0; i < size; i++) {
+                TreeNode node = queue.poll();
+                currentLevelNodes.add(node);
+                levelValues.add(node.val);
+
+                if (node.left != null) queue.add(node.left);
+                if (node.right != null) queue.add(node.right);
+            }
+
+            // Reverse the values if it's an odd level
+            if (isOddLevel) {
+                Collections.reverse(levelValues);
+                for (int i = 0; i < currentLevelNodes.size(); i++) {
+                    currentLevelNodes.get(i).val = levelValues.get(i);
+                }
+            }
+
+            isOddLevel = !isOddLevel; // Toggle odd/even level
+        }
+
+        return root;
+    }
+}
+============================================================================================================================
+Given the root of a binary tree, return all root-to-leaf paths in any order.A leaf is a node with no children.
+Example 1:Input: root = [1,2,3,null,5]										Output: ["1->2->5","1->3"]
+Example 2:Input: root = [1]													Output: ["1"]
+ 
+public class RootToLeafPaths {
+    public List<String> binaryTreePaths(TreeNode root) {
+        List<String> result = new ArrayList<>();
+        if (root == null) return result;
+
+        dfs(root, "", result);
+        return result;
+    }
+    private void dfs(TreeNode node, String path, List<String> result) {
+        if (node == null) return;
+
+        // Append the current node's value to the path
+        path += node.val;
+
+        // If it's a leaf node, add the path to the result
+        if (node.left == null && node.right == null) {
+            result.add(path);
+        } else {
+            // Otherwise, continue the DFS with "->" appended
+            path += "->";
+            dfs(node.left, path, result);
+            dfs(node.right, path, result);
+        }
+    }
+}
+=========================================================================================================================
+Given the root of a binary tree, return an array of the largest value in each row of the tree (0-indexed).
+Example 1:Input: root = [1,3,2,5,3,null,9]							Output: [1,3,9]
+Example 2:Input: root = [1,2,3]										Output: [1,3]
+ 
+class Solution {
+    public List<Integer> largestValues(TreeNode root) {
+        List<Integer> res = new ArrayList<>();
+        Queue<TreeNode> queue = new LinkedList<>();
+
+        if (root == null) return res;
+
+        queue.add(root);
+
+        while(!queue.isEmpty()){
+            int size = queue.size();
+            int max = queue.peek().val;
+            for(int i=0;i<size;i++){
+                TreeNode node = queue.poll();
+                max = Math.max(max,node.val);
+
+                if(node.left!=null) queue.add(node.left);
+                if(node.right!=null) queue.add(node.right);
+            }
+
+            res.add(max);
+        }
+        return res;
+    }
+}
+=============================================================================================================================
+Given the head of a singly linked list, group all the nodes with odd indices together followed by the nodes with even indices, and return the reordered list.The first node is considered odd, and the second node is even, and so on.Note that the relative order inside both the even and odd groups should remain as it was in the input.You must solve the problem in O(1) extra space complexity and O(n) time complexity.
+
+Example 1:Input: head = [1,2,3,4,5]			Output: [1,3,5,2,4]
+Example 2:Input: head = [2,1,3,5,6,4,7]		Output: [2,3,6,7,1,5,4]
+ 
+public class OddEvenLinkedList {
+    public ListNode oddEvenList(ListNode head) {
+        if (head == null || head.next == null) return head;
+
+        // Pointers for odd and even lists
+        ListNode odd = head;
+        ListNode even = head.next;
+        ListNode evenHead = even; // Save the head of the even list
+
+        // Traverse the list
+        while (even != null && even.next != null) {
+            odd.next = even.next; // Link odd to the next odd node
+            odd = odd.next;       // Move odd pointer forward
+            even.next = odd.next; // Link even to the next even node
+            even = even.next;     // Move even pointer forward
+        }
+
+        // Link the end of the odd list to the head of the even list
+        odd.next = evenHead;
+
+        return head;
+    }
+}
+============================================================================================================================
+Given the head of a linked list and a value x, partition it such that all nodes less than x come before nodes greater than or equal to x.
+You should preserve the original relative order of the nodes in each of the two partitions.
+Example 1:Input: head = [1,4,3,2,5,2], x = 3			Output: [1,2,2,4,3,5]
+Example 2:Input: head = [2,1], x = 2					Output: [1,2]
+
+class Solution {
+    public ListNode partition(ListNode head, int x) {
+        // Dummy nodes for the two lists
+        ListNode lessHead = new ListNode(0);
+        ListNode greaterHead = new ListNode(0);
+
+        // Pointers to the current node in each list
+        ListNode less = lessHead;
+        ListNode greater = greaterHead;
+
+        // Traverse the original linked list
+        while (head != null) {
+            if (head.val < x) {
+                less.next = head; // Add to the 'less' list
+                less = less.next;
+            } else {
+                greater.next = head; // Add to the 'greater' list
+                greater = greater.next;
+            }
+            head = head.next; // Move to the next node
+        }
+
+        // Terminate the 'greater' list
+        greater.next = null;
+
+        // Connect the 'less' list to the 'greater' list
+        less.next = greaterHead.next;
+
+        // Return the merged list starting with 'less'
+        return lessHead.next;
+    }
+}
+====================================================================================================================
+Given a string s, sort it in decreasing order based on the frequency of the characters. The frequency of a character is the number of times it appears in the string.Return the sorted string. If there are multiple answers, return any of them.
+Example 1:Input: s = "tree"			Output: "eert"
+Explanation: 'e' appears twice while 'r' and 't' both appear once.
+So 'e' must appear before both 'r' and 't'. Therefore "eetr" is also a valid answer.
+Example 2:Input: s = "cccaaa"			Output: "aaaccc"
+Explanation: Both 'c' and 'a' appear three times, so both "cccaaa" and "aaaccc" are valid answers.
+Note that "cacaca" is incorrect, as the same characters must be together.
+Example 3:Input: s = "Aabb"			Output: "bbAa"
+Explanation: "bbaA" is also a valid answer, but "Aabb" is incorrect.
+Note that 'A' and 'a' are treated as two different characters.
+
+public class FrequencySort {
+    public static String frequencySort(String s) {
+        // Step 1: Count frequencies of each character
+        Map<Character, Integer> frequencyMap = new HashMap<>();
+        for (char c : s.toCharArray()) {
+            frequencyMap.put(c, frequencyMap.getOrDefault(c, 0) + 1);
+        }
+
+        // Step 2: Use a PriorityQueue (max-heap) to sort characters by frequency
+        PriorityQueue<Map.Entry<Character, Integer>> maxHeap = new PriorityQueue<>(
+            (a, b) -> b.getValue() - a.getValue()
+        );
+        maxHeap.addAll(frequencyMap.entrySet());
+
+        // Step 3: Build the result string
+        StringBuilder result = new StringBuilder();
+        while (!maxHeap.isEmpty()) {
+            Map.Entry<Character, Integer> entry = maxHeap.poll();
+            char c = entry.getKey();
+            int freq = entry.getValue();
+            for (int i = 0; i < freq; i++) {
+                result.append(c);
+            }
+        }
+
+        return result.toString();
+    }
+}
+===============================================================================================================
+You are given two non-empty linked lists representing two non-negative integers. The most significant digit comes first and each of their nodes contains a single digit. Add the two numbers and return the sum as a linked list.You may assume the two numbers do not contain any leading zero, except the number 0 itself.
+Example 1:Input: l1 = [7,2,4,3], l2 = [5,6,4]			Output: [7,8,0,7]
+Example 2:Input: l1 = [2,4,3], l2 = [5,6,4]				Output: [8,0,7]
+Example 3:Input: l1 = [0], l2 = [0]						Output: [0]
+
+public class AddTwoNumbersForward {
+    
+    public ListNode addTwoNumbers(ListNode l1, ListNode l2) {
+        // Reverse both lists
+        l1 = reverseList(l1);
+        l2 = reverseList(l2);
+        
+        // Add reversed lists
+        ListNode sumList = addReversedLists(l1, l2);
+        
+        // Reverse the sum list to restore original order
+        return reverseList(sumList);
+    }
+    
+    // Function to reverse a linked list
+    private ListNode reverseList(ListNode head) {
+        ListNode prev = null, next = null, curr = head;
+        while (curr != null) {
+            next = curr.next;
+            curr.next = prev;
+            prev = curr;
+            curr = next;
+        }
+        return prev;
+    }
+
+    // Function to add two reversed lists
+    private ListNode addReversedLists(ListNode l1, ListNode l2) {
+        ListNode dummy = new ListNode(0);
+        ListNode curr = dummy;
+        int carry = 0;
+        
+        while (l1 != null || l2 != null || carry > 0) {
+            int sum = carry;
+            if (l1 != null) {
+                sum += l1.val;
+                l1 = l1.next;
+            }
+            if (l2 != null) {
+                sum += l2.val;
+                l2 = l2.next;
+            }
+            
+            carry = sum / 10;
+            curr.next = new ListNode(sum % 10);
+            curr = curr.next;
+        }
+        
+        return dummy.next;
+    }
+}
+===========================================================================================================================
+Given the roots of two binary trees p and q, write a function to check if they are the same or not.
+Two binary trees are considered the same if they are structurally identical, and the nodes have the same value.
+Example 1:Input: p = [1,2,3], q = [1,2,3]			Output: true
+Example 2:Input: p = [1,2], q = [1,null,2]			Output: false
+Example 3:Input: p = [1,2,1], q = [1,1,2]			Output: false
+
+class Solution {
+    public boolean isSameTree(TreeNode p, TreeNode q) {
+        // Base cases
+        if (p == null && q == null) return true; // Both trees are empty
+        if (p == null || q == null) return false; // One tree is empty, the other is not
+        if (p.val != q.val) return false; // Values at current nodes are different
+
+        // Recursively compare left and right subtrees
+        return isSameTree(p.left, q.left) && isSameTree(p.right, q.right);
+    }
+}
+===================================================================================================================
+Given an integer array nums and an integer k, return the kth largest element in the array.Note that it is the kth largest element in the sorted order, not the kth distinct element.Can you solve it without sorting?
+Example 1:Input: nums = [3,2,1,5,6,4], k = 2				Output: 5
+Example 2:Input: nums = [3,2,3,1,2,4,5,5,6], k = 4			Output: 4
+ 
+public class KthLargestElement {
+    public static int findKthLargest(int[] nums, int k) {
+        PriorityQueue<Integer> minHeap = new PriorityQueue<>(k);
+        
+        for (int num : nums) {
+            minHeap.offer(num); // Add the element
+            if (minHeap.size() > k) {
+                minHeap.poll(); // Remove the smallest element
+            }
+        }
+        return minHeap.peek(); // Root element is the kth largest
+    }
+}
+====================================================================================================================
+Given the root of a binary search tree, and an integer k, return the kth smallest value (1-indexed) of all the values of the nodes in the tree.
+Example 1:Input: root = [3,1,4,null,2], k = 1			Output: 1
+Example 2:Input: root = [5,3,6,2,4,null,null,1], k = 3	Output: 3
+
+class Solution {
+    int count=0;
+    int res = 0;
+    public int kthSmallest(TreeNode root, int k) {
+        inorder(root,k);
+
+        return res;
+    }
+
+    private void inorder(TreeNode root,int k){
+        if(root == null){
+            return;
+        }
+        inorder(root.left,k);
+
+        count++;
+
+        if(count==k){
+            res=root.val;
+            return;
+        }
+        inorder(root.right,k);
+
+
+    }
+}
+=====================================================================================================================================
+You are given a string s.Your task is to remove all digits by doing this operation repeatedly:Delete the first digit and the closest non-digit character to its left.Return the resulting string after removing all digits.
+Example 1:Input: s = "abc"												Output: "abc"
+Explanation:There is no digit in the string.
+Example 2:Input: s = "cb34"												Output: ""
+Explanation:First, we apply the operation on s[2], and s becomes "c4".Then we apply the operation on s[1], and s becomes "".
+
+class Solution {
+    public String clearDigits(String s) {
+        Stack<Character> stack = new Stack<>();
+
+        for(char c:s.toCharArray()){
+            if(!Character.isDigit(c)){
+                stack.push(c);
+            }else {
+                if(stack.size()>0) stack.pop();
+            }
+        }
+
+        StringBuilder sb = new StringBuilder();
+
+        while(!stack.isEmpty()){
+            sb.append(stack.pop());
+        }
+        return sb.reverse().toString();
+    }
+}
+
+or
+
+class Solution {
+    public String clearDigits(String s)
+    {
+        int len = s.length();
+        StringBuilder str = new StringBuilder ();
+        int i=-1;
+
+        for(int j=0;j<len;j++)
+        {
+            char c = s.charAt(j);
+            if(c>='a' && c<='z')
+            {
+                i++;
+                str.append(c);
+            }
+                
+            else{
+                if(i>=0)
+                {
+                    str.deleteCharAt(i);
+                    i--;
+                }
+            }
+        }
+===================================================================================================================================
+You are given a 0-indexed string pattern of length n consisting of the characters 'I' meaning increasing and 'D' meaning decreasing.A 0-indexed string num of length n + 1 is created using the following conditions:num consists of the digits '1' to '9', where each digit is used at most once.If pattern[i] == 'I', then num[i] < num[i + 1].If pattern[i] == 'D', then num[i] > num[i + 1].Return the lexicographically smallest possible string num that meets the conditions.
+Example 1:Input: pattern = "IIIDIDDD"			Output: "123549876"
+Explanation:
+At indices 0, 1, 2, and 4 we must have that num[i] < num[i+1].
+At indices 3, 5, 6, and 7 we must have that num[i] > num[i+1].
+Some possible values of num are "245639871", "135749862", and "123849765".
+It can be proven that "123549876" is the smallest possible num that meets the conditions.
+Note that "123414321" is not possible because the digit '1' is used more than once.
+Example 2:Input: pattern = "DDD"				Output: "4321"
+Explanation:
+Some possible values of num are "9876", "7321", and "8742".
+It can be proven that "4321" is the smallest possible num that meets the conditions.
+import java.util.*;
+
+public class SmallestNumberPattern {
+    public static String smallestNumber(String pattern) {
+        StringBuilder result = new StringBuilder();
+        Stack<Integer> stack = new Stack<>();
+        int num = 1; // Start with 1
+
+        for (int i = 0; i <= pattern.length(); i++) {
+            stack.push(num++); // Always push the next number
+
+            // If it's 'I' or at the end, pop and append all elements from the stack
+            if (i == pattern.length() || pattern.charAt(i) == 'I') {
+                while (!stack.isEmpty()) {
+                    result.append(stack.pop());
+                }
+            }
+        }
+        return result.toString();
+    }
+}

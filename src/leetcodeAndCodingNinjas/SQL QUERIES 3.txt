@@ -1,0 +1,1540 @@
+Swap adjacent department rows in a table
+
+WITH cte AS (
+    SELECT *, ROW_NUMBER() OVER (ORDER BY (SELECT NULL)) AS rn # Select null just ranks every row sequentially
+    FROM Employees
+)
+
+SELECT *, 
+    CASE 
+        WHEN rn % 2 = 0 THEN LAG(department, 1, department) OVER (ORDER BY rn) # 3rd param in LAG or LEAD is default value if the lag or lead is missing for that row
+        WHEN rn % 2 = 1 THEN LEAD(department, 1, department) OVER (ORDER BY rn)
+    END AS newDepartment
+FROM cte;
+==================================================================================================================================================
+Table find max difference between their visits
+customer_id		visit_date
+1				2024-01-01
+1				2024-01-10
+1				2024-02-25
+2				2024-03-20
+2				2024-04-05
+2				2024-05-25
+
+SELECT 
+    customer_id, 
+    COALESCE(MAX(gap_days), 0) AS max_window_days
+FROM (
+    SELECT 
+        customer_id,
+        visit_date,
+        DATEDIFF(
+            visit_date, 
+            LAG(visit_date) OVER (PARTITION BY customer_id ORDER BY visit_date)
+        ) AS gap_days
+    FROM hospital_visits
+) t
+GROUP BY customer_id;
+==================================================================================================
+Query to select difference between top 2 salaries of each department
+
+WITH cte as (SELECT distinct department , salary , DENSE_RANK() OVER(PARTIION BY department ORDER BY salary DESC) as rn
+FROM Employees)
+
+SELECT a.department , a.salary-b.salary as difference
+FROM cte a
+JOIN cte b on a.department=b.department
+WHERE a.rn=1 and b.rn=2
+
+OR
+
+WITH ranked AS (
+    SELECT 
+        department, 
+        salary, 
+        DENSE_RANK() OVER (PARTITION BY department ORDER BY salary DESC) AS rn
+    FROM Employees
+)
+SELECT 
+    department, 
+    MAX(CASE WHEN rn = 1 THEN salary END) - 
+    MAX(CASE WHEN rn = 2 THEN salary END) AS difference
+FROM ranked
+WHERE rn IN (1, 2)
+GROUP BY department;
+====================================================================================================================================
+Find customer's origin to destination
+| customerId | origin | dest |
+| ---------- | ------ | ---- |
+| 1          | A      | B    |
+| 1          | B      | C    |
+| 2          | X      | Y    |
+| 2          | Y      | Z    |
+
+SELECT 
+    customerId,
+    -- Find origin: origin which is never a destination
+    (SELECT origin 
+     FROM your_table t2 
+     WHERE t1.customerId = t2.customerId 
+       AND NOT EXISTS (
+           SELECT 1 FROM your_table t3 
+           WHERE t3.customerId = t2.customerId AND t3.dest = t2.origin
+       )
+     LIMIT 1
+    ) AS origin,
+    
+    -- Find destination: dest which is never an origin
+    (SELECT dest 
+     FROM your_table t2 
+     WHERE t1.customerId = t2.customerId 
+       AND NOT EXISTS (
+           SELECT 1 FROM your_table t3 
+           WHERE t3.customerId = t2.customerId AND t3.origin = t2.dest
+       )
+     LIMIT 1
+    ) AS dest
+FROM your_table t1
+GROUP BY customerId;
+=====================================================================================================
+SELECT *, REPLICATE(str,count) FROM table -- repeat the str count times
+=======================================================================================================
+Department with highest average
+
+SELECT DepartmentID
+FROM Employee
+GROUP BY DepartmentID
+ORDER BY AVG(Salary) DESC
+LIMIT 1;
+============================================================================================================================
+Query to find the seats where its previous or current is available along with it. (means if seat 2 is available then return if 1 or 3 is available)
+
+WITH cte AS (
+    SELECT 
+        seat_id, 
+        free,
+        -- Check if the current seat and the previous seat are both available
+        (lag(free) over (ORDER BY seat_id) * free) AS prev_seat,  
+        -- Check if the current seat and the next seat are both available
+        (lead(free) over (ORDER BY seat_id) * free) AS next_seat
+    FROM Cinema_seat
+)
+
+SELECT seat_id
+FROM cte
+WHERE prev_seat = 1 OR next_seat = 1;
+=============================================================================================================================================================
+Forward filling scenario 
+| CollegeId | StudentId | DeptId |
+| --------- | --------- | ------ |
+| 1         | 1         | 101    |
+| 1         | 2         | NULL   |
+| 1         | 3         | NULL   |
+| 1         | 4         | NULL   |
+| 1         | 11        | 201    |
+| 1         | 12        | NULL   |
+| 1         | 13        | NULL   |
+| 1         | 14        | NULL   |
+
+SELECT 
+  CollegeId,
+  StudentId,
+  -- Forward fill DeptId
+  COALESCE(
+    DeptId,
+    MAX(DeptId) OVER (
+      PARTITION BY CollegeId 
+      ORDER BY StudentId 
+      ROWS BETWEEN UNBOUNDED PRECEDING AND 1 PRECEDING -- Look at all rows from the start up to the row just before the current row
+    )
+  ) AS FilledDeptId
+FROM StudentDetail
+ORDER BY StudentId;
+==============================================================================================================================================================
+Foward filling rows: Brand
+| category   | brand\_name |
+| ---------- | ----------- |
+| chocolates | 5-star      |
+| NULL       | dairy milk  |
+| NULL       | perk        |
+| NULL       | eclair      |
+| Biscuits   | Britania    |
+| NULL       | good day    |
+| NULL       | boost       |
+
+WITH numbered AS (
+  SELECT *, ROW_NUMBER() OVER (ORDER BY (SELECT NULL)) AS rn
+  FROM brands
+),
+groups AS (
+  SELECT *,
+         COUNT(category) OVER (ORDER BY rn) AS grp
+  FROM numbered
+),
+filled AS (
+  SELECT *,
+         FIRST_VALUE(category) OVER (PARTITION BY grp ORDER BY rn) AS filled_category
+  FROM groups
+)
+SELECT filled_category AS category, brand_name
+FROM filled;
+==============================================================================================================================================================
+Male to female ratio in a company
+WITH CTE AS (
+    SELECT 
+        COUNT(*) AS total,
+        SUM(CASE WHEN GENDER = 'M' THEN 1 ELSE 0 END) AS male_count,
+        SUM(CASE WHEN GENDER = 'F' THEN 1 ELSE 0 END) AS female_count
+    FROM Company
+)
+SELECT 
+    male_count,
+    female_count,
+   CAST(male_count AS FLOAT) / NULLIF(female_count, 0) AS male_to_female_ratio  # CAST (expression AS target_data_type) and NULLIFF make sure if female_count is 0 then return null 																						as ans
+FROM CTE;
+
+NULLIF Compares two values.If they are equal, it returns NULL.If they are different, it returns the first value. NULLIF(value1, value2)
+ex : NULLIF(5,5)-> NULL , NULLIF(1,5)->1
+=================================================================================================================================================================
+Department wise second highest salary
+
+WITH cte AS (
+    SELECT *, DENSE_RANK() OVER (PARTITION BY dept ORDER BY salary DESC) AS rnk
+)
+SELECT dept, salary, emp_id
+FROM cte
+WHERE rnk = 2;
+================================================================================================================================================
+Product wise total sale based on year and month
+Product
+| pid | pname | price |
+| --- | ----- | ----- |
+| 1   | A     | 1000  |
+| 2   | B     | 400   |
+| 3   | C     | 500   |
+Transactions
+| pid | sold\_date | qty | amount |
+| --- | ---------- | --- | ------ |
+| 1   | 2024-02-01 | 2   | 2000   |
+| 1   | 2024-03-01 | 4   | 4000   |
+| 1   | 2024-03-15 | 2   | 2000   |
+| 3   | 2024-04-24 | 3   | 1500   |
+| 3   | 2024-05-16 | 5   | 2500   |
+
+output:
+| pname | year | month | total\_amount |
+| ----- | ---- | ----- | ------------- |
+| A     | 2024 | 2     | 2000          |
+| A     | 2024 | 3     | 6000          |
+| A     | 2024 | 4     | 0             |
+| A     | 2024 | 5     | 0             |
+| B     | 2024 | 2     | 0             |
+| B     | 2024 | 3     | 0             |
+| B     | 2024 | 4     | 0             |
+| B     | 2024 | 5     | 0             |
+| C     | 2024 | 2     | 0             |
+| C     | 2024 | 3     | 0             |
+| C     | 2024 | 4     | 1500          |
+| C     | 2024 | 5     | 2500          |
+
+WITH months AS (
+    SELECT 2024 AS year, 2 AS month UNION ALL
+    SELECT 2024, 3 UNION ALL
+    SELECT 2024, 4 UNION ALL
+    SELECT 2024, 5
+),
+product_months AS (
+    SELECT p.pname, p.pid, m.year, m.month
+    FROM Product p
+    CROSS JOIN months m
+)
+SELECT 
+    pm.pname,
+    pm.year,
+    pm.month,
+    COALESCE(SUM(t.amount), 0) AS total_amount
+FROM product_months pm
+LEFT JOIN Transactions t 
+    ON pm.pid = t.pid
+    AND YEAR(t.sold_date) = pm.year
+    AND MONTH(t.sold_date) = pm.month
+GROUP BY pm.pname, pm.year, pm.month
+ORDER BY pm.pname, pm.year, pm.month;
+
+====================================================================================================================================================
+Extract domain names from Email table
+| id | email                                     | domain      |
+| -- | ----------------------------------------- | ----------- |
+| 1  | [abc@gmail.com](mailto:abc@gmail.com)     | gmail.com   |
+| 2  | [xyz@hotmail.com](mailto:xyz@hotmail.com) | hotmail.com |
+| 3  | [pqr@outlook.com](mailto:pqr@outlook.com) | outlook.com |
+output:
+| id | email                                     | domain      |
+| -- | ----------------------------------------- | ----------- |
+| 1  | [abc@gmail.com](mailto:abc@gmail.com)     | gmail.com   |
+| 2  | [xyz@hotmail.com](mailto:xyz@hotmail.com) | hotmail.com |
+| 3  | [pqr@outlook.com](mailto:pqr@outlook.com) | outlook.com |
+
+SELECT 
+    id,
+    email,
+    SUBSTR(email, INSTR(email, '@') + 1) AS domain
+FROM Email;
+
+validate email address :-
+
+SELECT 
+    id,
+    email,
+    CASE 
+        WHEN REGEXP_LIKE(email, '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$') THEN 'Valid'
+        ELSE 'Invalid'
+    END AS email_status
+FROM 
+    Email;
+===================================================================================================================================================
+Dept wise min salary employee name and max salary employee name
+| emp\_name | dept\_id | salary |
+| --------- | -------- | ------ |
+| Siva      | 1        | 30000  |
+| Ravi      | 2        | 40000  |
+| Prasad    | 1        | 50000  |
+| Sai       | 2        | 20000  |
+| Anna      | 2        | 10000  |
+output:
+| dept\_id | max\_salary\_name | min\_salary\_name |
+| -------- | ----------------- | ----------------- |
+| 1        | Prasad            | Siva              |
+| 2        | Ravi              | Anna              |
+
+WITH cte AS (
+    SELECT *, 
+           DENSE_RANK() OVER (PARTITION BY dept_id ORDER BY salary DESC) AS max_rank,
+           DENSE_RANK() OVER (PARTITION BY dept_id ORDER BY salary ASC) AS min_rank
+    FROM emps_tbl
+)
+SELECT 
+    dept_id,
+    MAX(CASE WHEN max_rank = 1 THEN emp_name END) AS max_salary_name,
+    MAX(CASE WHEN min_rank = 1 THEN emp_name END) AS min_salary_name
+FROM cte
+GROUP BY dept_id;
+======================================================================================================================================================
+| employee\_id |
+| ------------ |
+| 72657        |
+| 1234         |
+| Tom          |
+| 8792         |
+| Sam          |
+| 19998        |
+| Philip       |
+output:
+| employee\_id |
+| ------------ |
+| 72657        |
+| 1234         |
+| 8792         |
+| 19998        |
+
+SELECT employee_id 
+FROM emp_new 
+WHERE employee_id REGEXP '^[0-9]+$';
+========================================================================================================================================================
+| month | ytd\_sales | monthnum |
+| ----- | ---------- | -------- |
+| jan   | 15         | 1        |
+| feb   | 22         | 2        |
+| mar   | 35         | 3        |
+| apr   | 45         | 4        |
+| may   | 60         | 5        |
+output
+| month | ytd\_sales | periodic\_sales |
+| ----- | ---------- | --------------- |
+| jan   | 15         | 15              |
+| feb   | 22         | 7               |
+| mar   | 35         | 13              |
+| apr   | 45         | 10              |
+| may   | 60         | 15              |
+
+
+SELECT 
+    month, 
+    ytd_sales, 
+    (ytd_sales - COALESCE(LAG(ytd_sales) OVER (ORDER BY monthnum), 0)) AS periodic_sales
+FROM sales;
+==========================================================================================================================================================
+Given us happiness_tbl, we need to display a few specific Rows always at top of the query results.
+| ranking | country     |
+| ------- | ----------- |
+| 1       | Finland     |
+| 2       | Denmark     |
+| 3       | Iceland     |
+| 4       | Israel      |
+| 5       | Netherlands |
+| 6       | Sweden      |
+| 7       | Norway      |
+| 8       | Switzerland |
+| 9       | Luxembourg  |
+| 128     | Srilanka    |
+| 126     | INDIA       |
+Output:
+| ranking | country     |
+| ------- | ----------- |
+| 128     | Srilanka    |
+| 126     | INDIA       |
+| 1       | Finland     |
+| 2       | Denmark     |
+| 3       | Iceland     |
+| 4       | Israel      |
+| 5       | Netherlands |
+| 6       | Sweden      |
+| 7       | Norway      |
+| 8       | Switzerland |
+| 9       | Luxembourg  |
+
+WITH cte AS (
+	SELECT *, 
+	       CASE 
+	           WHEN country = 'Srilanka' THEN 2
+	           WHEN country = 'INDIA' THEN 1
+	           ELSE 3
+	       END AS sort_order
+	FROM happiness_tbl
+)
+SELECT ranking, country 
+FROM cte 
+ORDER BY sort_order, ranking;
+
+or
+
+SELECT *
+FROM happiness_tbl
+ORDER BY	
+  CASE
+    WHEN country = 'INDIA' THEN 1
+    WHEN country = 'Srilanka' THEN 2
+    ELSE 3
+  END,
+  ranking;
+=============================================================================================================================================
+SQL Interview Questions: 
+Part 1: Find the top 3 highest-paid employees in each department.
+Part 2: Find the average salary of employees hired in the last 5 years.
+Part 3: Find the employees whose salry is less than the average salary of employees hired in the last 5 years.
+Departments:
+| DepartmentID | DepartmentName |
+| ------------ | -------------- |
+| 1            | HR             |
+| 2            | Engineering    |
+| 3            | Sales          |
+Employees table:
+| EmployeeID | FirstName | LastName | DepartmentID | Salary | DateHired  |
+| ---------- | --------- | -------- | ------------ | ------ | ---------- |
+| 1          | Alice     | Smith    | 1            | 50000  | 2020-01-15 |
+| 2          | Bob       | Johnson  | 1            | 60000  | 2018-03-22 |
+| 3          | Charlie   | Williams | 2            | 70000  | 2019-07-30 |
+| 4          | David     | Brown    | 2            | 80000  | 2017-11-11 |
+| 5          | Eve       | Davis    | 3            | 90000  | 2021-02-25 |
+| 6          | Frank     | Miller   | 3            | 55000  | 2020-09-10 |
+| 7          | Grace     | Wilson   | 2            | 75000  | 2016-04-05 |
+| 8          | Henry     | Moore    | 1            | 65000  | 2022-06-17 |
+
+part1:
+SELECT *
+FROM (
+    SELECT e.*, 
+           DENSE_RANK() OVER (PARTITION BY e.DepartmentID ORDER BY e.Salary DESC) as salary_rank
+    FROM Employees e
+) ranked
+WHERE salary_rank <= 3;
+
+part2:
+SELECT 
+    AVG(Salary) AS avg_salary_last_5_years
+FROM Employees
+WHERE DateHired >= DATE_SUB(CURDATE(), INTERVAL 5 YEAR);
+
+part3:
+SELECT *
+FROM Employees
+WHERE Salary < (
+    SELECT AVG(Salary)
+    FROM Employees
+    WHERE DateHired >= DATE_SUB(CURDATE(), INTERVAL 5 YEAR)
+);
+=========================================================================================================================================================
+write a query to select monthwise total of electronics and clothing  , where result has month clothing and electornics ans column , show the table
+Input : sales_data 
+| month    | category    | amount |
+| -------- | ----------- | ------ |
+| January  | Electronics | 1500   |
+| January  | Clothing    | 1200   |
+| February | Electronics | 1800   |
+| February | Clothing    | 1300   |
+| March    | Electronics | 1600   |
+| March    | Clothing    | 1100   |
+| April    | Electronics | 1700   |
+| April    | Clothing    | 1400   |
+output:
+| month    | electronics_total | clothing_total |
+| -------- | ------------------ | --------------- |
+| April    | 1700               | 1400            |
+| February | 1800               | 1300            |
+| January  | 1500               | 1200            |
+| March    | 1600               | 1100            |
+
+SELECT
+    month,
+    SUM(amount) FILTER (WHERE category = 'Electronics') AS electronics_total,
+    SUM(amount) FILTER (WHERE category = 'Clothing') AS clothing_total
+FROM	sales_data
+GROUP BY	month
+ORDER BY	month;
+=====================================================================================================================================
+| user_identifier  | event_type  | event_date |
+| ---------------- | ----------- | ----------- |
+| 1                | Login       | 2023-05-10  |
+| 1                | Logout      | 2023-05-12  |
+| 2                | Login       | 2023-06-01  |
+| 2                | Purchase    | 2023-06-04  |
+| 3                | Login       | 2023-07-15  |
+| 3                | Logout      | 2023-07-16  |
+| 4                | Login       | 2023-08-20  |
+| 4                | Purchase    | 2023-08-25  |
+output:
+| user\_identifier | difference\_date |
+| ---------------- | ---------------- |
+| 1                | 2                |
+| 2                | 3                |
+| 3                | 1                |
+| 4                | 5                |
+
+WITH cte AS (
+    SELECT *, 
+           LAG(event_date) OVER (PARTITION BY user_identifier ORDER BY event_date) AS prev_date
+    FROM user_activity
+)
+SELECT user_identifier, 
+       DATEDIFF(event_date, prev_date) AS difference_date
+FROM cte
+WHERE prev_date IS NOT NULL;
+=============================================================================================================================
+users:
+| id | full_name       |
+| -- | ---------------- |
+| 1  | John Doe         |
+| 2  | Alice Johnson    |
+| 3  | Michael Williams |
+
+SELECT
+  SUBSTRING_INDEX(full_name, ' ', 1) AS first_name,
+  SUBSTRING_INDEX(full_name, ' ', -1) AS last_name
+FROM users;
+==============================================================================================================================
+Recursice query to generate numbers from 1 to 10
+WITH RECURSIVE numbers AS (
+	#Base case , anchor query
+    SELECT 1 AS number
+    UNION ALL
+	#Recursive query
+    SELECT number + 1
+    FROM numbers
+    WHERE number < 10
+)
+SELECT * FROM numbers;
+
+Generate series of dates
+WITH RECURSIVE date_series AS (
+    SELECT DATE '2024-12-15' AS date
+    UNION ALL
+    SELECT date + INTERVAL '1 day'
+    FROM date_series
+    WHERE date < DATE '2025-12-31'
+)
+SELECT * FROM date_series;
+
+Compute factorial 
+WITH RECURSIVE factorial(n, fact) AS (
+    SELECT 1, 1
+    UNION ALL
+    SELECT n + 1, fact * (n + 1)
+    FROM factorial
+    WHERE n < 10
+)
+SELECT * FROM factorial;
+
+or
+WITH RECURSIVE factorial AS (
+    SELECT 1 as n, 1 as fact
+    UNION ALL
+    SELECT n + 1, fact * (n + 1)
+    FROM factorial
+    WHERE n < 10
+)
+SELECT * FROM factorial;
+=========================================================================================================================================
+SELECT 
+    b.BookID,
+    b.BookTitle,
+    b.PublicationYear,
+    a.AuthorName
+FROM 
+    Books b
+JOIN 
+    Authors a ON b.AuthorID = a.AuthorID
+WHERE 
+    b.PublicationYear >= DATE_SUB(CURDATE(), INTERVAL 1 YEAR)
+ORDER BY 
+    b.PublicationYear DESC;
+===================================================================================================================================================
+SQL query to retrieve Walmart users' most recent transaction date, user ID, and the total number of products they purchased. 
+| product_id  | user_id  | spend  | transaction_date    |
+| ----------- | -------- | ------ | ------------------- |
+| 3673        | 123      | 68.90  | 2022-07-08 10:00:00 |
+| 9623        | 123      | 274.10 | 2022-07-08 10:00:00 |
+| 1467        | 115      | 19.90  | 2022-07-08 10:00:00 |
+| 2513        | 159      | 25.00  | 2022-07-08 10:00:00 |
+| 1452        | 159      | 74.50  | 2022-07-10 10:00:00 |
+| 1452        | 123      | 74.50  | 2022-07-10 10:00:00 |
+| 9765        | 123      | 100.15 | 2022-07-11 10:00:00 |
+| 6536        | 115      | 57.00  | 2022-07-12 10:00:00 |
+| 7384        | 159      | 15.50  | 2022-07-12 10:00:00 |
+| 1247        | 159      | 23.40  | 2022-07-12 10:00:00 |
+Output:
+| user_id  | most_recent_transaction_date    | total_products_purchased   |
+| -------- | ------------------------------- | -------------------------- |
+| 159      | 2022-07-12 10:00:00             | 5                          |
+| 115      | 2022-07-12 10:00:00             | 2                          |
+| 123      | 2022-07-11 10:00:00             | 4                          |
+
+WITH cte AS (
+    SELECT *,
+        RANK() OVER (PARTITION BY user_id ORDER BY transaction_date DESC) AS rnk
+    FROM transactions
+)
+SELECT 
+    user_id,
+    transaction_date AS most_recent_transaction_date,
+    COUNT(product_id) AS total_products_purchased
+FROM cte
+WHERE rnk = 1
+GROUP BY user_id, transaction_date
+ORDER BY user_id;
+===========================================================================================================================================
+Find missing order_id's
+| order\_id | order\_date |
+| --------- | ----------- |
+| 1         | 2024-07-01  |
+| 2         | 2024-07-02  |
+| 3         | 2024-07-03  |
+| 5         | 2024-07-05  |
+| 6         | 2024-07-06  |
+| 7         | 2024-07-07  |
+| 9         | 2024-07-09  |
+| 10        | 2024-07-10  |
+| 11        | 2024-07-11  |
+| 13        | 2024-07-13  |
+| 14        | 2024-07-14  |
+| 15        | 2024-07-15  |
+| 16        | 2024-07-16  |
+| 18        | 2024-07-18  |
+| 19        | 2024-07-19  |
+| 20        | 2024-07-20  |
+Output:
+| missing\_order\_id |
+| ------------------ |
+| 4                  |
+| 8                  |
+| 12                 |
+| 17                 |
+
+WITH RECURSIVE series AS (
+    SELECT MIN(order_id) AS id FROM orders
+    UNION ALL
+    SELECT id + 1 FROM series WHERE id + 1 <= (SELECT MAX(order_id) FROM orders)
+)
+
+SELECT s.id AS missing_order_id
+FROM series s
+LEFT JOIN orders o ON o.order_id = s.id
+WHERE o.order_id IS NULL;
+==============================================================================================================================================
+Given a Teams table with columns TeamID (integer) and Members (comma-separated string of names), write a query to calculate and display the total number of members in each team.
+| TeamID | Members                                        |
+| ------ | ---------------------------------------------- |
+| 1      | Chris, Evan, Marty, Eva                        |
+| 2      | Jake, Olivia                                   |
+| 3      | Sophia, Liam, Noah, Emma                       |
+| 4      | Ava, Lucas, Mia, Ethan, Amelia                 |
+| 5      | Benjamin, Charlotte                            |
+| 6      | Harper, Henry, Evelyn, Daniel, Ella            |
+| 7      | Michael, Emily, Alexander                      |
+| 8      | James, Abigail, William, Isabella, Jack, Grace |
+| 9      | Sebastian, Chloe                               |
+| 10     | David, Lily, Samuel, Madison                   |
+output:
+| TeamID | TotalMembers |
+| ------ | ------------ |
+| 1      | 4            |
+| 2      | 2            |
+| 3      | 4            |
+| 4      | 5            |
+| 5      | 2            |
+| 6      | 5            |
+| 7      | 3            |
+| 8      | 6            |
+| 9      | 2            |
+| 10     | 4            |
+
+SELECT 
+    TeamID,
+    LENGTH(Members) - LENGTH(REPLACE(Members, ',', '')) + 1 AS TotalMembers
+FROM Teams;
+================================================================================================================================================
+Write a SQL query to retrieve the most frequently ordered item(s) for each date from a given orders table. If multiple items have the highest order count on a particular date, include all such items in the result.
+| order_date  | item   |
+| ----------- | ------ |
+| 2024-03-01  | Apple  |
+| 2024-03-01  | Banana |
+| 2024-03-01  | Apple  |
+| 2024-03-02  | Orange |
+| 2024-03-02  | Orange |
+| 2024-03-02  | Mango  |
+| 2024-03-03  | Banana |
+| 2024-03-03  | Banana |
+| 2024-03-03  | Mango  |
+| 2024-03-03  | Mango  |
+Output:
+| order_date | item   | order_count   |
+| ----------- | ------ | ------------ |
+| 2024-03-01  | Apple  | 2            |
+| 2024-03-02  | Orange | 2            |
+| 2024-03-03  | Banana | 2            |
+| 2024-03-03  | Mango  | 2            |
+
+WITH cte as (
+	SELECT order_date , item , count(*) as order_count , RANK() OVER (PARTITION BY order_date ORDER BY COUNT(*) DESC) as rank
+	FROM Orders
+	GROUP BY order_date , item 
+)
+
+SELECT order_date , item , order_count 
+FROM cte WHERE rank = 1
+===============================================================================================================================================
+Write a SQL query to retrieve the first and last order for each customer from the orders table
+| order_id  | customer_id  | order_date  |
+| --------- | ------------ | ----------- |
+| 1         | 101          | 2024-01-05  |
+| 2         | 101          | 2024-03-15  |
+| 3         | 101          | 2024-05-20  |
+| 4         | 102          | 2024-02-10  |
+| 5         | 102          | 2024-04-25  |
+| 6         | 102          | 2024-06-30  |
+| 7         | 103          | 2024-01-01  |
+| 8         | 103          | 2024-02-18  |
+| 9         | 103          | 2024-03-25  |
+Output:
+| customer_id  | first_order_id   | first_order_date   | last_order_id   | last_order_date   |
+| ------------ | ---------------- | ------------------ | --------------- | ----------------- |
+| 101          | 1                | 2024-01-05         | 3               | 2024-05-20        |
+| 102          | 4                | 2024-02-10         | 6               | 2024-06-30        |
+| 103          | 7                | 2024-01-01         | 9               | 2024-03-25        |
+
+WITH ranked_orders AS (
+  SELECT 
+    order_id,
+    customer_id,
+    order_date,
+    RANK() OVER (PARTITION BY customer_id ORDER BY order_date ASC) AS first_rank,
+    RANK() OVER (PARTITION BY customer_id ORDER BY order_date DESC) AS last_rank
+  FROM orders
+)
+SELECT 
+  customer_id,
+  MAX(CASE WHEN first_rank = 1 THEN order_id END) AS first_order_id,
+  MAX(CASE WHEN first_rank = 1 THEN order_date END) AS first_order_date,
+  MAX(CASE WHEN last_rank = 1 THEN order_id END) AS last_order_id,
+  MAX(CASE WHEN last_rank = 1 THEN order_date END) AS last_order_date
+FROM ranked_orders
+GROUP BY customer_id;
+===============================================================================================================================================
+Transactions:
+| transaction_id  | company_id  | transaction_date  | revenue |
+| --------------- | ----------- | ----------------- | ------- |
+| 101             | 1           | 2020-01-15        | 5000.00 |
+| 102             | 2           | 2020-01-20        | 8500.00 |
+| 103             | 1           | 2020-02-10        | 4500.00 |
+| 104             | 3           | 2020-02-20        | 9900.00 |
+| 105             | 2           | 2020-02-25        | 7500.00 |
+Sectors:
+| company_id  | sector     |
+| ----------- | ---------- |
+| 1           | Technology |
+| 2           | Healthcare |
+| 3           | Technology |
+output:
+| sector     | month | avg_revenue  |
+| ---------- | ----- | -------------- |
+| Healthcare | 01    | 8500.00        |
+| Healthcare | 02    | 7500.00        |
+| Technology | 01    | 5000.00        |
+| Technology | 02    | 14400.00       |
+
+WITH cte AS (
+  SELECT 
+    company_id, 
+    YEAR(transaction_date) AS year,
+    MONTH(transaction_date) AS month,
+    AVG(revenue) AS avg_revenue
+  FROM Transactions 
+  GROUP BY company_id, YEAR(transaction_date), MONTH(transaction_date)
+)
+
+SELECT 
+  LPAD(c.month, 2, '0') AS month,
+  s.sector,
+  ROUND(AVG(c.avg_revenue), 2) AS avg_revenue
+FROM cte c
+JOIN Sectors s ON c.company_id = s.company_id
+GROUP BY s.sector, c.month
+ORDER BY s.sector, c.month;
+=======================================================================================================================================================
+Calculate the 3-month moving average of sales revenue for each month, using the sales data in the Orders table
+| Order_id  | Customer_id  | Order_Date  | Amount |
+| --------- | ------------ | ----------- | ------ |
+| 1         | 1            | 2023-01-05  | 100.00 |
+| 2         | 2            | 2023-02-14  | 150.00 |
+| 3         | 1            | 2023-02-28  | 200.00 |
+| 4         | 3            | 2023-03-22  | 300.00 |
+| 5         | 2            | 2023-04-10  | 250.00 |
+| 6         | 1            | 2023-05-15  | 400.00 |
+| 7         | 3            | 2023-06-10  | 350.00 |
+Output:
+| Month   | Monthly_Revenue  | 3-Month_Moving_Avg   |
+| ------- | ---------------- | -------------------- |
+| 2023-01 | 100.00           | 100.00               |
+| 2023-02 | 350.00           | 225.00               |
+| 2023-03 | 300.00           | 250.00               |
+| 2023-04 | 250.00           | 300.00               |
+| 2023-05 | 400.00           | 316.67               |
+| 2023-06 | 350.00           | 333.33               |
+
+WITH cte AS (
+    SELECT 
+        DATE_FORMAT(Order_Date,'%Y-%m') AS year_month,  -- Use %m instead of %M for numeric month
+        SUM(Amount) AS total
+    FROM Orders
+    GROUP BY DATE_FORMAT(Order_Date,'%Y-%m')
+)
+SELECT 
+    year_month,
+    total,
+    ROUND(AVG(total) OVER (
+        ORDER BY year_month
+        ROWS BETWEEN 2 PRECEDING AND CURRENT ROW
+    ), 2) AS `3-Month_Moving_Avg`
+FROM cte
+ORDER BY year_month;
+==============================================================================================================================
+Generate match combinations between teams from the same table
+Input: Teams
+| team_name |
+| ---------- |
+| CSK        |
+| KKR        |
+| GT         |
+| DC         |
+| LSG        |
+Output:
+| team1 | team2 |
+| ----- | ----- |
+| CSK   | DC    |
+| CSK   | GT    |
+| CSK   | KKR   |
+| CSK   | LSG   |
+| DC    | GT    |
+| DC    | KKR   |
+| DC    | LSG   |
+| GT    | KKR   |
+| GT    | LSG   |
+| KKR   | LSG   |
+
+SELECT t1.team_name as team1 , t2.team_name as team2
+FROM Teams t1
+JOIN Teams t2 on t1.team_name < t2.team_name
+============================================================================================================================
+Year by Year difference in sales
+Input: Sales
+| sale_id  | sale_date  | amount |
+| -------- | ---------- | ------ |
+| 1        | 2021-03-15 | 1000   |
+| 2        | 2021-07-22 | 1500   |
+| 3        | 2022-01-10 | 2000   |
+| 4        | 2022-09-05 | 2500   |
+| 5        | 2023-02-18 | 3500   |
+| 6        | 2023-06-25 | 4000   |
+Output: 
+| year | total_sales  | previous_year_sales   | yoy_growth_percentage   |
+| ---- | ------------ | --------------------- | ----------------------- |
+| 2021 | 2500         | NULL                  | NULL                    |
+| 2022 | 4500         | 2500                  | 80.00                   |
+| 2023 | 7500         | 4500                  | 66.67                   |
+
+
+
+WITH yearly_sales AS (
+    SELECT 
+        EXTRACT(YEAR FROM sale_date) AS year,
+        SUM(amount) AS total_sales
+    FROM Sales
+    GROUP BY EXTRACT(YEAR FROM sale_date)
+)
+
+SELECT 
+    year,
+    total_sales,
+    LAG(total_sales) OVER (ORDER BY year) AS previous_year_sales,
+    ROUND(
+        (total_sales - LAG(total_sales) OVER (ORDER BY year)) 
+        / NULLIF(LAG(total_sales) OVER (ORDER BY year), 0) * 100,
+        2
+    ) AS yoy_growth_percentage
+FROM yearly_sales;
+=================================================================================================================================================
+| card_name              | issued_amount  | issue_month  | issue_year  |
+| ---------------------- | -------------- | ------------ | ----------- |
+| Chase Freedom Flex     | 55000          | 1            | 2021        |
+| Chase Freedom Flex     | 60000          | 2            | 2021        |
+| Chase Freedom Flex     | 65000          | 3            | 2021        |
+| Chase Freedom Flex     | 70000          | 4            | 2021        |
+| Chase Sapphire Reserve | 170000         | 1            | 2021        |
+| Chase Sapphire Reserve | 175000         | 2            | 2021        |
+| Chase Sapphire Reserve | 180000         | 3            | 2021        |
+Output:
+| card_name              | issue_year  | issue_month  | issued_amount  | monthly_diff  |
+| ---------------------- | ----------- | ------------ | -------------- | ------------- |
+| Chase Freedom Flex     | 2021        | 1            | 55000          | null          |
+| Chase Freedom Flex     | 2021        | 2            | 60000          | 5000          |
+| Chase Freedom Flex     | 2021        | 3            | 65000          | 5000          |
+| Chase Freedom Flex     | 2021        | 4            | 70000          | 5000          |
+| Chase Sapphire Reserve | 2021        | 1            | 170000         | null          |
+| Chase Sapphire Reserve | 2021        | 2            | 175000         | 5000          |
+| Chase Sapphire Reserve | 2021        | 3            | 180000         | 5000          |
+
+SELECT 
+    card_name,
+    issue_year,
+    issue_month,
+    issued_amount,
+    issued_amount - LAG(issued_amount) OVER (
+        PARTITION BY card_name, issue_year 
+        ORDER BY issue_month
+    ) AS monthly_diff
+FROM credit_card_issuance;
+=====================================================================================================================================================
+Calculate the average transaction amount per year for each client for the years 2018 to 2022. Transactions table
+| transaction_id  | user_id  | transaction_date  | transaction_amount  |
+| --------------- | -------- | ----------------- | ------------------- |
+| 1               | 269      | 2018-08-15        | 500.00              |
+| 2               | 478      | 2018-11-25        | 400.00              |
+| 3               | 269      | 2019-01-05        | 1000.00             |
+| 4               | 123      | 2020-10-20        | 600.00              |
+| 5               | 478      | 2021-07-05        | 700.00              |
+| 6               | 123      | 2022-03-05        | 900.00              |
+Output:
+| user_id  | year | avg_transaction_amount   |
+| -------- | ---- | ------------------------ |
+| 269      | 2018 | 500.00                   |
+| 269      | 2019 | 1000.00                  |
+| 478      | 2018 | 400.00                   |
+| 123      | 2020 | 600.00                   |
+| 478      | 2021 | 700.00                   |
+| 123      | 2022 | 900.00                   |
+
+SELECT 
+    user_id, 
+    YEAR(transaction_date) AS year, 
+    ROUND(AVG(transaction_amount), 2) AS avg_transaction_amount
+FROM  Transactions
+GROUP BY user_id, YEAR(transaction_date);
+===================================================================================================================================================
+Write a SQL query to find managers who directly oversee at least five employees within the same department. We'll also retrieve the department name and the total number of direct reports per manager, but only for departments with more than 10 employees.Input table Employee
+| id | name     | department | managerId |
+| -- | -------- | ---------- | --------- |
+| 1  | John     | HR         | NULL      |
+| 2  | Bob      | HR         | 1         |
+| 3  | Olivia   | HR         | 1         |
+| 4  | Emma     | Finance    | NULL      |
+| 5  | Sophia   | HR         | 1         |
+| 6  | Mason    | Finance    | 4         |
+| 7  | Ethan    | HR         | 1         |
+| 8  | Ava      | HR         | 1         |
+| 9  | Lucas    | HR         | 1         |
+| 10 | Isabella | Finance    | 4         |
+| 11 | Harper   | Finance    | 4         |
+| 12 | Hemla    | HR         | 3         |
+| 13 | Aisha    | HR         | 2         |
+| 14 | Himani   | HR         | 2         |
+| 15 | Lily     | HR         | 2         |
+Output:
+| manager_name  | department | direct_reports  |
+| ------------- | ---------- | --------------- |
+| John          | HR         | 6               |
+
+-- Step 1: Identify departments with more than 10 employees
+WITH DeptEmployeeCount AS (
+    SELECT department, COUNT(*) AS total_employees
+    FROM Employee
+    GROUP BY department
+    HAVING COUNT(*) > 10
+),
+
+-- Step 2: Count direct reports per manager per department
+ManagerReports AS (
+    SELECT 
+        e.managerId AS manager_id,
+        m.name AS manager_name,
+        e.department,
+        COUNT(*) AS direct_reports
+    FROM Employee e
+    JOIN Employee m ON e.managerId = m.id
+    GROUP BY e.managerId, m.name, e.department
+    HAVING COUNT(*) >= 5
+)
+
+-- Step 3: Filter to include only departments from Step 1
+SELECT 
+    mr.manager_name,
+    mr.department,
+    mr.direct_reports
+FROM ManagerReports mr
+JOIN DeptEmployeeCount dec ON mr.department = dec.department;
+========================================================================================================================================================================
+Finding the Net Present Value (NPV) for queries from two tables using SQL. 
+npv table
+| id | year | npv    |
+| -- | ---- | ------ |
+| 1  | 2018 | 100.00 |
+| 7  | 2020 | 30.00  |
+| 13 | 2019 | 40.00  |
+| 1  | 2019 | 113.00 |
+| 2  | 2008 | 121.00 |
+| 3  | 2009 | 12.00  |
+| 11 | 2020 | 99.00  |
+| 7  | 2019 | 0.00   |
+Queries table
+| id | year |
+| -- | ---- |
+| 1  | 2019 |
+| 2  | 2008 |
+| 3  | 2009 |
+| 7  | 2018 |
+| 7  | 2019 |
+| 7  | 2020 |
+| 13 | 2019 |
+Output:
+| id | year | npv    |
+| -- | ---- | ------ |
+| 1  | 2019 | 113.00 |
+| 2  | 2008 | 121.00 |
+| 3  | 2009 | 12.00  |
+| 7  | 2018 | 100.00 |
+| 7  | 2019 | 0.00   |
+| 7  | 2020 | 30.00  |
+| 13 | 2019 | 40.00  |
+
+SELECT 
+  q.id, 
+  COALESCE(n.npv, 0.00) AS npv, 
+  q.year AS year
+FROM Queries q 
+LEFT JOIN npv n ON n.id = q.id AND q.year = n.year;
+======================================================================================================================
+Calculate the average rating for each restaurant for each month. We'll be using Zomato's review data to calculate the average rating for each restaurant on a monthly basis. 
+Input : Reviews
+| review_id  | user_id  | submit_date  | restaurant_id  | rating |
+| ---------- | -------- | ------------ | -------------- | ------ |
+| 1001       | 501      | 2022-01-15   | 101            | 4      |
+| 1002       | 502      | 2022-01-20   | 101            | 5      |
+| 1003       | 503      | 2022-01-25   | 102            | 3      |
+| 1004       | 504      | 2022-01-15   | 102            | 4      |
+| 1005       | 505      | 2022-02-20   | 101            | 5      |
+| 1006       | 506      | 2022-02-26   | 101            | 4      |
+| 1007       | 507      | 2022-03-01   | 101            | 4      |
+| 1008       | 508      | 2022-03-05   | 102            | 2      |
+Output:
+| restaurant_id  | year_month  | average_rating  |
+| -------------- | ----------- | --------------- |
+| 101            | 2022-01     | 4.50            |
+| 102            | 2022-01     | 3.50            |
+| 101            | 2022-02     | 4.50            |
+| 101            | 2022-03     | 4.00            |
+| 102            | 2022-03     | 2.00            |
+
+SELECT restaurant_id , MONTH(submit_date) as year_month, ROUND(AVG(rating),2) as average_rating
+FROM Reviews
+GROUP BY MONTH(submit_date) , restaurant_id
+HAVING COUNT(*) > 2
+===================================================================================================================================
+Find the top 5 artists whose songs most frequently appeared in the Top 10 of the global charts.
+Input: Artists
+| artist_id | artist_name | label_owner        |
+| ---------- | ------------ | ------------------- |
+| 101        | Ed Sheeran   | Warner Music Group  |
+| 120        | Drake        | Warner Music Group  |
+| 125        | Bad Bunny    | Rimas Entertainment |
+| 130        | Lady Gaga    | Interscope Records  |
+| 140        | Katy Perry   | Capitol Records     |
+Songs:
+| song_id | artist_id | name          |
+| -------- | ---------- | ------------- |
+| 55511    | 101        | Perfect       |
+| 45202    | 101        | Shape of You  |
+| 22222    | 120        | One Dance     |
+| 19960    | 120        | Hotline Bling |
+| 33333    | 125        | Dákiti        |
+| 44444    | 125        | Yonaguni      |
+| 55555    | 130        | Bad Romance   |
+| 66666    | 130        | Poker Face    |
+| 99999    | 140        | Roar          |
+| 101010   | 140        | Firework      |
+Global_song_rank
+| day | song_id | rank |
+| --- | -------- | ---- |
+| 1   | 45202    | 5    |
+| 3   | 45202    | 2    |
+| 1   | 19960    | 3    |
+| 9   | 19960    | 6    |
+| 1   | 55511    | 8    |
+| 5   | 22222    | 7    |
+| 2   | 33333    | 4    |
+| 4   | 44444    | 8    |
+| 6   | 55555    | 1    |
+| 7   | 66666    | 10   |
+| 5   | 99999    | 5    |
+Output:
+| artist_name  | top_10_appearances   |
+| ------------ | -------------------- |
+| Ed Sheeran   | 3                    |
+| Drake        | 3                    |
+| Bad Bunny    | 2                    |
+| Lady Gaga    | 2                    |
+| Katy Perry   | 1                    |
+
+SELECT 
+	a.artist_name, 
+    COUNT(*) AS top_10_appearances
+FROM 
+    global_song_rank g
+JOIN 
+    songs s ON g.song_id = s.song_id
+JOIN 
+    artists a ON a.artist_id = s.artist_id
+WHERE 
+    g.rank <= 10
+GROUP BY 
+    a.artist_name
+ORDER BY 
+    top_10_appearances DESC
+LIMIT 5;
+=====================================================================================================================================================
+Find the details of employees having 3rd highest salary in each job_category
+Input: Employees
+| employee_id  | first_name  | last_name  | salary   | job_category  |
+| ------------ | ----------- | ---------- | -------- | ------------- |
+| 101          | John        | Doe        | 50000.00 | DEV           |
+| 102          | Jane        | Smith      | 60000.00 | DEV           |
+| 104          | Charlie     | Davis      | 58000.00 | DEV           |
+| 108          | Ivan        | Hall       | 62000.00 | DEV           |
+| 103          | Alice       | Johnson    | 61000.00 | HR            |
+| 105          | Eve         | Miller     | 61000.00 | HR            |
+| 107          | Heidi       | Clark      | 57000.00 | HR            |
+| 109          | Judy        | Lewis      | 53000.00 | HR            |
+| 110          | Paul        | Allen      | 70000.00 | FIN           |
+| 113          | Olivia      | Scott      | 65000.00 | FIN           |
+| 115          | Nora        | Adams      | 72000.00 | FIN           |
+| 106          | Grace       | Wilson     | 66000.00 | PDT           |
+| 111          | Rose        | Baker      | 68000.00 | PDT           |
+| 112          | Max         | Carter     | 66000.00 | PDT           |
+| 114          | Lucas       | Turner     | 64000.00 | PDT           |
+Output:
+| employee_id  | first_name  | last_name  | salary   | job_category  |
+| ------------ | ----------- | ---------- | -------- | ------------- |
+| 104          | Charlie     | Davis      | 58000.00 | DEV           |
+| 107          | Heidi       | Clark      | 57000.00 | HR            |
+| 114          | Lucas       | Turner     | 64000.00 | PDT           |
+| 113          | Olivia      | Scott      | 65000.00 | FIN           |
+WITH cte AS (
+    SELECT *, 
+           DENSE_RANK() OVER (PARTITION BY job_category ORDER BY salary DESC) AS rank
+    FROM employees
+)
+SELECT employee_id, first_name, last_name, salary, job_category
+FROM cte
+WHERE rank = 3;
+==================================================================================================================================================
+Given the details of the Amazon customer, specifically focusing on the 'product_spend' table, which contains information about customer purchases, the products they bought, and how much they spent.You need to find the top two highest-selling products within each category based on total spending. 
+Input:ProductSpend
+| category    | product          | user_id  | spend  |
+| ----------- | ---------------- | -------- | ------ |
+| appliance   | refrigerator     | 165      | 26.00  |
+| appliance   | refrigerator     | 123      | 3.00   |
+| appliance   | washing machine  | 123      | 19.80  |
+| electronics | vacuum           | 178      | 5.00   |
+| electronics | wireless headset | 156      | 7.00   |
+| electronics | vacuum           | 145      | 15.00  |
+| electronics | laptop           | 114      | 999.99 |
+| fashion     | dress            | 117      | 49.99  |
+| groceries   | milk             | 243      | 2.99   |
+| groceries   | bread            | 645      | 1.99   |
+| home        | furniture        | 276      | 599.99 |
+| home        | decor            | 456      | 29.99  |
+Output:
+| category    | product         | total_spend  |
+| ----------- | --------------- | ------------ |
+| appliance   | refrigerator    | 29.00        |
+| appliance   | washing machine | 19.80        |
+| electronics | laptop          | 999.99       |
+| electronics | vacuum          | 20.00        |
+| fashion     | dress           | 49.99        |
+| groceries   | milk            | 2.99         |
+| groceries   | bread           | 1.99         |
+| home        | furniture       | 599.99       |
+| home        | decor           | 29.99        |
+
+WITH product_totals AS (
+    SELECT 
+        category,
+        product,
+        SUM(spend) AS total_spend
+    FROM ProductSpend
+    GROUP BY category, product
+),
+ranked_products AS (
+    SELECT *,
+           DENSE_RANK() OVER (PARTITION BY category ORDER BY total_spend DESC) AS rnk
+    FROM product_totals
+)
+SELECT category, product, total_spend
+FROM ranked_products
+WHERE rnk <= 2;
+================================================================================================================================================================
+Find a user's third transaction:Transactions
+| user_id  | spend  | transaction_date    |
+| -------- | ------ | ------------------- |
+| 111      | 100.50 | 2022-01-08 12:00:00 |
+| 111      | 55.00  | 2022-01-10 12:00:00 |
+| 121      | 36.00  | 2022-01-18 12:00:00 |
+| 145      | 24.99  | 2022-01-26 12:00:00 |
+| 111      | 89.60  | 2022-02-05 12:00:00 |
+Output:
+| user_id  | spend | transaction_date    |
+| -------- | ----- | ------------------- |
+| 111      | 89.60 | 2022-02-05 12:00:00 |
+
+WITH RankedTransactions AS (
+  SELECT *,
+         ROW_NUMBER() OVER (PARTITION BY user_id ORDER BY transaction_date) AS txn_rank
+  FROM transactions
+)
+SELECT user_id, spend, transaction_date
+FROM RankedTransactions
+WHERE txn_rank = 3;
+================================================================================================================================================================
+Input: customer_contracts
+| customer_id  | product_id  | amount |
+| ------------ | ----------- | ------ |
+| 1            | 101         | 200    |
+| 1            | 102         | 150    |
+| 1            | 103         | 180    |
+| 2            | 101         | 210    |
+| 2            | 102         | 130    |
+| 3            | 101         | 190    |
+| 3            | 104         | 250    |
+Products
+| product_id  | product_category  | product_name  |
+| ----------- | ----------------- | ------------- |
+| 101         | Electronics       | Laptop        |
+| 102         | Clothing          | T-Shirt       |
+| 103         | Grocery           | Rice Bag      |
+| 104         | Grocery           | Wheat Flour   |
+Output:
+| customer_id  |
+| ------------ |
+| 1            |
+
+-- Step 1: Get the total number of distinct product categories
+WITH total_category AS (
+  SELECT COUNT(DISTINCT product_category) AS total_category
+  FROM Products
+),
+
+-- Step 2: Map each customer to the product and its category
+customer_map AS (
+  SELECT c.customer_id, c.product_id, p.product_category 
+  FROM customer_contracts c
+  JOIN Products p ON c.product_id = p.product_id
+),
+
+-- Step 3: Count distinct categories per customer
+totals AS (
+  SELECT customer_id, COUNT(DISTINCT product_category) AS product_category_count
+  FROM customer_map 
+  GROUP BY customer_id
+)
+
+-- Step 4: Filter customers who bought from all categories
+SELECT customer_id
+FROM totals 
+WHERE product_category_count = (SELECT total_category FROM total_category);
+
+
+or
+
+-- Count of distinct product categories
+WITH category_count AS (
+  SELECT COUNT(DISTINCT product_category) AS total_categories
+  FROM products
+),
+
+-- Join contracts and products to get category per purchase
+customer_categories AS (
+  SELECT cc.customer_id, p.product_category
+  FROM customer_contracts cc
+  JOIN products p ON cc.product_id = p.product_id
+  GROUP BY cc.customer_id, p.product_category
+),
+
+-- Count how many distinct categories each customer has bought from
+customer_category_count AS (
+  SELECT customer_id, COUNT(DISTINCT product_category) AS categories_bought
+  FROM customer_categories
+  GROUP BY customer_id
+)
+
+-- Final filter: customers who bought from all categories
+SELECT ccc.customer_id
+FROM customer_category_count ccc, category_count cc   -- this is the shorthand for CROSS JOIN 
+WHERE ccc.categories_bought = cc.total_categories;
+==========================================================================================================================================
+Write an SQL to find the list of premium customers along with the number of orders placed by each of them, display the results in highest to lowest no of orders. Where premium customer is the customer who placed order greater than average orders
+Orders:
+| order_id  | order_date  | customer_name  | sales |
+| --------- | ----------- | -------------- | ----- |
+| 1         | 2023-01-01  | Alexa          | 2000  |
+| 2         | 2023-01-02  | Alexa          | 300   |
+| 3         | 2023-01-03  | Alexa          | 1100  |
+| 4         | 2023-01-03  | Alexa          | 1350  |
+| 5         | 2023-01-01  | Ramesh         | 3500  |
+| 6         | 2023-01-02  | Ramesh         | 1600  |
+| 7         | 2023-01-03  | Ramesh         | 1100  |
+| 8         | 2023-01-03  | Neha           | 1200  |
+| 9         | 2023-01-03  | Subhash        | 1000  |
+| 10        | 2023-01-03  | Subhash        | 1050  |
+Output:
+| customer_name  | num_orders  |
+| -------------- | ----------- |
+| Alexa          | 4           |
+| Ramesh         | 3           |
+
+SELECT customer_name, COUNT(*) AS num_orders
+FROM orders
+GROUP BY customer_name
+HAVING COUNT(*) > (
+    SELECT AVG(order_count)
+    FROM (
+        SELECT customer_name, COUNT(*) AS order_count
+        FROM orders
+        GROUP BY customer_name
+    ) AS customer_orders
+)
+ORDER BY num_orders DESC;
+========================================================================================================================================================
+Convert unpivoted table to pivoted table:SalesData
+| Year | Quarter | Sales |
+| ---- | ------- | ----- |
+| 2024 | Q1      | 1000  |
+| 2024 | Q2      | 1500  |
+| 2024 | Q3      | 2000  |
+| 2024 | Q4      | 2500  |
+| 2025 | Q1      | 1200  |
+| 2025 | Q2      | 1800  |
+| 2025 | Q3      | 2100  |
+| 2025 | Q4      | 2600  |
+Output:
+| Year | Q1   | Q2   | Q3   | Q4   |
+| ---- | ---- | ---- | ---- | ---- |
+| 2024 | 1000 | 1500 | 2000 | 2500 |
+| 2025 | 1200 | 1800 | 2100 | 2600 |
+
+SELECT *
+FROM (
+    SELECT Year, Quarter, Sales
+    FROM SalesData
+) AS SourceTable
+PIVOT (
+    SUM(Sales)
+    FOR Quarter IN ([Q1], [Q2], [Q3], [Q4])
+) AS PivotTable;
+
+Unpivoting:
+SELECT Year, Quarter, Sales
+FROM YearlySales
+UNPIVOT (
+    Sales FOR Quarter IN (Q1, Q2, Q3, Q4)
+) AS UnpivotedData;
+=================================================================================================================================================
+Query to find number of times each student has taken each exam
+Students:
+| student_id  | student_name  |
+| ----------- | ------------- |
+| 1           | Alice         |
+| 2           | Bob           |
+| 3           | John          |
+| 4           | Alex          |
+Examinations:
+| student_id  | subject_name  |
+| ----------- | ------------- |
+| 1           | Math          |
+| 1           | Physics       |
+| 1           | Programming   |
+| 2           | Programming   |
+| 1           | Physics       |
+| 1           | Math          |
+| 3           | Math          |
+| 3           | Programming   |
+| 3           | Physics       |
+| 2           | Math          |
+| 1           | Math          |
+| 4           | Math          |
+Output:
+| student_name  | subject_name  | attended_exams  |
+| ------------- | ------------- | --------------- |
+| Alice         | Math          | 3               |
+| Alice         | Physics       | 2               |
+| Alice         | Programming   | 1               |
+| Bob           | Math          | 1               |
+| Bob           | Programming   | 1               |
+| John          | Math          | 1               |
+| John          | Physics       | 1               |
+| John          | Programming   | 1               |
+| Alex          | Math          | 1               |
+
+SELECT s.student_name , e.subject_name , COUNT(*) as attended_exams
+FROM Students s 
+JOIN Examinations e ON s.student_id = e.student_id
+GROUP BY s.student_id , e.subject_name , s.student_name -- in Postgres u might get error since output field is not included anywhere in aggregation so just included
+ORDER BY attended_exams DESC
+=================================================================================================================================================
+rolling sum of orders for each product ordered by sold_date:Sales
+| product_id  | product_name  | price | sold_date  | 
+| ----------- | ------------- | ----- | ---------- |
+| 1           | mouse         | 150   | 2025-01-01 |
+| 1           | mouse         | 145   | 2025-01-02 |
+| 1           | mouse         | 280   | 2025-01-03 |
+| 1           | mouse         | 300   | 2025-01-04 |
+| 1           | mouse         | 150   | 2025-01-05 |
+| 2           | key-board     | 350   | 2025-01-01 |
+| 2           | key-board     | 380   | 2025-01-02 |
+| 2           | key-board     | 390   | 2025-01-03 |
+| 2           | key-board     | 400   | 2025-01-04 |
+Output: 
+| product_id  | product_name  | sold_date  | price | rolling_sum  |
+| ----------- | ------------- | ---------- | ----- | ------------ |
+| 1           | mouse         | 2025-01-01 | 150   | 150          |
+| 1           | mouse         | 2025-01-02 | 145   | 295          |
+| 1           | mouse         | 2025-01-03 | 280   | 575          |
+| 1           | mouse         | 2025-01-04 | 300   | 875          |
+| 1           | mouse         | 2025-01-05 | 150   | 1025         |
+| 2           | key-board     | 2025-01-01 | 350   | 350          |
+| 2           | key-board     | 2025-01-02 | 380   | 730          |
+| 2           | key-board     | 2025-01-03 | 390   | 1120         |
+| 2           | key-board     | 2025-01-04 | 400   | 1520         |
+
+SELECT *, 
+       SUM(price) OVER (PARTITION BY product_id ORDER BY sold_date) AS rolling_sum
+FROM sales;
+
+2) Rolling sum for current_date and 2 days preceding
+Output:
+| product_id  | product_name  | sold_date  | price | rolling_sum  |
+| ----------- | ------------- | ---------- | ----- | ------------ |
+| 1           | mouse         | 2025-01-01 | 150   | 150          |
+| 1           | mouse         | 2025-01-02 | 145   | 295          |
+| 1           | mouse         | 2025-01-03 | 280   | 575          |
+| 1           | mouse         | 2025-01-04 | 300   | 725          |
+| 1           | mouse         | 2025-01-05 | 150   | 730          |
+| 2           | key-board     | 2025-01-01 | 350   | 350          |
+| 2           | key-board     | 2025-01-02 | 380   | 730          |
+| 2           | key-board     | 2025-01-03 | 390   | 1120         |
+| 2           | key-board     | 2025-01-04 | 400   | 1170         |
+
+SELECT *, 
+  SUM(price) OVER (
+    PARTITION BY product_id 
+    ORDER BY sold_date 
+    ROWS BETWEEN 2 PRECEDING AND CURRENT ROW
+  ) AS rolling_sum
+FROM sales;
+=================================================================================================================================================
+Query to find employees who are inside office. Office table input
+| emp_id  | emp_status  | time_id             |
+| ------- | ----------- | ------------------- |
+| 1       | in          | 2023-12-22 09:00:00 |
+| 1       | out         | 2023-12-22 09:15:00 |
+| 2       | in          | 2023-12-22 09:00:00 |
+| 2       | out         | 2023-12-22 09:15:00 |
+| 2       | in          | 2023-12-22 09:30:00 |
+| 3       | out         | 2023-12-22 09:00:00 |
+| 3       | in          | 2023-12-22 09:15:00 |
+| 3       | out         | 2023-12-22 09:30:00 |
+| 3       | in          | 2023-12-22 09:45:00 |
+| 4       | in          | 2023-12-22 09:45:00 |
+| 5       | out         | 2023-12-22 09:40:00 |
+Output:
+| emp_id  |
+| ------- |
+| 2       |
+| 3       |
+| 4       |
+
+WITH max_in_time AS (
+  SELECT emp_id, MAX(time_id) AS in_max
+  FROM Office
+  WHERE emp_status = 'in'
+  GROUP BY emp_id
+),
+max_out_time AS (
+  SELECT emp_id, MAX(time_id) AS out_max
+  FROM Office
+  WHERE emp_status = 'out'
+  GROUP BY emp_id
+)
+
+SELECT mi.emp_id
+FROM max_in_time mi
+LEFT JOIN max_out_time mo ON mi.emp_id = mo.emp_id
+WHERE mo.out_max IS NULL OR mi.in_max > mo.out_max;
+
+OR
+
+WITH in_entries AS (
+    SELECT * FROM office WHERE emp_status = 'in'
+),
+out_entries AS (
+    SELECT * FROM office WHERE emp_status = 'out'
+),
+in_out_match AS (
+    SELECT 
+        i.emp_id,
+        i.time_id AS in_time,
+        o.time_id AS out_time,
+        ROW_NUMBER() OVER (PARTITION BY i.emp_id, i.time_id ORDER BY o.time_id) AS rn
+    FROM in_entries i
+    LEFT JOIN out_entries o 
+        ON i.emp_id = o.emp_id AND o.time_id > i.time_id
+)
+SELECT emp_id, in_time
+FROM in_out_match
+WHERE rn = 1 AND out_time IS NULL;

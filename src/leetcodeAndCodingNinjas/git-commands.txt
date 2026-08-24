@@ -1,0 +1,19 @@
+git init 
+
+git add README.md 
+
+git commit -m "first commit" 
+
+git remote add origin my_url 
+
+git push -u origin master 
+
+ 
+
+git fetch - updating references from remote repository 
+
+git checkout @{u} -- myfolder (pulling a specific folder) // use with caution 
+
+git pull - pull everything from remote repository 
+
+git clone -b <branch_name> remote name 
