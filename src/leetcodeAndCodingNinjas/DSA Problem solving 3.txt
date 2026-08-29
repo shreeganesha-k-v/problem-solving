@@ -1708,3 +1708,191 @@ public class Solution {
     }
 }
 ========================================================================================================================================================================================================
+Round Robin is a CPU Scheduling algorithm where each process is assigned a fixed time slice / quantum in a cyclic manner.You should be aware of the following terms before proceeding:
+Arrival time: Time at which the process arrives.Burst time: The time the process takes for its execution. Completion time: Time at which the process completes its execution.Turn Around time: Time difference between the Completion time and the Arrival time.Waiting time: Time difference between the Turn Around time and the Burst time.You are given time slice / quantum and a list of processes where 'PROCESS[ i ]' denotes the Burst time of the process 'i'. Your task is to perform Round Robin scheduling and print a list of Waiting time where (i)th index of your list denotes the waiting time for 'PROCESS[ i ]'.
+Sample Input 1:4 2	5 3 4 2					Sample output 1:9 8 9 6
+Explanation of Sample output 1:The pictorial representation for the scheduling will be as follows:
+Waiting time for P1: 14 - 5 i.e. 9.Waiting time for P2: 11 - 3 i.e. 8.Waiting time for P3: 13 - 4 i.e. 9.Waiting time for P4: 8 - 2 i.e. 6.Thus, the output will be [ 9, 8, 9, 6 ].
+Sample Input2:	3 2		5 4 3 			Sample Output2:	7 6 8
+
+public class Solution {
+
+    public static ArrayList<Integer> roundRobin(
+            ArrayList<Integer> process,
+            int n,
+            int quantum) {
+
+        // Remaining burst time for every process.
+        int[] remaining = new int[n];
+
+        // Copy the original burst times.
+        for (int i = 0; i < n; i++) {
+            remaining[i] = process.get(i);
+        }
+
+        // Completion time for every process.
+        int[] completion = new int[n];
+
+        // Queue stores process indexes.
+        Queue<Integer> queue = new LinkedList<>();
+
+        // Initially all processes have arrived.
+        for (int i = 0; i < n; i++) {
+            queue.offer(i);
+        }
+
+        // Current CPU time.
+        int currentTime = 0;
+
+        while (!queue.isEmpty()) {
+
+            // Get the next process.
+            int index = queue.poll();
+
+            // Process can execute for at most quantum time.
+            int executionTime = Math.min(
+                    quantum,
+                    remaining[index]
+            );
+
+            // CPU executes this process.
+            currentTime += executionTime;
+
+            // Reduce remaining burst time.
+            remaining[index] -= executionTime;
+
+            // If process is completed,
+            // record its completion time.
+            if (remaining[index] == 0) {
+
+                completion[index] = currentTime;
+
+            } else {
+
+                // Process is not completed.
+                // Put it back at the end of the queue.
+                queue.offer(index);
+            }
+        }
+
+        ArrayList<Integer> waitingTime = new ArrayList<>();
+
+        for (int i = 0; i < n; i++) {
+
+            /*
+             * Waiting Time =
+             * Turn Around Time - Burst Time
+             *
+             * Arrival time = 0
+             *
+             * Turn Around Time =
+             * Completion Time - Arrival Time
+             * = Completion Time
+             */
+            int wait = completion[i] - process.get(i);
+
+            waitingTime.add(wait);
+        }
+
+        return waitingTime;
+    }
+}
+========================================================================================================================================================================================================
+You’re given two binary trees. Your task is to check if all the trees’ levels are anagrams of each other. If they’re anagram of each other, print ‘Yes’ else print ‘No.’
+Note :An Anagram is a word or phrase formed by rearranging the letters of a different word or phrase, typically using all the original letters exactly once.Detailed explanation ( Input/output format, Notes, Images )
+Sample Input 1:
+1 2 3 -1 -1 -1 -1 
+1 3 2 -1 -1 -1 -1
+Sample Output 1:
+Yes
+Explanation of Sample Input 1:The first level of both trees is an anagram of each other since it only has 1. The second level of the first tree contains elements 2, 3, which is also an anagram, to the second tree’s second level, including elements 3,2.
+Sample Input 2 :
+1 3 2 -1 -1 5 4 -1 -1 -1 -1 
+1 2 3 4 5 -1 -1 -1 -1 -1 -1   
+Sample Output 2 :Yes
+Explanation of Sample Input 2 :The first level of both trees contains 1. Hence they are an anagram of each other. The second level of the first tree has 3,2, is an anagram to the second level of the second tree, which contains 2,3, and the third level of the first tree contains 5,4, which is also an anagram to the third level of the second tree, which includes 4,5.
+
+public class Solution {
+
+    public static boolean areAnagrams(TreeNode root1, TreeNode root2) {
+
+        // If both trees are empty, they are considered equal.
+        if (root1 == null && root2 == null) {
+            return true;
+        }
+
+        // If only one tree is empty, they cannot have
+        // matching levels.
+        if (root1 == null || root2 == null) {
+            return false;
+        }
+
+        Queue<TreeNode> q1 = new LinkedList<>();
+        Queue<TreeNode> q2 = new LinkedList<>();
+
+        q1.offer(root1);
+        q2.offer(root2);
+
+        while (!q1.isEmpty() && !q2.isEmpty()) {
+
+            // Both queues should contain the same number
+            // of nodes at the current level.
+            if (q1.size() != q2.size()) {
+                return false;
+            }
+
+            // Frequency maps for the current level.
+            Map<Integer, Integer> freq1 = new HashMap<>();
+            Map<Integer, Integer> freq2 = new HashMap<>();
+
+            int levelSize = q1.size();
+
+            // Process current level of both trees.
+            for (int i = 0; i < levelSize; i++) {
+
+                TreeNode node1 = q1.poll();
+                TreeNode node2 = q2.poll();
+
+                // Count values in tree 1.
+                freq1.put(
+                    node1.data,
+                    freq1.getOrDefault(node1.data, 0) + 1
+                );
+
+                // Count values in tree 2.
+                freq2.put(
+                    node2.data,
+                    freq2.getOrDefault(node2.data, 0) + 1
+                );
+
+                // Add children of tree 1.
+                if (node1.left != null) {
+                    q1.offer(node1.left);
+                }
+
+                if (node1.right != null) {
+                    q1.offer(node1.right);
+                }
+
+                // Add children of tree 2.
+                if (node2.left != null) {
+                    q2.offer(node2.left);
+                }
+
+                if (node2.right != null) {
+                    q2.offer(node2.right);
+                }
+            }
+
+            // If the frequency maps differ,
+            // this level is not an anagram.
+            if (!freq1.equals(freq2)) {
+                return false;
+            }
+        }
+
+        // Both trees must finish at the same time.
+        return q1.isEmpty() && q2.isEmpty();
+    }
+}
+========================================================================================================================================================================================================
