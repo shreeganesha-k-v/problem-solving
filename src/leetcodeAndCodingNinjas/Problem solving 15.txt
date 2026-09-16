@@ -1038,4 +1038,257 @@ class Solution {
     }
 }
 ========================================================================================================================================================================================================
+You are given a string ‘S’ consisting of alphanumeric characters, the string divided into groups by a ‘-’. Your task is to reformat the string that all the groups contain exactly ‘K’ characters. All the lowercase characters should be converted to uppercase.
+Sample Input 1:k=3	Ab-ijklmno-pqr				k=4		Isa-dkj
+Sample Output 1:	ABI-JKL-MNO-PQR				IS-ADKJ
+Explanation:For the first test case ‘S’ = ’Ab-ijklmno-pqr’ and ‘K’ = ‘3’, then the string contains 3 groups, [“Ab”, “ijklmno”, “pqr”], then you can form the string in groups ["ABI”, “JKL”, “MNO”, “PQR"] of uppercase characters. Hence the answer is "ABI-JKL-MNO-PQR".For the second test case ‘S’ = “Isa-dkj” and ‘K’ = ‘4’, then the string contains 2 groups, [“Isa”, “dkj”], then you can form the string in groups ["IS”, “ADKJ”] of uppercase characters. Hence the answer is "IS-ADKJ".
+Sample Input 2: k =2	a-b-1		k=1	abcdef
+Sample Output 2:A-B1				A-B-C-D-E-F
  
+public class Solution {
+
+    public static String reformatString(String s, int k) {
+
+        // Remove all hyphens and convert to uppercase.
+        String str = s.replace("-", "").toUpperCase();
+
+        int n = str.length();
+
+        // Find the size of the first group.
+        int firstGroupSize = n % k;
+
+        // If divisible by k, the first group has k characters.
+        if (firstGroupSize == 0) {
+            firstGroupSize = k;
+        }
+
+        StringBuilder result = new StringBuilder();
+
+        int index = 0;
+
+        // Add the first group.
+        result.append(str, 0, firstGroupSize);
+
+        index = firstGroupSize;
+
+        // Add remaining groups of exactly k characters.
+        while (index < n) {
+
+            result.append("-");
+
+            int end = Math.min(index + k, n);
+
+            result.append(str, index, end);
+
+            index = end;
+        }
+
+        return result.toString();
+    }
+}
+========================================================================================================================================================================================================
+You are given an array of digits called digits. Your task is to determine the number of distinct three-digit even numbers that can be formed using these digits.Note: Each copy of a digit can only be used once per number, and there may not be leading zeros.
+Example 1:Input: digits = [1,2,3,4]				Output: 12
+Explanation: The 12 distinct 3-digit even numbers that can be formed are 124, 132, 134, 142, 214, 234, 312, 314, 324, 342, 412, and 432. Note that 222 cannot be formed because there is only 1 copy of the digit 2.
+Example 2:Input: digits = [0,2,2]				Output: 2
+Explanation: The only 3-digit even numbers that can be formed are 202 and 220. Note that the digit 2 can be used twice because it appears twice in the array.
+Example 3:Input: digits = [6,6,6]				Output: 1
+Explanation: Only 666 can be formed.
+Example 4:Input: digits = [1,3,5]				Output: 0
+Explanation: No even 3-digit numbers can be formed.
+
+import java.util.*;
+
+public class Solution {
+
+    public int totalNumbers(int[] digits) {
+
+        // Count the frequency of each digit.
+        int[] freq = new int[10];
+
+        for (int digit : digits) {
+            freq[digit]++;
+        }
+
+        int count = 0;
+
+        // Choose the hundreds digit.
+        // It cannot be zero.
+        for (int hundreds = 1; hundreds <= 9; hundreds++) {
+
+            if (freq[hundreds] == 0) {
+                continue;
+            }
+
+            freq[hundreds]--;
+
+            // Choose the tens digit.
+            for (int tens = 0; tens <= 9; tens++) {
+
+                if (freq[tens] == 0) {
+                    continue;
+                }
+
+                freq[tens]--;
+
+                // Choose the units digit.
+                // It must be even.
+                for (int units = 0; units <= 8; units += 2) {
+
+                    if (freq[units] > 0) {
+                        count++;
+                    }
+                }
+
+                // Restore the tens digit.
+                freq[tens]++;
+            }
+
+            // Restore the hundreds digit.
+            freq[hundreds]++;
+        }
+
+        return count;
+    }
+}
+========================================================================================================================================================================================================
+You are given an integer n.Return the total number of commas used when writing all integers from [1, n] (inclusive) in standard number formatting.
+In standard formatting:A comma is inserted after every three digits from the right.Numbers with fewer than 4 digits contain no commas.
+Example 1:Input: n = 1002				Output: 3
+Explanation:The numbers "1,000", "1,001", and "1,002" each contain one comma, giving a total of 3.
+Example 2:Input: n = 998				Output: 0
+Explanation:All numbers from 1 to 998 have fewer than four digits. Therefore, no commas are used.
+
+public class Solution {
+
+    public long countCommas(int n) {
+
+        long total = 0;
+
+        // Numbers with at least 4 digits contain one comma.
+        if (n >= 1000) {
+            total += n - 999;
+        }
+
+        // Numbers with at least 7 digits contain a second comma.
+        if (n >= 1_000_000) {
+            total += n - 999_999;
+        }
+
+        // Numbers with at least 10 digits contain a third comma.
+        if (n >= 1_000_000_000) {
+            total += (long) n - 999_999_999;
+        }
+
+        return total;
+    }
+}
+======================================================================================================================================================================================================== 
+You have been given two binary strings ‘A’ and ‘B’. Your task is to find the sum of both strings in the form of a binary string.
+Sample Input 1:	10 01				111 10
+Sample Output 1:	11				1001
+Explanation of sample input 1:In the first test case, the first string is “10” which is 2 in the decimal format, and the second string is “01” which is 1 in the decimal format. So, 2 + 1 = 3, which is represented as “11” in binary form.In the first test case, the first string is “111” which is 7 in the decimal format, and the second string is “10” which is 2 in the decimal format. So, 7 + 2 = 9, which is represented as “1001” in binary form.
+Sample Input 2:	111 0			1 1
+Sample Output 2:111				10
+Explanation for sample input 2:In the first test case, the first string is “111” which is 7 in the decimal format, and the second string is “0” which is 0 in the decimal format. So, 7 + 0 = 0, which is represented as “111” in binary form.In the first test case, the first string is “1” which is 1 in the decimal format and the second string is “1” which is 1 in the decimal format. So, 1 + 1 = 2, which is represented as “10” in binary form.
+
+public class Solution {
+
+    public static String addBinary(String A, String B) {
+
+        int i = A.length() - 1;
+        int j = B.length() - 1;
+
+        int carry = 0;
+
+        StringBuilder result = new StringBuilder();
+
+        // Continue while either string has digits
+        // or a carry is still remaining.
+        while (i >= 0 || j >= 0 || carry != 0) {
+
+            int sum = carry;
+
+            // Add the current digit of A.
+            if (i >= 0) {
+                sum += A.charAt(i) - '0';
+                i--;
+            }
+
+            // Add the current digit of B.
+            if (j >= 0) {
+                sum += B.charAt(j) - '0';
+                j--;
+            }
+
+            // Store the current binary digit.
+            result.append(sum % 2);
+
+            // Calculate carry for the next position.
+            carry = sum / 2;
+        }
+
+        // Digits were added from right to left,
+        // so reverse them to get the correct answer.
+        return result.reverse().toString();
+    }
+}
+========================================================================================================================================================================================================
+You are given two images, img1 and img2, represented as binary, square matrices of size n x n. A binary matrix has only 0s and 1s as values.We translate one image however we choose by sliding all the 1 bits left, right, up, and/or down any number of units. We then place it on top of the other image. We can then calculate the overlap by counting the number of positions that have a 1 in both images.Note also that a translation does not include any kind of rotation. Any 1 bits that are translated outside of the matrix borders are erased.Return the largest possible overlap.
+Example 1:Input: img1 = [[1,1,0],[0,1,0],[0,1,0]], img2 = [[0,0,0],[0,1,1],[0,0,1]]				Output: 3
+Explanation: We translate img1 to right by 1 unit and down by 1 unit.The number of positions that have a 1 in both images is 3 (shown in red).
+Example 2:Input: img1 = [[1]], img2 = [[1]]														Output: 1
+Example 3:Input: img1 = [[0]], img2 = [[0]]														Output: 0
+
+public class Solution {
+
+    public int largestOverlap(int[][] img1, int[][] img2) {
+
+        int n = img1.length;
+
+        List<int[]> ones1 = new ArrayList<>();
+        List<int[]> ones2 = new ArrayList<>();
+
+        // Store coordinates of all 1s in img1.
+        for (int r = 0; r < n; r++) {
+            for (int c = 0; c < n; c++) {
+                if (img1[r][c] == 1) {
+                    ones1.add(new int[]{r, c});
+                }
+            }
+        }
+
+        // Store coordinates of all 1s in img2.
+        for (int r = 0; r < n; r++) {
+            for (int c = 0; c < n; c++) {
+                if (img2[r][c] == 1) {
+                    ones2.add(new int[]{r, c});
+                }
+            }
+        }
+
+        Map<String, Integer> frequency = new HashMap<>();
+
+        int maxOverlap = 0;
+
+        // Try aligning every 1 in img1 with every 1 in img2.
+        for (int[] p1 : ones1) {
+            for (int[] p2 : ones2) {
+
+                int dr = p2[0] - p1[0];
+                int dc = p2[1] - p1[1];
+
+                String key = dr + "," + dc;
+
+                int count = frequency.getOrDefault(key, 0) + 1;
+
+                frequency.put(key, count);
+
+                maxOverlap = Math.max(maxOverlap, count);
+            }
+        }
+
+        return maxOverlap;
+    }
+}
+========================================================================================================================================================================================================
