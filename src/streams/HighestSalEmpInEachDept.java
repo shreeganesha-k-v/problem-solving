@@ -2,6 +2,7 @@ package streams;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class HighestSalEmpInEachDept {
@@ -13,14 +14,47 @@ public class HighestSalEmpInEachDept {
                 new Employee("Eve", "Finance", 70000.0));
 
         employeeList.stream()
-                .collect(Collectors.groupingBy(Employee::dept,Collectors.maxBy(Comparator.comparingDouble(Employee::salary))))
+                .collect(Collectors.groupingBy(
+                        Employee::dept,
+                        Collectors.maxBy(
+                                Comparator.comparingDouble(Employee::salary)
+                                        .thenComparing(
+                                                Employee::name,
+                                                Comparator.reverseOrder()
+                                        )
+                        )
+                ))
                 .entrySet()
                 .stream()
-                .sorted((a,b)->a.getKey().compareTo(b.getKey()))
-                .forEach(entry->{
+                .sorted(Map.Entry.comparingByKey())
+                .forEach(entry -> {
                     System.out.println("Department: " + entry.getKey());
-                    entry.getValue().ifPresent(employee -> System.out.println("Employee: " + employee.name() + ", Salary: " + employee.salary()));
+
+                    entry.getValue().ifPresent(employee ->
+                            System.out.println(
+                                    "Employee: " + employee.name()
+                                            + ", Salary: " + employee.salary()
+                            )
+                    );
                 });
+
+        // Simple or cleaner approach
+        Map<String, Employee> result = employeeList.stream()
+                .collect(Collectors.toMap(
+                        Employee::dept,
+                        e -> e,
+                        (e1, e2) -> {
+                            if (e1.salary() > e2.salary()) {
+                                return e1;
+                            }
+
+                            if (e2.salary() > e1.salary()) {
+                                return e2;
+                            }
+
+                            return e1.name().compareTo(e2.name()) < 0 ? e1 : e2;
+                        }
+                ));
     }
     record Employee(String name , String dept , Double salary){}
 }
