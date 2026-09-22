@@ -1422,3 +1422,156 @@ public class Solution {
     }
 }
 ========================================================================================================================================================================================================
+Luke, a naughty kid, went to a museum one day. He sees an ancient grid 'A' consisting of 'N' rows and 'N' columns. Each cell of a grid is coloured with either black or white.Luke performs two sequential operations on the grid ‘A’. First, he twists the grid vertically around the center. After that, as the second operation, he changes the colours of all the cells. If the cell is white, it is changed to black and vice-versa.The following drawings show the twist operation and the colour change operation, respectively :
+The black colour is represented by '1' and white colour is represented by '0' here. You have to print the final grid.
+Sample Input 1 :
+1 1 0
+0 1 1
+1 0 0
+1
+0
+Sample Output 1 :
+1 0 0
+0 0 1
+1 1 0
+1
+Explanation Of Sample Input 1 :For test 1:After twisting the grid looks like : { {0, 1, 1}, {1, 1, 0}, {0, 0, 1} }.After changing the colour of cells the grid looks like : { {1, 0, 0}, {0, 0, 1}, {1, 1, 0} }.
+For test 2:fter twisting the grid looks like : { {0} }.After changing the colour of cells the grid looks like : { {1} }.
+Sample Input 2 :
+2
+3
+1 1 1
+1 1 1
+1 1 1
+4
+1 1 1 1
+0 0 0 0
+1 1 1 1
+0 0 0 0
+Sample Output 2 :
+0 0 0
+0 0 0
+0 0 0
+0 0 0 0
+1 1 1 1
+0 0 0 0
+1 1 1 1
+
+import java.util.*;
+
+public class Solution {
+
+    public static ArrayList<ArrayList<Integer>> twistAndChange(
+            ArrayList<ArrayList<Integer>> A) {
+
+        int n = A.size();
+
+        for (int i = 0; i < n; i++) {
+
+            // Reverse the row and invert the value
+            for (int j = 0; j < n; j++) {
+
+                int value = A.get(i).get(n - 1 - j);
+
+                // 0 -> 1 and 1 -> 0
+                A.get(i).set(j, 1 - value);
+            }
+        }
+
+        return A;
+    }
+}
+========================================================================================================================================================================================================
+You are given an array 'ARR' consisting of 'N' integers. You need to rearrange the array elements such that all negative numbers appear before all positive numbers.
+Sample Input 1:			1 -4 -2 5 3			2 1    
+Sample Output 1:		Yes					Yes
+Explanation for Sample Input 1:
+For the first test case we have, array: [1, -4, -2, 5, 3] and N = 5. On rearranging the array such that all negative numbers appear before all positive numbers we get the resulting array [-2, -4, 1, 5, 3].
+For the second test case we have, array: [2, 1] and N = 2. There are no negative numbers. Hence, we do not require any rearrangement.
+Sample Input 2:	1 -5 -5 3				-1 -2 3 4 5				-2
+Sample Output 2:Yes 					Yes						Yes
+Explanation for Sample Input 2:
+For the first test case we have, array: [1, -5, -5,  3] and N = 4. On rearranging the array such that all negative numbers appear before all positive numbers we get the resulting array [-5, -5, 1, 3].For the second test case we have, array: [-1, -2, 3, 4, 5] and N = 5. There are already arranged in required way. Hence, we do not require any rearrangement.For the third test case we have, array: [-2 ] and N = 1. The array is already arranged in required way. Hence, we do not require any rearrangement.
+
+public class Solution {
+
+    public static void rearrange(int[] arr) {
+
+        int left = 0;
+        int right = arr.length - 1;
+
+        while (left <= right) {
+
+            // Already a negative number
+            if (arr[left] < 0) {
+                left++;
+            }
+
+            // Already a positive/non-negative number
+            else if (arr[right] >= 0) {
+                right--;
+            }
+
+            // arr[left] is positive/non-negative
+            // arr[right] is negative -> swap
+            else {
+                int temp = arr[left];
+                arr[left] = arr[right];
+                arr[right] = temp;
+
+                left++;
+                right--;
+            }
+        }
+    }
+}
+========================================================================================================================================================================================================
+Ninja is observing an array of ‘N’ numbers and wants to make as many unique subsets as possible. Can you help the Ninja to find all the unique subsets?Note: Two subsets are called same if they have same set of elements.For example {3,4,1} and {1,4,3} are not unique subsets.You are given an array ‘ARR’ having N elements. Your task is to print all unique subsets.
+For ExampleFor the given if ARR = [1,1,3],the answer will be [ ],[1],[1,1],[1,3],[3],[1,1,3].
+Sample Input 1:	1 1 3				1 3 3 3
+Explanation of sample input 1:For the first test case,The unique subsets will be  [ ],[1],[1,1],[1,3],[3],[1,1,3]. 
+For the second test case:The unique subsets will be  [ ],[1,3],[1,3,3],[1,3,3,3],[3],[3,3],[3,3,3]. 
+
+public class Solution {
+
+    public static ArrayList<ArrayList<Integer>> uniqueSubsets(
+            ArrayList<Integer> arr) {
+
+        // Sorting makes duplicate elements adjacent
+        Collections.sort(arr);
+
+        ArrayList<ArrayList<Integer>> result = new ArrayList<>();
+
+        generateSubsets(arr, 0, new ArrayList<>(), result);
+
+        return result;
+    }
+
+    private static void generateSubsets(
+            ArrayList<Integer> arr,
+            int start,
+            ArrayList<Integer> current,
+            ArrayList<ArrayList<Integer>> result) {
+
+        // Every current selection is a valid subset
+        result.add(new ArrayList<>(current));
+
+        for (int i = start; i < arr.size(); i++) {
+
+            // Skip duplicate choices at the same recursion level
+            if (i > start && arr.get(i).equals(arr.get(i - 1))) {
+                continue;
+            }
+
+            // Choose
+            current.add(arr.get(i));
+
+            // Explore
+            generateSubsets(arr, i + 1, current, result);
+
+            // Backtrack
+            current.remove(current.size() - 1);
+        }
+    }
+}
+========================================================================================================================================================================================================

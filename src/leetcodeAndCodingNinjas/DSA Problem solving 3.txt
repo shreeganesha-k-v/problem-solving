@@ -1898,7 +1898,7 @@ public class Solution {
 ========================================================================================================================================================================================================
 Given an array/list 'ARR' of integers and an integer 'LIMIT'. You are supposed to return the length of the longest subarray for which the absolute difference between the maximum and minimum element is less than or equal to the 'LIMIT'.
 Sample Input 1 :	3 6 5 4 1, k = 3				7 2 5 4, k = 2
-Sample Output 1 :	3 							2
+Sample Output 1 :	3 								2
 Explanation of Sample Input 1 :In the first test case, the longest subarray with the absolute difference of maximum and minimum element less than or equal to 2 is [1, 3]  (described by indexes with 0 based indexing). The elements of the subarray are {6, 5, 4}. The maximum element is 6 and the minimum element is 4 and the absolute difference is 6 - 4 = 2.In the second test case, the subarray [2, 3] is the longest subarray having the absolute difference of maximum and minimum element less than or equal to 1. The length of the subarray is 2.
 Sample Input 2 :	1 2 3 4 5	, k = 5				3 5 6 2 9 , k = 0
 Sample Output 2 :	5								1
@@ -1961,6 +1961,39 @@ public class Solution {
         }
 
         return maxLength;
+    }
+}
+========================================================================================================================================================================================================
+You are given a circle represented as (radius, xCenter, yCenter) and an axis-aligned rectangle represented as (x1, y1, x2, y2), where (x1, y1) are the coordinates of the bottom-left corner, and (x2, y2) are the coordinates of the top-right corner of the rectangle.Return true if the circle and rectangle are overlapped otherwise return false. In other words, check if there is any point (xi, yi) that belongs to the circle and the rectangle at the same time.
+Example 1:Input: radius = 1, xCenter = 0, yCenter = 0, x1 = 1, y1 = -1, x2 = 3, y2 = 1			Output: true
+Explanation: Circle and rectangle share the point (1,0).
+Example 2:Input: radius = 1, xCenter = 1, yCenter = 1, x1 = 1, y1 = -3, x2 = 2, y2 = -1			Output: false
+Example 3:Input: radius = 1, xCenter = 0, yCenter = 0, x1 = -1, y1 = 0, x2 = 0, y2 = 1			Output: true
+
+class Solution {
+
+    public boolean checkOverlap(
+            int radius,
+            int xCenter,
+            int yCenter,
+            int x1,
+            int y1,
+            int x2,
+            int y2) {
+
+        // Find the closest point of the rectangle to the circle center
+        int closestX = Math.max(x1, Math.min(xCenter, x2));
+        int closestY = Math.max(y1, Math.min(yCenter, y2));
+
+        // Distance between circle center and closest rectangle point
+        long dx = closestX - xCenter;
+        long dy = closestY - yCenter;
+
+        long distanceSquared = dx * dx + dy * dy;
+        long radiusSquared = (long) radius * radius;
+
+        // If closest point is inside/on the circle, they overlap
+        return distanceSquared <= radiusSquared;
     }
 }
 ========================================================================================================================================================================================================
