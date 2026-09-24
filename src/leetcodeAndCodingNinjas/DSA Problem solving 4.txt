@@ -1,0 +1,31 @@
+Given the head node of the singly linked list and an integer ‘k’, , find the value at the kth node from the end of the linked list.
+For example:For the above-linked list, if k=2, then the value at the kth i.e second node from the end is ‘12’.
+Note :1.You don’t need to take any input. It has already been taken care of. Just implement the given function and return a pointer pointing to the k-th element from the last of the linked list.2.It is guaranteed that k<=size of the linked list.
+Sample Input 1 :	43 6 9 1 5 -1	k=4			3 7 -32 8 11 -1	k=5
+Sample Output 1 :	6							3
+Explanation Of Sample Input 1 :First Test Case : The given linked list is: 43->6->9->1->5We can clearly see that the 4th element from the last is 6 therefore we return a pointer pointing to the element ‘6’.
+Second Test Case :The linked list in this case is 3->7->-32->8->11The 5th element from last is the first node of the list therefore we return a pointer pointing to the first node i.e. ‘3’
+Sample Input 2 :2 26 35 5 -1	k=1	Sample Output 2 :5
+
+public class Solution {
+
+    public static Node getKthFromLast(Node head, int k) {
+
+        Node fast = head;
+        Node slow = head;
+
+        // Move fast k nodes ahead
+        for (int i = 0; i < k; i++) {
+            fast = fast.next;
+        }
+
+        // Move both pointers until fast reaches the end
+        while (fast != null) {
+            slow = slow.next;
+            fast = fast.next;
+        }
+
+        return slow;
+    }
+}
+========================================================================================================================================================================================================

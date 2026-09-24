@@ -1575,3 +1575,145 @@ public class Solution {
     }
 }
 ========================================================================================================================================================================================================
+You are given two integers ‘X’ and ‘Y’. Your task is to find if the given integers are an amicable pair.A pair of numbers are called Amicable if the sum of the proper divisor of each number is equal to the other number. Print ‘True’ if the numbers form amicable pair otherwise print ‘False’A positive proper divisor is a positive divisor of a number, excluding itself. For example, 1, 2, and 3 are positive proper divisors of 6, but 6 itself is not.
+For example:Let 'X' = 220 and 'Y' = 284 form an amicable pair as the sum of the proper divisor of one is equal to the other. 
+Sample Input 1:	4 8				220 284
+Sample Output 1:False			True
+Explanation For Sample Input 1:In test case 1:Proper divisors of 4 are 1 and 2 with sum 3!=8. Proper divisors of 8 are 1, 2, and 4 with sum 7!=4Thus they are not amicable pairs.
+In test case 2:Proper divisors of X=220 are 1, 2, 4, 5, 10, 11, 20, 22, 44, 55 and 110.
+The sum of these is 284 = Y.Proper divisors of Y=284 are 1, 2, 4, 71, and 142.The sum of these is 220 = X.Thus they are amicable pairs.
+Sample Input 2:	67095 71145				253 487			280 81
+Sample Output 2:True					False			False
+Explanation For Sample Input 2:67095 & 71145 are amicable pairs while 253 & 487 and 280 and 81 are not amicable numbers. 
+
+public class Solution {
+
+    public static boolean isAmicable(int x, int y) {
+
+        // Usually amicable numbers are positive and distinct.
+        if (x <= 0 || y <= 0 || x == y) {
+            return false;
+        }
+
+        return sumOfProperDivisors(x) == y
+                && sumOfProperDivisors(y) == x;
+    }
+
+    private static int sumOfProperDivisors(int n) {
+
+        // 1 is a proper divisor of every n > 1
+        int sum = 1;
+
+        for (int i = 2; i * i <= n; i++) {
+
+            if (n % i == 0) {
+
+                // i is a divisor
+                sum += i;
+
+                // n / i is the paired divisor
+                if (i != n / i) {
+                    sum += n / i;
+                }
+            }
+        }
+
+        return sum;
+    }
+}
+========================================================================================================================================================================================================
+You are given an integer array nums and an integer x. In one operation, you can either remove the leftmost or the rightmost element from the array nums and subtract its value from x. Note that this modifies the array for future operations.Return the minimum number of operations to reduce x to exactly 0 if it is possible, otherwise, return -1.
+Example 1:Input: nums = [1,1,4,2,3], x = 5			Output: 2
+Explanation: The optimal solution is to remove the last two elements to reduce x to zero.
+Example 2:Input: nums = [5,6,7,8,9], x = 4			Output: -1
+Example 3:Input: nums = [3,2,20,1,1,3], x = 10		Output: 5
+Explanation: The optimal solution is to remove the last three elements and the first two elements (5 operations in total) to reduce x to zero.
+
+//If we remove elements from the left and right whose sum is x, the elements we don't remove form one contiguous subarray. sum(remaining subarray) = total - x . Find the longest subarray whose sum is total - x. then Find the longest subarray whose sum is total - x.
+class Solution {
+
+    public int minOperations(int[] nums, int x) {
+
+        int total = 0;
+
+        for (int num : nums) {
+            total += num;
+        }
+
+        // Sum that should remain in the array
+        int target = total - x;
+
+        // If target is 0, remove the entire array
+        if (target == 0) {
+            return nums.length;
+        }
+
+        int left = 0;
+        int sum = 0;
+        int maxLength = -1;
+
+        for (int right = 0; right < nums.length; right++) {
+
+            sum += nums[right];
+
+            // Shrink window if sum becomes too large
+            while (sum > target && left <= right) {
+                sum -= nums[left];
+                left++;
+            }
+
+            // Found a subarray with required sum
+            if (sum == target) {
+                maxLength = Math.max(
+                        maxLength,
+                        right - left + 1
+                );
+            }
+        }
+
+        // No valid subarray
+        if (maxLength == -1) {
+            return -1;
+        }
+
+        // Remove everything outside the longest subarray
+        return nums.length - maxLength;
+    }
+}
+========================================================================================================================================================================================================
+You are given an integer array nums.Return the smallest index i such that the sum of the digits of nums[i] is equal to i.If no such index exists, return -1.
+Example 1:Input: nums = [1,3,2]				Output: 2
+Explanation:For nums[2] = 2, the sum of digits is 2, which is equal to index i = 2. Thus, the output is 2.
+Example 2:Input: nums = [1,10,11]			Output: 1
+Explanation:For nums[1] = 10, the sum of digits is 1 + 0 = 1, which is equal to index i = 1.For nums[2] = 11, the sum of digits is 1 + 1 = 2, which is equal to index i = 2.Since index 1 is the smallest, the output is 1.
+Example 3:Input: nums = [1,2,3]				Output: -1
+Explanation:Since no index satisfies the condition, the output is -1.
+
+class Solution {
+
+    public int smallestIndex(int[] nums) {
+
+        for (int i = 0; i < nums.length; i++) {
+
+            if (digitSum(nums[i]) == i) {
+                return i;
+            }
+        }
+
+        return -1;
+    }
+
+    private int digitSum(int num) {
+
+        int sum = 0;
+
+        while (num > 0) {
+            sum += num % 10;
+            num /= 10;
+        }
+
+        return sum;
+    }
+}
+========================================================================================================================================================================================================
+ 
