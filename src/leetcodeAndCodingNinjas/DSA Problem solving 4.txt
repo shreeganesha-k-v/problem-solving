@@ -29,3 +29,40 @@ public class Solution {
     }
 }
 ========================================================================================================================================================================================================
+You are provided with a singly linked list, all you have to do is to delete the last node of the linked list and add it to the front of the linked list.
+Example:Please note that the linked list will only contain numeric values.
+Sample Input 1:	2 5 3 11 1 -1					2 -1
+Sample Output 1:1 2 5 3 11 -1					2 -1
+Explanation of Sample Output 1:In test case 1, the new linked list after doing delete and add operations to the last node: 1 2 5 3 11 -1.In test case 2, the linked list has only one node and so, the last node is itself at the front.
+Sample Input: 4 3 -1			1 1 1 1 -1
+Sample Output 2:3 4 -1			1 1 1 1 -1
+Explanation for Sample Output 2:In test case 1, the new linked list after doing delete and add operations to the last node: 3 4 -1.In test case 2, the new linked list after swapping first and last nodes: 1 1 1 1 -1.
+
+class Solution {
+
+    public static Node moveLastToFront(Node head) {
+
+        // Empty or single node
+        if (head == null || head.next == null) {
+            return head;
+        }
+
+        Node prev = null;
+        Node curr = head;
+
+        // Reach the last node
+        while (curr.next != null) {
+            prev = curr;
+            curr = curr.next;
+        }
+
+        // Remove last node
+        prev.next = null;
+
+        // Move it to front
+        curr.next = head;
+
+        return curr;
+    }
+}
+========================================================================================================================================================================================================
