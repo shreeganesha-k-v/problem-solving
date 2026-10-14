@@ -66,3 +66,162 @@ class Solution {
     }
 }
 ========================================================================================================================================================================================================
+You are given two LinkedList of length ‘N’. Your task is to insert the elements of the second LinkedList in the first LinkedList at the alternate positions.For example: Let 1 -> 3 -> 5 be the first LinkedList and 2 -> 4 -> 6 be the second LinkedList. Then after merging the first LinkedList will look like 1 -> 2 -> 3 -> 4 -> 5 -> 6.
+Sample Input: 1 3 5 -1 	2 4 6 -1				3 -1	6 -1
+Sample Output: 1 2 3 4 5 6						3 6
+
+public class Solution {
+
+    public static void merge(Node head1, Node head2) {
+        
+        Node first = head1, second = head2;
+        Node f_next = null, s_next = null;
+
+        // Solving for each node in Linkedlist.
+        while (first != null)
+        {
+            // Storing the next pointers.
+            f_next = first.next;
+            s_next = second.next;
+
+            // Inserting the node of the second LinkedList in the first LinkedList.
+            second.next = f_next;
+            first.next = second;
+
+            // Updating the current pointers for the next iteration.
+            first = f_next;
+            second = s_next;
+        }
+    }   
+}
+========================================================================================================================================================================================================
+You are given a linked list with a cycle. You need to find and return the Nth node from where the cycle starts in the input Linked List (moving towards the head of the linked list).The cycle is created by connecting the last element of Linked List (i.e., tail) to some other node given in input.Return null if no such part exists.The counting of nodes starts from 1.
+For Example:head = [5 , 4 , 0 , -1]			pos = 2 N = 1
+You have to find the node where the cycle begins and return the Nth node from that point in the direction of the head.
+Sample Input 1 : 5 4 0 -1	n=1		9 8 1 2 5 14 -1		n=3
+Sample Output 1 : 5					8
+Explanation:For test case one:- The cycle starts at 4. So the 1st node from 4 in the direction of the head is 5.For test case two:- The cycle starts at 5. So the 3rd node from 5 in the direction of the head is 8.
+Sample Input 2 : 1 2 3 4 5 6 7 8 -1 n=2			5 4 3 2 1 -1	n=4
+Sample Output 2 : 2								null
+
+public class Solution {
+
+    public static ListNode findNode(ListNode head, int n) {
+
+        if (head == null) {
+            return null;
+        }
+
+        // Step 1: Detect the cycle
+        ListNode slow = head;
+        ListNode fast = head;
+        boolean hasCycle = false;
+
+        while (fast != null && fast.next != null) {
+            slow = slow.next;
+            fast = fast.next.next;
+
+            if (slow == fast) {
+                hasCycle = true;
+                break;
+            }
+        }
+
+        if (!hasCycle) {
+            return null;
+        }
+
+        // Step 2: Find the cycle start
+        slow = head;
+
+        while (slow != fast) {
+            slow = slow.next;
+            fast = fast.next;
+        }
+
+        ListNode cycleStart = slow;
+
+        // Step 3: Store nodes before the cycle start
+        ArrayList<ListNode> previous = new ArrayList<>();
+        ListNode curr = head;
+
+        while (curr != cycleStart) {
+            previous.add(curr);
+            curr = curr.next;
+        }
+
+        // Step 4: Find the Nth node moving towards the head
+        int index = previous.size() - n;
+
+        if (index < 0 || index >= previous.size()) {
+            return null;
+        }
+
+        return previous.get(index);
+    }
+}
+========================================================================================================================================================================================================
+Design a stack that supports push, pop, top, and retrieving the minimum element in constant time.
+1. Push(num): Push the given number in the stack.
+2. Pop: Remove and return the top element from the stack if present, else return -1.
+3. Top: return the top element of the stack if present, else return -1.
+4. getMin: Returns minimum element of the stack if present, else return -1.
+
+public class Solution {
+
+    static class MinStack {
+        private Stack<Integer> stack;
+        private Stack<Integer> minStack;
+
+        // Constructor
+        MinStack() {
+            stack = new Stack<>();
+            minStack = new Stack<>();
+        }
+
+        // Add an element to the top of the stack.
+        void push(int num) {
+            stack.push(num);
+
+            if (minStack.isEmpty() || num <= minStack.peek()) {
+                minStack.push(num);
+            }
+        }
+
+        // Remove and return the top element.
+        int pop() {
+            if (stack.isEmpty()) {
+                return -1;
+            }
+
+            int removed = stack.pop();
+
+            if (removed == minStack.peek()) {
+                minStack.pop();
+            }
+
+            return removed;
+        }
+
+        // Return the top element, or -1 if empty.
+        int top() {
+            if (stack.isEmpty()) {
+                return -1;
+            }
+
+            return stack.peek();
+        }
+
+        // Return the minimum element, or -1 if empty.
+        int getMin() {
+            if (minStack.isEmpty()) {
+                return -1;
+            }
+
+            return minStack.peek();
+        }
+    }
+}
+========================================================================================================================================================================================================
+
+
