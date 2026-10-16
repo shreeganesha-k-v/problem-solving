@@ -1,0 +1,31 @@
+You are given a positive integer 'N'. Your task is to find the greatest integer less than or equal to 'N' which is a power of 2.
+For Example:If N = 14, then the nearest integer that is less than or equal to 14 and is a power of two is 8(2^3). So, the answer is 8.
+Sample Input 1:	4				22
+Sample Output 1:4				16
+Explanation for sample 1:For the first test case, 4 itself is a power of two.For the second test case, the nearest integer that is less than or equal to 22 and also is a power of two is 16.
+Sample Input 2:	1				63
+Sample Output 2:1				32
+Explanation for sample 1:For the first test case, 1 itself is a power of two.For the second test case, the nearest integer that is less than or equal to 63 and also is a power of two is 32.
+
+
+public class Solution {
+    public static int greatestPowerOf2(int n) {
+        return Integer.highestOneBit(n);
+    }
+}
+
+or
+
+//This bit trick fills all bits below the highest set bit with 1s. Subtracting half of that value leaves only the highest set bit.
+public class Solution {
+    public static int greatestPowerOf2(int n) {
+        n |= n >> 1;
+        n |= n >> 2;
+        n |= n >> 4;
+        n |= n >> 8;
+        n |= n >> 16;
+
+        return n - (n >> 1);
+    }
+}
+=======================================================================================================================================================================================================
