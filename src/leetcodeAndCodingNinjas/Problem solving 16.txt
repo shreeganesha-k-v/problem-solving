@@ -146,3 +146,141 @@ public class Solution {
     }
 }
 =======================================================================================================================================================================================================
+You are given an integer array nums of length n, where nums is a permutation of the integers from 0 to n - 1.You may perform only the following operations:Reverse the entire array.Rotate Left by One: Move the first element to the end of the array, and rest elements to left by one position.Return an integer denoting the minimum number of operations required to sort the array in increasing order. If it is not possible to sort the array using only the given operations, return -1.
+Example 1:Input: nums = [0,2,1]					Output: 2
+Explanation:Rotate Left by one: [2, 1, 0] Reverse the array: [0, 1, 2] The array becomes sorted in 2 operations, which is minimal
+Example 2:Input: nums = [1,0,2]					Output: 2
+Explanation:Reverse the array: [2, 0, 1]Rotate Left by one: [0, 1, 2]The array becomes sorted in 2 operations, which is minimal.
+Example 3:Input: nums = [2,0,1,3]				Output: -1
+Explanation:It is impossible to reach [2, 0, 1, 3]. Thus, the answer is -1.
+
+class Solution {
+    public int minOperations(int[] nums) {
+        int n = nums.length;
+
+        int[] reversed = new int[n];
+        for (int i = 0; i < n; i++) {
+            reversed[i] = nums[n - 1 - i];
+        }
+
+        int ans = Integer.MAX_VALUE;
+
+        // Check rotations of the original array
+        for (int r = 0; r < n; r++) {
+            if (isSortedAfterRotation(nums, r)) {
+                ans = Math.min(ans, Math.min(r, n - r));
+            }
+        }
+
+        // Check rotations of the reversed array
+        for (int r = 0; r < n; r++) {
+            if (isSortedAfterRotation(reversed, r)) {
+                ans = Math.min(ans, 1 + Math.min(r, n - r));
+            }
+        }
+
+        return ans == Integer.MAX_VALUE ? -1 : ans;
+    }
+
+    private boolean isSortedAfterRotation(int[] nums, int rotate) {
+        int n = nums.length;
+
+        for (int i = 0; i < n - 1; i++) {
+            int curr = nums[(i + rotate) % n];
+            int next = nums[(i + 1 + rotate) % n];
+
+            if (curr > next) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+}
+=======================================================================================================================================================================================================
+One day Ninja got an array and started to play with it. He is finding subarrays of the array randomly and suddenly starts to wonder about the maximum of the sum of the smallest and the second smallest elements of all the subarrays possible of size at least 2.
+For Example:For the array [3 2 1]All the subarrays of size at least 2 are:[3 2], [2 1], [3 2 1]For the second subarray, the smallest and second smallest elements are 1 and 2, and their sum is 3.
+So the maximum among these sums is 5.Since Ninja is too lazy to do this task, he asked you for help. You have to find the maximum of the sum of the smallest and the second smallest elements of all the subarray possible of size at least 2.
+Sample Input 1:		1 2 3 4				3 8
+Sample Output 1:	7					11
+Explanation For Sample Output 1:For the first test case, all the possible subarrays of size at least 2 are:[1 2], [1 2 3], [1 2 3 4], [2 3], [2 3 4], [3 4].The respective sum of the smallest and second smallest elements are 3, 3, 3, 5, 5, 7.So the answer will be the maximum of all of them, i.e., 7.For the second test case, there is only one subarray possible [3 8]. So the answer will be 11. 
+Sample Input 2:		8 3 7 2 4				6 4 7 5
+Sample Output 2:	11						12
+
+// Max Sum of adjacent element 
+public class Solution {
+    public static int maxSum(int[] arr, int n) {
+        int maxSum = arr[0] + arr[1];
+
+        for (int i = 1; i < n - 1; i++) {
+            maxSum = Math.max(maxSum, arr[i] + arr[i + 1]);
+        }
+
+        return maxSum;
+    }
+}
+=======================================================================================================================================================================================================
+You are given an integer array nums of length n, where nums is a permutation of the numbers in the range [0..n - 1].You may swap elements at indices i and j only if nums[i] AND nums[j] == k, where AND denotes the bitwise AND operation and k is a non-negative integer.Return the maximum value of k such that the array can be sorted in non-decreasing order using any number of such swaps. If nums is already sorted, return 0.
+Example 1:Input: nums = [0,3,2,1]			Output: 1
+Explanation:Choose k = 1. Swapping nums[1] = 3 and nums[3] = 1 is allowed since nums[1] AND nums[3] == 1, resulting in a sorted permutation: [0, 1, 2, 3].
+Example 2:Input: nums = [0,1,3,2]			Output: 2
+Explanation:Choose k = 2. Swapping nums[2] = 3 and nums[3] = 2 is allowed since nums[2] AND nums[3] == 2, resulting in a sorted permutation: [0, 1, 2, 3].
+Example 3:Input: nums = [3,2,1,0]			Output: 0
+Explanation:Only k = 0 allows sorting since no greater k allows the required swaps where nums[i] AND nums[j] == k.
+
+class Solution {
+    public int sortPermutation(int[] nums) {
+        int n = nums.length;
+        int k = -1;
+
+        for (int i = 0; i < n; i++) {
+            if (nums[i] != i) {
+                k &= nums[i];
+            }
+        }
+
+        return k == -1 ? 0 : k;
+    }
+}
+=======================================================================================================================================================================================================
+You are given 4 strings arriveAlice, leaveAlice, arriveBob, and leaveBob. Alice will be in the city from the dates arriveAlice to leaveAlice (inclusive), while Bob will be in the city from the dates arriveBob to leaveBob (inclusive). Each will be a 5-character string in the format "MM-DD", corresponding to the month and day of the date.Return the total number of days that Alice and Bob are in Rome together.
+You can assume that all dates occur in the same calendar year, which is not a leap year. Note that the number of days per month can be represented as: [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31].
+Example 1:Input: arriveAlice = "08-15", leaveAlice = "08-18", arriveBob = "08-16", leaveBob = "08-19"				Output: 3
+Explanation: Alice will be in Rome from August 15 to August 18. Bob will be in Rome from August 16 to August 19. They are both in Rome together on August 16th, 17th, and 18th, so the answer is 3.
+Example 2:Input: arriveAlice = "10-01", leaveAlice = "10-31", arriveBob = "11-01", leaveBob = "12-31"				Output: 0
+Explanation: There is no day when Alice and Bob are in Rome together, so we return 0.
+
+class Solution {
+    public int countDaysTogether(String arriveAlice, String leaveAlice,
+                                 String arriveBob, String leaveBob) {
+
+        int startAlice = getDayOfYear(arriveAlice);
+        int endAlice = getDayOfYear(leaveAlice);
+        int startBob = getDayOfYear(arriveBob);
+        int endBob = getDayOfYear(leaveBob);
+
+        int start = Math.max(startAlice, startBob);
+        int end = Math.min(endAlice, endBob);
+
+        return Math.max(0, end - start + 1);
+    }
+
+    private int getDayOfYear(String date) {
+        int[] daysInMonth = {
+            31, 28, 31, 30, 31, 30,
+            31, 31, 30, 31, 30, 31
+        };
+
+        int month = Integer.parseInt(date.substring(0, 2));
+        int day = Integer.parseInt(date.substring(3, 5));
+
+        int totalDays = day;
+
+        for (int i = 0; i < month - 1; i++) {
+            totalDays += daysInMonth[i];
+        }
+
+        return totalDays;
+    }
+}
+=======================================================================================================================================================================================================

@@ -223,5 +223,39 @@ public class Solution {
     }
 }
 ========================================================================================================================================================================================================
+In a magic event, you are given ‘N’ bags, each bag containing ‘A[i]’ chocolates. In one unit of time, you can choose any bag ‘i’ and eat all the chocolates ‘A[i]’ in that bag and then the magician fills the ith bag with floor(‘A[i]’ / 2) chocolates. Your task is to find the maximum number of chocolate you can eat in ‘K’ units of time.
+Since the answer could be large, return answer modulo 10^9 + 7.
+For Example:For the array [ 4, 7, 9, 10] and ‘k’=2In the first step, we can choose the last bag. So the answer will be 10 and the array will be [4, 7, 9, 5].In the second step, we can choose the second last bag. So the answer will be 19 and the array will be [4, 7, 4, 5].So the final output will be 19.Detailed explanation ( Input/output format, Notes, Images )
+Sample Input 1: k=1 arr=3 8 2 4   k= 2 arr=10 4 7 22
+Sample Output 1:8					33
+Explanation For Sample Output 1:For the first test case,
+In the first step, we can choose the second bag. So the answer will be 8 and the array will be [3, 4, 2, 4].So, the final answer will be 8.For the second test case,In the first step, we can choose the last bag. So the answer will be 22 and the array will be [10, 4, 7, 11].In the second step, we can choose the last bag. So the answer will be 33 and the array will be [10, 4, 7, 5].So, the final answer will be 33.
+Sample Input 2: k= 3  arr=3 6 10 12 8   			k= 1  arr=2 10 4 3
+Sample Output 2: 30										10
 
+public class Solution {
+    public static int maximumChocolates(int[] arr, int n, int k) {
+        final long MOD = 1_000_000_007L;
+
+        PriorityQueue<Integer> maxHeap =
+                new PriorityQueue<>(Collections.reverseOrder());
+
+        for (int chocolates : arr) {
+            maxHeap.offer(chocolates);
+        }
+
+        long total = 0;
+
+        for (int i = 0; i < k; i++) {
+            int max = maxHeap.poll();
+
+            total = (total + max) % MOD;
+
+            maxHeap.offer(max / 2);
+        }
+
+        return (int) total;
+    }
+}
+========================================================================================================================================================================================================
 
