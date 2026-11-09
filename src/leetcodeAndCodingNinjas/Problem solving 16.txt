@@ -284,3 +284,129 @@ class Solution {
     }
 }
 =======================================================================================================================================================================================================
+You have been given a string STR and a non-empty string PTR. Your task is to find all the starting indices of PTR’s anagram in STR.An anagram of a string is another string which contains the same characters and is obtained by rearranging the characters.For example: ‘SILENT’ and ‘LISTEN’ are anagrams of each other. ‘ABA’ and ‘ABB’ are not anagram because we can’t convert ‘ABA’ to ‘ABB’ by rearranging the characters of particular strings.
+Sample Input 1 :	CBAEBABACD	ABC				ABADE		BA
+Sample Output 1 :	0 6							0 1
+Explanation For Sample Output 1:
+Test Case 1:'STR' is ‘CBAEBABACD’ and ‘PTR’ is ‘ABC’.0-2 in 'STR' index 0,1,2 are ‘CBA’, and it is an anagram with ‘ABC’.1-2-4 in 'STR' index 2,3,4 are ‘AEB’, and it is not anagram with ‘ABC’.4-6 in 'STR' index 4,5,6 are ‘BAB’, and it is not anagram with ‘ABC’.5-7 in 'STR' index 5,6,7 are ‘ABA’, and it is not anagram with ‘ABC’.6-8 in 'STR' index 6,7,8 are ‘BAC’, and it is an anagram with ‘ABC’.7-9 in 'STR' index 7,8,9 are ‘ACD’, and it is not anagram with ‘ABC’.Hence, there are only two substrings in the given string 'STR'  that are anagram with given string  ‘PTR’ which are ‘CBA’, and ‘BAC’ and starting indices of respective anagram substrings are 0 and 6.
+Test case 2:'STR' is ‘ABADE’ and ‘PTR’ is ‘BA’.In the given string ‘ABADE’ the substring of length 2 starting with index 0 is ‘AB’ which is an anagram with the string ‘BA’ and a substring of length 2 starting with index 1 is ‘BA’ which is also an anagram with the string ‘BA’. Because 0 and 1 are starting indices of the substrings, we print 0 and 1.
+Sample Input 2:	BACDGABCDA	ABCD			ABABABA	A
+Sample Output 2:	0 5 6					0 2 4 6
+
+public class Solution {
+
+    public static ArrayList<Integer> findAnagrams(String str, String ptr) {
+        ArrayList<Integer> result = new ArrayList<>();
+
+        int n = str.length();
+        int m = ptr.length();
+
+        int[] patternFreq = new int[26];
+        int[] windowFreq = new int[26];
+
+        // Build frequency of pattern
+        for (int i = 0; i < m; i++) {
+            patternFreq[ptr.charAt(i) - 'A']++;
+            windowFreq[str.charAt(i) - 'A']++;
+        }
+
+        // Check first window
+        if (Arrays.equals(patternFreq, windowFreq)) {
+            result.add(0);
+        }
+
+        // Slide the window
+        for (int i = m; i < n; i++) {
+
+            // Add incoming character
+            windowFreq[str.charAt(i) - 'A']++;
+
+            // Remove outgoing character
+            windowFreq[str.charAt(i - m) - 'A']--;
+
+            // Compare frequencies
+            if (Arrays.equals(patternFreq, windowFreq)) {
+                result.add(i - m + 1);
+            }
+        }
+
+        return result;
+    }
+}
+=======================================================================================================================================================================================================
+You are given a map of a server center, represented as a m * n integer matrix grid, where 1 means that on that cell there is a server and 0 means that it is no server. Two servers are said to communicate if they are on the same row or on the same column.Return the number of servers that communicate with any other server.
+Example 1:Input: grid = [[1,0],[0,1]]						Output: 0
+Explanation: No servers can communicate with others.
+Example 2:Input: grid = [[1,0],[1,1]]						Output: 3
+Explanation: All three servers can communicate with at least one other server.
+Example 3:Input: grid = [[1,1,0,0],[0,0,1,0],[0,0,1,0],[0,0,0,1]]		Output: 4
+Explanation: The two servers in the first row can communicate with each other. The two servers in the third column can communicate with each other. The server at right bottom corner can't communicate with any other server.
+
+class Solution {
+    public int countServers(int[][] grid) {
+        int m = grid.length;
+        int n = grid[0].length;
+        int res = 0;
+
+        int[] rowCount = new int[m];
+        int[] colCount = new int[n];
+
+        // Count servers in each row and column
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
+                if (grid[i][j] == 1) {
+                    rowCount[i]++;
+                    colCount[j]++;
+                }
+            }
+        }
+
+        // Count communicating servers
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
+                if (grid[i][j] == 1 &&
+                    (rowCount[i] > 1 || colCount[j] > 1)) {
+                    res++;
+                }
+            }
+        }
+
+        return res;
+    }
+}
+=======================================================================================================================================================================================================
+You’re given two fractions, a/b, and c/d. Your task is to add these two fractions and print this answer in the simplest form.
+Sample Input 1 :5 7 4 9				Sample Output 1 :73 63
+Explanation of Sample Input 1 :
+Sum of 5/7 + 4/9 = 73/63, which is already in its simplest form because we cannot reduce it further.
+Sample Input 2 :1 500 2 1500				Sample Output 2 :1 300
+Explanation of Sample Input 2 :Sum of 1/500 + 2/1500 = 5/1500, which after reducing in simplest form becomes 1/300.
+
+import java.util.*;
+
+public class Solution {
+
+    public static void addFractions(int a, int b, int c, int d) {
+
+        long numerator = (long) a * d + (long) c * b;
+        long denominator = (long) b * d;
+
+        long gcd = findGCD(numerator, denominator);
+
+        numerator /= gcd;
+        denominator /= gcd;
+
+        System.out.println(numerator + " " + denominator);
+    }
+
+    private static long findGCD(long a, long b) {
+        while (b != 0) {
+            long temp = b;
+            b = a % b;
+            a = temp;
+        }
+
+        return a;
+    }
+}
+=======================================================================================================================================================================================================
