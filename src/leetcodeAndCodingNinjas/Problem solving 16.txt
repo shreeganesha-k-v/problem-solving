@@ -543,3 +543,154 @@ public class Solution {
     }
 }
 =======================================================================================================================================================================================================
+Given two integers ‘Left’ and ‘Right’. Your task is to find the total count of ‘megaprime’ numbers from the range ‘Left’ to ‘Right’. A ‘megaprime’ number is a prime number and its individual digits are also prime.For example, ‘53’ is a ‘megaprime’ number because ‘53’ is a prime number and its individual digits,‘3’ and ‘5’, are also prime. ‘13’ is not a ‘megaprime’ number because out of its individual digits (1, 3), ‘1’ is not prime.
+Note :1.’Left’ and ‘Right’ both are inclusive in the range ‘Left’ to ‘Right’.
+Example :‘Left’ = ‘23’  and ‘Right’ = ‘37’All prime numbers from ‘23’ to ‘37’ are 23, 29, 31, 3723 is ‘megaprime’ number because ‘2’ and ‘3’ both are prime2931 is not a ‘megaprime’ number because ‘1’ is not a prime number37 is ‘megaprime’ number because ‘3’ and ‘7’ both are prime numbersHence there are two ‘megaprime’ numbers 23, 37 out of 23, 29, 31, 37.
+Sample Input 1 :	2 15				11 24
+Sample Output 1 :	4					1
+Explanation Of Sample Input 1 :
+Test Case 1:‘Left’ = ‘2’ and ‘Right’ = ‘15’ All prime numbers from ‘2’ to ‘15’ are 2, 3, 5, 7, 11, 132 is ‘megaprime’ number because its individual digit ‘2’ is prime.3 is ‘megaprime’ number because its individual digit ‘3’ is prime.5 is ‘megaprime’ number because its individual digit ‘5’ is prime.7 is ‘megaprime’ number because its individual digit ‘7’ is prime.11 is not ‘megaprime’ number because its individual digits ‘1’ and ‘1’ both are not prime.13 is not ‘megaprime’ number because its individual digits ‘1’ is not prime.Hence because there are four ‘megaprime’ numbers 2, 3, 5, 7 out of 2, 3, 5, 7, 11, 13, we return four.
+
+public class Solution {
+
+    public static int countMegaPrimes(int left, int right) {
+        int count = 0;
+
+        for (int num = left; num <= right; num++) {
+            if (isPrime(num) && hasPrimeDigits(num)) {
+                count++;
+            }
+        }
+
+        return count;
+    }
+
+    // Check whether the number is prime
+    private static boolean isPrime(int num) {
+        if (num < 2) {
+            return false;
+        }
+
+        for (int i = 2; i * i <= num; i++) {
+            if (num % i == 0) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    // Check whether every digit is prime
+    private static boolean hasPrimeDigits(int num) {
+        while (num > 0) {
+            int digit = num % 10;
+
+            if (digit != 2 && digit != 3 &&
+                digit != 5 && digit != 7) {
+                return false;
+            }
+
+            num /= 10;
+        }
+
+        return true;
+    }
+}
+=======================================================================================================================================================================================================
+You are given an integer array nums and two integers l and r. Your task is to find the minimum sum of a subarray whose size is between l and r (inclusive) and whose sum is greater than 0.Return the minimum sum of such a subarray. If no such subarray exists, return -1.A subarray is a contiguous non-empty sequence of elements within an array.
+Example 1:Input: nums = [3, -2, 1, 4], l = 2, r = 3				Output: 1
+Explanation:The subarrays of length between l = 2 and r = 3 where the sum is greater than 0 are:[3, -2] with a sum of 1[1, 4] with a sum of 5[3, -2, 1] with a sum of 2[-2, 1, 4] with a sum of 3Out of these, the subarray [3, -2] has a sum of 1, which is the smallest positive sum. Hence, the answer is 1.
+Example 2:Input: nums = [-2, 2, -3, 1], l = 2, r = 3	Output: -1
+Explanation:There is no subarray of length between l and r that has a sum greater than 0. So, the answer is -1.
+Example 3:Input: nums = [1, 2, 3, 4], l = 2, r = 4		Output: 3
+Explanation:The subarray [1, 2] has a length of 2 and the minimum sum greater than 0. So, the answer is 3
+
+class Solution {
+    public int minimumSumSubarray(List<Integer> nums, int l, int r) {
+
+        int n = nums.size();
+        int minSum = Integer.MAX_VALUE;
+
+        for (int i = 0; i < n; i++) {
+            int sum = 0;
+
+            for (int j = i; j < n && j - i + 1 <= r; j++) {
+                sum += nums.get(j);
+
+                int length = j - i + 1;
+
+                if (length >= l && sum > 0) {
+                    minSum = Math.min(minSum, sum);
+                }
+            }
+        }
+
+        return minSum == Integer.MAX_VALUE ? -1 : minSum;
+    }
+}
+=======================================================================================================================================================================================================
+You are given a string ‘str’ of even length. Your task is to find out if we divide the ‘str’ from the middle, will both the substrings contain an equal number of vowels or not.‘str’ will contain upper and lower case characters of the English alphabet.|str| is even.
+Sample Input 1:		codingninjas					helloworld
+Sample Output 2:	True							False
+Explanation:For the first test case, ‘str’= ‘codingninjas’, when we split this string we get, ‘coding’ and ‘ninjas’ which both contain 2 vowels each. Hence the answer is ‘True’.For the second test case, ‘str’= ‘helloworld’, when we split this string we get ‘hello and ‘world’, which contain 2 and 1 vowels respectively. Hence the answer is ‘False’.
+Sample Input 2:	Aa		AbbaaA		Sample Output 2:	True	False
+
+public static boolean isVowelCountEqual(String str) {
+    int mid = str.length() / 2;
+    int firstCount = 0;
+    int secondCount = 0;
+
+    for (int i = 0; i < mid; i++) {
+        if (isVowel(str.charAt(i))) {
+            firstCount++;
+        }
+
+        if (isVowel(str.charAt(i + mid))) {
+            secondCount++;
+        }
+    }
+
+    return firstCount == secondCount;
+}
+
+private static boolean isVowel(char ch) {
+    ch = Character.toLowerCase(ch);
+	//return "aeiou".indexOf(ch) != -1;
+    return ch == 'a' || ch == 'e' || ch == 'i'
+            || ch == 'o' || ch == 'u';
+}
+================================================================================================================================================================================================================
+Given an array of integers arr, return the number of subarrays with an odd sum.Since the answer can be very large, return it modulo 109 + 7.
+Example 1:Input: arr = [1,3,5]				Output: 4
+Explanation: All subarrays are [[1],[1,3],[1,3,5],[3],[3,5],[5]]All sub-arrays sum are [1,4,9,3,8,5].
+Odd sums are [1,9,3,5] so the answer is 4.
+Example 2:Input: arr = [2,4,6]					Output: 0
+Explanation: All subarrays are [[2],[2,4],[2,4,6],[4],[4,6],[6]]. All sub-arrays sum are [2,6,12,4,10,6]. All sub-arrays have even sum and the answer is 0.
+Example 3:Input: arr = [1,2,3,4,5,6,7]			Output: 16
+
+class Solution {
+    public int numOfSubarrays(int[] arr) {
+        final int MOD = 1_000_000_007;
+
+        long even = 1;
+        long odd = 0;
+        long ans = 0;
+
+        int prefixSum = 0;
+
+        for (int num : arr) {
+            prefixSum += num;
+
+            if (prefixSum % 2 != 0) {
+                ans = (ans + even) % MOD;
+                odd++;
+            } else {
+                ans = (ans + odd) % MOD;
+                even++;
+            }
+        }
+
+        return (int) ans;
+    }
+}
+================================================================================================================================================================================================================
