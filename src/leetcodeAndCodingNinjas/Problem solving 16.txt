@@ -799,3 +799,103 @@ public class Solution {
     }
 }
 ================================================================================================================================================================================================================
+You are given a string, 'MESSAGE'. The receiver of this ‘MESSAGE’ has a set of instructions on how to decrypt the message. In order to decrypt the message, we need to perform some rotation operations on the string.These rotations can either be left rotations or right rotations. The set of instructions contains information about which type of rotation is to be performed and how many times. Your task is to determine the decrypted message.
+Note:Performing a 'left rotation' means deleting the first character of the string and appending it to the end of the string.Performing a 'right rotation' means deleting the last character of the string and appending it to the beginning of the string.For example, if we perform a left rotation on the string “coding”, it will become “odingc”. If we perform a right rotation on the string “ninja”, it will become “aninj”.
+Sample Input 1:abcde 
+-1 2
+1 1
+-1 2
+-1 1
+Sample Output 1:eabcd
+Explanation for sample input 1:Initially, the given string is “abcde”. After performing the left rotation on it two times, we will get “cdeab”. After performing the right rotation on this string once, we will get “bcdea”. Next time, the string will become “deabc”. And finally, the string will become “eabcd”. Hence, we print the final result.
+Sample Input 2:babb 
+-1 1
+1 2
+1 3
+Sample Output 2:babb
+Explanation for sample input 2:Initially, the given string is “babb”. After performing the left rotation on it once, we will get “abbb”. After performing the right rotation on this string two times, we will get “bbab”. And finally, the string will become “babb”. Hence, we print the final result.
+
+public class Solution {
+
+    public static String decryptMessage(String message, int n, int[][] rotations) {
+
+        int netRotation = 0;
+        int len = message.length();
+
+        for (int i = 0; i < n; i++) {
+
+            int direction = rotations[i][0];
+            int count = rotations[i][1];
+
+            if (direction == -1) {
+                netRotation += count;
+            } else {
+                netRotation -= count;
+            }
+        }
+
+        // Normalize rotation to the string length
+        netRotation = ((netRotation % len) + len) % len;
+
+        // Perform the final left rotation
+        return message.substring(netRotation)
+                + message.substring(0, netRotation);
+    }
+}
+================================================================================================================================================================================================================
+You are given two big numbers ‘A’ and ‘B’ as strings. Your task is to find the product of both the numbers.
+Note:There are no leading zeros in both the strings, except the number 0 itself.Do not use any built-in Big Integer Library.
+For Example:If, A = 123, and B = 456.So the product of both numbers will be 56088.
+Sample Input 1: 17281  91276					123		456
+Sample Output 1: 1577340556						56088    
+Explanation for sample 1:For the first test case:A=17281, and B=91276The product of both numbers is 1577340556.For the second test case:A=123, B=456The product of both numbers is 56088
+
+public class Solution {
+
+    public static String multiplyStrings(String a, String b) {
+
+        if (a.equals("0") || b.equals("0")) {
+            return "0";
+        }
+
+        int m = a.length();
+        int n = b.length();
+
+        int[] result = new int[m + n];
+
+        // Multiply digit by digit
+        for (int i = m - 1; i >= 0; i--) {
+
+            for (int j = n - 1; j >= 0; j--) {
+
+                int digit1 = a.charAt(i) - '0';
+                int digit2 = b.charAt(j) - '0';
+
+                int product = digit1 * digit2;
+
+                int sum = product + result[i + j + 1];
+
+                result[i + j + 1] = sum % 10;
+                result[i + j] += sum / 10;
+            }
+        }
+
+        // Convert result array into string
+        StringBuilder answer = new StringBuilder();
+
+        int i = 0;
+
+        // Skip leading zeros
+        while (i < result.length && result[i] == 0) {
+            i++;
+        }
+
+        while (i < result.length) {
+            answer.append(result[i]);
+            i++;
+        }
+
+        return answer.toString();
+    }
+}
+================================================================================================================================================================================================================
